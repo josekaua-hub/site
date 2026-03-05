@@ -1,40 +1,40 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            background-color: #158b31; 
-            font-family: Arial, sans-serif;
-        }
-
-        .faixa-topo {
-            background-color: #19f009;
-            height: 100px; 
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .conteudo {
-            padding: 1%;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-
-    <div class="faixa-topo">
-        <h1>Cor de Cima (Topo)</h1>
+  <header class="main-header">
+    <div class="logo">
+        <img src="{% static 'images/SENAR.png' %}" alt="logo senar" class="img-logo"> 
+        <h1>Agrotech</h1>
     </div>
+    <nav>
+        <ul class="nav-links">
+            <li>Análise de Solo</li>
+            <li>Calculadora</li>
+            <li>Preços</li>
+            <li>Cronograma</li>
+        </ul>
+    </nav>
+</header>
+    
+<div class="container">
+    <nav >
+        <ul>
+            <li>
+                <h1>Otimize a sua plantação de macaxeira</h1>
+            </li>
 
-    <div class="conteudo">
-        <p>Esta cor de fundo está cobrindo o restante da tela.</p>
-    </div>
+            <li>
+                <h3>ferramentas inteligentes para analise de solo e planejamento de safra</h3>
+            </li>
+
+            <li class="centralizado"><h4>Começar analise de solo</h4></li>
+        </ul>
+    </nav>
+</div>
 
 </body>
 </html>
