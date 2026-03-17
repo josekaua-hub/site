@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroTech - Análise de Mandioca</title>
+<link rel="stylesheet" href="{% static 'global/css/style.css' %}">
+    
+</head>
+<body>
+ <header class="main-header">
+    <div class="logo">
+        <h1> <a href="{% url "home" %}", class = "link" >AgroTech</a></h1>
+        <a href="{% url "home" %}", class ="link" > <img src="{% static 'images/SENAR.png' %}" alt="logo senar" class="img-logo"> </a>
+    </div>
+    <nav>
+        <ul class="nav-links">
+            <li>{% block texto %}<a href="{% url "planejador" %}", class = "link" > planejador de plantio </a>{% endblock texto %} </li>  
+            <li>{% block texto2 %}<a href="{% url "calculadora" %}", class = "link" > Calculadora </a>{% endblock texto2 %} </li>  
+            <li>{% block texto3 %} Preço {% endblock texto3 %} </li>  
+            <li>{% block texto4 %}Cronograma {% endblock texto4 %} </li>  
+        </ul>
+    </nav>
+</header>
+
+{% block content %}
+<div class="container">
+    <nav >
+        <ul>
+            <li>
+                <h1>Otimize a sua plantação de macaxeira</h1>
+            </li>
+
+            <li>
+                <h3>ferramentas inteligentes para analise de solo e planejamento de safra</h3>
+            </li>
+
+           <a href="{% url "planejador" %}", class = "link" > <li class="centralizado"><h4>Começar analise de solo</h4></li></a>
+        </ul>
+    </nav>
+</div>
+{% endblock content %}
+</body>
+</html>

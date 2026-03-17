@@ -1,40 +1,7 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
-  <header class="main-header">
-    <div class="logo">
-        <h1>AgroTech</h1>
-        <img src="{% static 'images/SENAR.png' %}" alt="logo senar" class="img-logo"> 
-    </div>
-    <nav>
-        <ul class="nav-links">
-            <li>Análise de Solo</li>
-            <li>Calculadora</li>
-            <li>Preços</li>
-            <li>Cronograma</li>
-        </ul>
-    </nav>
-</header>
+{% extends "global/base.html" %}
+
+
+{% block content %}
+
     
-<div class="container">
-    <nav >
-        <ul>
-            <li>
-                <h1>Otimize a sua plantação de macaxeira</h1>
-            </li>
-
-            <li>
-                <h3>ferramentas inteligentes para analise de solo e planejamento de safra</h3>
-            </li>
-
-            <li class="centralizado"><h4>Começar analise de solo</h4></li>
-        </ul>
-    </nav>
-</div>
-
-</body>
-</html>
+{% endblock %}
