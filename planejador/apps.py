@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class AnaliseConfig(AppConfig):
+class PlanejadorConfig(AppConfig):
     name = 'planejador'

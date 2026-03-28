@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    "usuarios",
     'planejador',
-    'calculadora',
+    'diario_campo',
+    "financeiro",
 ]
 
 MIDDLEWARE = [

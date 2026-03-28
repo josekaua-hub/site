@@ -1,0 +1,93 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container"> 
+    <form>
+        <h1> Diario de campo</h1>
+        <br> <br>
+        <label>Data </label>
+        <br>
+        <input type= "date"> 
+        <br> <br>
+        <fieldset> <legend> Tipo de atividade </legend> 
+        <select>
+            <option value="plantio">Plantio</option>
+            <option value="preparo">Preparo do Solo</option>
+            <option value="manejo">Manejo/Tratos Culturais</option>
+            <option value="adubacao">Adubação de Cobertura</option>
+            <option value="tratamento">Tratamento Fitossanitário</option>
+            <option value="colheita">Colheita</option>
+            <option value="climatico">Evento Climático</option>
+            <option value="outro">Outro</option>
+        </select>
+        </fieldset>
+        
+
+        <fieldset> <legend> Preparo do Solo </legend>
+        <input type="checkbox" id="aracao" name="ocorrencia" value="aracao">
+        <label for="aracao"> Aração </label><br>
+        <input type="checkbox" id="gradagem" name="ocorrencia" value="gradagem">
+        <label for="gradagem"> Gradagem </label><br>
+        <input type="checkbox" id="calcario" name="ocorrencia" value="calcario">
+        <label for="calcario"> Aplicação de calcário </label><br>
+        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
+        <label for="outro"> Outro </label><br>
+        </fieldset>
+
+        <fieldset> <legend> Manejo/Tratos Culturais </legend>
+        <input type="checkbox" id="capina" name="ocorrencia" value="capina">
+        <label for="capina"> Capina manual </label><br>
+        <input type="checkbox" id="limpeza" name="ocorrencia" value="limpeza">
+        <label for="limpeza"> Limpeza de mato </label><br>
+        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
+        <label for="outro"> Outro </label><br>
+        </fieldset>
+
+        <fieldset> <legend> Adubação de Cobertura </legend>
+        <input type="checkbox" id="n" name="ocorrencia" value="n">
+        <label for="n"> Aplicação de N </label><br>
+        <input type="checkbox" id="k" name="ocorrencia" value="k">
+        <label for="k"> Aplicação de K </label><br>
+        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
+        <label for="outro"> Outro </label><br>
+        </fieldset>
+
+        <fieldset> <legend> Tratamento fitossanitário </legend>
+        <input type="checkbox" id="formigas" name="ocorrencia" value="formigas">
+        <label for="formigas"> Formigas </label><br>
+        <input type="checkbox" id="acaros" name="ocorrencia" value="acaros">
+        <label for="acaros"> Ácaros </label><br>
+        <input type="checkbox" id="lagartas" name="ocorrencia" value="lagartas">
+        <label for="lagartas"> Lagartas </label><br>
+        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
+        <label for="outro"> Outro </label><br>
+        </fieldset>
+
+        <fieldset> <legend> Evento Climático </legend>
+        <input type="checkbox" id="chuva" name="ocorrencia" value="chuva">
+        <label for="chuva"> Chuva forte </label><br>
+        <input type="checkbox" id="geada" name="ocorrencia" value="geada">
+        <label for="geada"> Geada </label><br>
+        <input type="checkbox" id="seca" name="ocorrencia" value="seca">
+        <label for="seca"> Seca prolongada </label><br>
+        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
+        <label for="outro"> Outro </label><br>
+        </fieldset>
+
+    
+
+
+      
+
+        <br> <br>
+        <label for="resumo"> Resumo</label>
+        <br>
+        <input id= "resumo" type = "text" required>
+        <br> <br>
+        <label for= "detalhe"> detalhe do ocorrido </label>
+        <textarea id="detalhe" rows="4" cols="50"> </textarea>
+    </form>
+
+</div>
+{% endblock content %}

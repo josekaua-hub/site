@@ -19,5 +19,5 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path('', views.calculadora, name='calculadora'),
+    path('', views.diario_campo, name='diario_campo'),
 ]
