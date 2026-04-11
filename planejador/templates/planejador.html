@@ -1,91 +1,132 @@
 {% extends "global/base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'planejador/style.css' %}">
+{% endblock extra_css %}
+
 {% block content %}
 <div class="container"> 
-    <nav> 
-        <h1>Planejador de Plantio</h1>
-        <br>
-        
-        <form id="formulario" method="POST"> 
-            {% csrf_token %} <h2> Dados do campo </h2>
-            <br>
-            <label> Area total(m²): </label> <br>
-            <input id="id_area" type="number" step="0.01" name="area" placeholder="ex:130">  <br> <br>
+    <div class="planejador-layout">
+        <section class="planejador-principal">
+            <h1>Planejador de Plantio</h1>
 
-            <label> Espaçamento entre linhas (m): </label> <br>
-            <input id="id_linhas" type="number" step="0.01" name="linhas" value="1.0" placeholder="ex: 1.0"> <br> <br>
+            <form id="formulario" method="POST"> 
+                {% csrf_token %}
 
-            <label> Espaçamento entre plantas (m): </label> <br>
-            <input id="id_plantas" type="number" step="0.01" name="plantas" value="0.8" placeholder="ex: 0.8">  <br> <br>
+                <h2>Dados do campo</h2>
+                <br>
 
-            <h2> Dados da análise de solo </h2>
-            <br>
-            <label> Saturação por Bases (V1 %): </label> <br>
-            <input id="id_saturacao" type="number" step="0.01" name="saturacao" placeholder="ex: 60"> <br> <br>
+                <div class="form-grupo">
+                    <label for="id_area">Area total (m²):</label>
+                    <input id="id_area" type="number" step="0.01" name="area" placeholder="ex: 130">
+                </div>
 
-            <label> CTC Total (T): </label> <br>
-            <input id="id_ctc" type="number" step="0.01" name="ctc" placeholder="ex: 10"> <br> <br>
+                <div class="form-grupo">
+                    <label for="id_linhas">Espaçamento entre linhas (m):</label>
+                    <input id="id_linhas" type="number" step="0.01" name="linhas" value="1.0" placeholder="ex: 1.0">
+                </div>
 
-            <label> Fósforo (P): </label> <br>
-            <input id="id_fosforo" type="number" step="0.01" name="fosforo" placeholder="ex: 12"> <br> <br>
+                <div class="form-grupo">
+                    <label for="id_plantas">Espaçamento entre plantas (m):</label>
+                    <input id="id_plantas" type="number" step="0.01" name="plantas" value="0.8" placeholder="ex: 0.8">
+                </div>
 
-            <label> Potássio (K): </label> <br>
-            <input id="id_potassio" type="number" step="0.01" name="potassio" placeholder="ex: 0.10"> <br> <br>
+                <h2>Dados da análise de solo</h2>
+                <br>
 
-            <label> Matéria Orgânica (MO): </label> <br>
-            <input id="id_materia" type="number" step="0.01" name="materia" placeholder="ex: 15"> <br> <br>
+                <div class="form-grupo">
+                    <label for="id_saturacao">Saturação por Bases (V1 %):</label>
+                    <input id="id_saturacao" type="number" step="0.01" name="saturacao" placeholder="ex: 60">
+                </div>
 
-            <label> PRNT do Calcário (%): </label> <br>
-            <input id="id_calcario" type="number" step="0.01" name="calcario" value="80" placeholder="ex: 80"> <br> <br>
+                <div class="form-grupo">
+                    <label for="id_ctc">CTC Total (T):</label>
+                    <input id="id_ctc" type="number" step="0.01" name="ctc" placeholder="ex: 10">
+                </div>
 
-            <button type="button" onclick="calcular()">Calcular Insumos ou Plantio</button> 
-        </form>
+                <div class="form-grupo">
+                    <label for="id_fosforo">Fósforo (P):</label>
+                    <input id="id_fosforo" type="number" step="0.01" name="fosforo" placeholder="ex: 12">
+                </div>
 
-        <hr>
+                <div class="form-grupo">
+                    <label for="id_potassio">Potássio (K):</label>
+                    <input id="id_potassio" type="number" step="0.01" name="potassio" placeholder="ex: 0.10">
+                </div>
 
+                <div class="form-grupo">
+                    <label for="id_nitrogenio">Dose de Nitrogênio (kg/ha):</label>
+                    <input id="id_nitrogenio" type="number" step="0.01" name="nitrogenio" value="30" placeholder="ex: 30">
+                </div>
 
-        <div id="resultado" style="margin-top: 20px; display: none;">
-            <h2>📊 Resultados Calculados</h2>
-            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #28a745;">
-                <div id="plantio"></div>
-                <div id="insumos"></div>
-                <p><small>* Os resultados acima foram gerados com base apenas nos campos preenchidos.</small></p>
-                <p><small>* 1 metro de vara rende 5 manivas(cada uma com 20 cm).</small></p>
+                <div class="form-grupo">
+                    <label for="id_materia">Matéria Orgânica (MO):</label>
+                    <input id="id_materia" type="number" step="0.01" name="materia" placeholder="ex: 15">
+                </div>
+
+                <div class="form-grupo">
+                    <label for="id_calcario">PRNT (%) do Calcário:</label>
+                    <input id="id_calcario" type="number" step="0.01" name="calcario" value="80" placeholder="ex: 80">
+                </div>
+
+                <h2>Custo dos insumos</h2>
+                <br>
+                
+                <div class="form-grupo">
+                    <label for="id_quantidade">Quantidade (sacos):</label>
+                    <input id="id_quantidade" type="number" step="0.01" name="quantidade" placeholder="ex: 1">
+                </div>
+
+                <div class="form-grupo">
+                    <label for="id_preco">Preço por saco (R$):</label>
+                    <input id="id_preco" type="number" step="0.01" name="preco" placeholder="ex: 10">
+                </div>
+
+                <button id="botao-calcular" type="button">Calcular Insumos ou Plantio</button> 
+            </form>
+
+            <div id="resultado" class="resultado-box">
+                <h2>📊 Resultados Calculados</h2>
+                <div class="resultado-card">
+                    <div id="plantio"></div>
+                    <div id="insumos"></div>
+                    <div id="custos"></div>
+                    <p><small>* Os resultados acima foram gerados com base apenas nos campos preenchidos.</small></p>
+                    <p><small>* 1 metro de vara rende 5 manivas(cada uma com 20 cm).</small></p>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <script src="{% static 'planejador/calculadora.js' %}"></script>
-        
-        <!-- Bloco de Informações sobre Interações dos Cálculos -->
-        <div style="margin-top: 30px; background-color: #e8f4f8; padding: 20px; border-radius: 8px; border-left: 5px solid #0066cc;">
+        <aside class="guia-calculos">
             <h3>ℹ️ Guia dos Cálculos</h3>
             <p><strong>🌱 1 hectare (ha) → </strong> equivale a 10000 m²</p>
-            
+
             <p><strong>🌱 Plantio e Mudas:</strong> Área + Espaçamento → Covas e Varas necessárias</p>
-            
-            <p><strong>🚜 Fosfatado (P2O5):</strong> Fósforo + Área</p>
-            <ul style="margin-left: 20px; color: #333;">
+
+            <p><strong>🚜 Fósforo (P₂O₅):</strong> Fósforo do solo + Área</p>
+            <ul class="guia-lista">
                 <li><strong>Muito baixo (≤10 mg/dm³):</strong> 60 kg/ha</li>
                 <li><strong>Baixo (10-20 mg/dm³):</strong> 40 kg/ha</li>
                 <li><strong>Médio (>20 mg/dm³):</strong> 20 kg/ha</li>
             </ul>
-            
-            <p><strong>🚜 Potássico (K2O):</strong> Potássio + Área</p>
-            <ul style="margin-left: 20px; color: #333;">
+
+            <p><strong>🚜 Potássio (K₂O):</strong> Potássio do solo + Área</p>
+            <ul class="guia-lista">
                 <li><strong>Muito baixo (≤0.05 cmolc/dm³):</strong> 40 kg/ha</li>
                 <li><strong>Baixo (0.06-0.10 cmolc/dm³):</strong> 30 kg/ha</li>
                 <li><strong>Médio (0.11-0.15 cmolc/dm³):</strong> 20 kg/ha</li>
                 <li><strong>Alto (>0.15 cmolc/dm³):</strong> 0 kg/ha</li>
             </ul>
-            
-            <p><strong>🚜 Nitrogenado (N):</strong> Área → Dose fixa 30 kg/ha na cobertura</p>
-            
-            <p><strong>⚗️ Calcário:</strong> Saturação + CTC + PRNT + Área → Para elevar saturação a 60%</p>
-            
-            <p style="margin-top: 15px;"><strong>💡 Dica:</strong> Calcule separadamente preenchendo apenas os campos necessários(com exceção da área).</p>
-        </div>
 
-        <hr>
+            <p><strong>🚜 Nitrogênio (N):</strong> Área + Dose (kg/ha) informada no formulário (padrão 30)</p>
+
+            <p><strong>⚗️ Calcário:</strong> Saturação + CTC + PRNT + Área → Para elevar saturação a 60%</p>
+
+            <p class="guia-dica"><strong>💡 Dica:</strong> Preencha apenas os campos do cálculo que deseja fazer. A área deve ser informada sempre.</p>
+        </aside>
+    </div>
+
+    <script src="{% static 'planejador/calculadora.js' %}?v=20260410-4"></script>
 
 {% endblock content %}

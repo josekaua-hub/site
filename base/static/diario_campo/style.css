@@ -1,0 +1,157 @@
+/* ── Formulário principal ── */
+.container form {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #ffffff;
+}
+
+.container form h1 {
+    font-size: 1.6rem;
+    border-bottom: 2px solid #ffffff50;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+}
+
+/* ── Labels ── */
+.container form > label {
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-top: 6px;
+}
+
+/* ── Input texto / data ── */
+.container form input[type="date"],
+.container form input[type="text"],
+.container form textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.95rem;
+    background-color: #ffffff;
+    color: #2d2d2d;
+    outline: none;
+    transition: box-shadow 0.2s;
+}
+
+.container form input[type="date"]:focus,
+.container form input[type="text"]:focus,
+.container form textarea:focus {
+    box-shadow: 0 0 0 3px #28a74560;
+}
+
+.container form textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+/* ── Fieldset tipo de atividade ── */
+.container form > fieldset {
+    border: 2px solid #ffffff40;
+    border-radius: 10px;
+    padding: 14px 18px;
+    background-color: #3a7358;
+}
+
+.container form > fieldset legend {
+    font-weight: bold;
+    padding: 0 8px;
+    font-size: 0.9rem;
+    color: #d4f5e2;
+}
+
+/* ── Select ── */
+.container form select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.95rem;
+    background-color: #ffffff;
+    color: #2d2d2d;
+    cursor: pointer;
+    outline: none;
+    transition: box-shadow 0.2s;
+    margin-top: 6px;
+}
+
+.container form select:focus {
+    box-shadow: 0 0 0 3px #28a74560;
+}
+
+/* ── Fieldsets de checkbox (tabela) ── */
+.tabela {
+    margin-top: 4px;
+    display: none;
+    background-color: #2e6349;
+    padding: 18px 20px;
+    border-radius: 10px;
+    border: 2px solid #28a74580;
+    border-left: 5px solid #28a745;
+    animation: fadeIn 0.25s ease;
+}
+
+.tabela legend {
+    font-weight: bold;
+    color: #d4f5e2;
+    padding: 0 8px;
+    font-size: 0.9rem;
+}
+
+/* ── Checkboxes ── */
+.tabela input[type="checkbox"] {
+    accent-color: #28a745;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.tabela label {
+    cursor: pointer;
+    font-size: 0.95rem;
+    vertical-align: middle;
+    line-height: 2;
+}
+
+/* ── Animação ao aparecer ── */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Botão Salvar ── */
+.btn-salvar {
+    margin-top: 10px;
+    width: 100%;
+    padding: 13px;
+    background-color: #28a745;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-salvar:hover {
+    background-color: #1e7e34;
+    transform: scale(1.02);
+}
+
+.btn-salvar:active {
+    transform: scale(0.98);
+}
+
+/* ── Responsividade ── */
+@media (max-width: 600px) {
+    .container form {
+        gap: 8px;
+    }
+}
+

@@ -1,0 +1,166 @@
+#formulario {
+    text-align: left;
+}
+
+#formulario input {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    margin-top: 0;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+}
+
+.form-grupo {
+    margin-bottom: 14px;
+}
+
+.form-grupo label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+#formulario h2 {
+    margin-top: 20px;
+    color: #ffffff;
+    border-bottom: 2px solid #ffffff50;
+    padding-bottom: 5px;
+}
+
+#formulario button {
+    margin-top: 30px;
+    background-color: #ffffff;
+    color: #376A4F;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#formulario button:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.05);
+}
+
+.planejador-layout {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.95fr);
+    gap: 32px;
+    align-items: start;
+}
+
+.planejador-principal {
+    width: 100%;
+}
+
+.planejador-principal h1 {
+    color: #ffffff;
+}
+
+.resultado-box {
+    margin-top: 20px;
+    display: none;
+    text-align: left;
+}
+
+.resultado-card {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid #28a745;
+}
+
+.resultado-card > div:empty {
+    display: none;
+}
+
+.resultado-card > div + div {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #d9dde2;
+}
+
+.resultado-card h3 {
+    margin: 0 0 6px;
+}
+
+.guia-calculos {
+    position: sticky;
+    top: 100px;
+    background-color: #e8f4f8;
+    padding: 18px;
+    border-radius: 8px;
+    border-left: 5px solid #0066cc;
+    text-align: left;
+}
+
+.guia-calculos h3 {
+    margin: 0 0 12px;
+    color: #1f3b53;
+    font-size: 1.05rem;
+}
+
+.guia-calculos p {
+    margin: 0 0 10px;
+    color: #4d5c68;
+    line-height: 1.45;
+}
+
+.container .guia-lista {
+    display: block;
+    list-style: disc;
+    margin: 6px 0 12px;
+    padding-left: 20px;
+    color: #5f6b76;
+    align-items: initial;
+    gap: 0;
+}
+
+.container .guia-lista li {
+    display: list-item;
+    color: #5f6b76;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.guia-lista strong {
+    color: #44515c;
+}
+
+.guia-dica {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(68, 81, 92, 0.14);
+    color: #33424f;
+}
+
+@media (max-width: 900px) {
+    .planejador-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .guia-calculos {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    #formulario {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #formulario input {
+        max-width: 100%;
+    }
+
+    #formulario button {
+        width: 100%;
+    }
+}

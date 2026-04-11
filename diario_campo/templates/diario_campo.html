@@ -1,6 +1,10 @@
 {% extends "global/base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diario_campo/style.css' %}">
+{% endblock extra_css %}
+
 {% block content %}
 <div class="container"> 
     <form>
@@ -8,10 +12,10 @@
         <br> <br>
         <label>Data </label>
         <br>
-        <input type= "date"> 
+        <input type="date" id="data" name="data"> 
         <br> <br>
         <fieldset> <legend> Tipo de atividade </legend> 
-        <select>
+        <select id="tipo-atividade">
             <option value="plantio">Plantio</option>
             <option value="preparo">Preparo do Solo</option>
             <option value="manejo">Manejo/Tratos Culturais</option>
@@ -24,7 +28,7 @@
         </fieldset>
         
 
-        <fieldset> <legend> Preparo do Solo </legend>
+        <fieldset id="preparo-solo"  class="tabela"> <legend> Preparo do Solo </legend>
         <input type="checkbox" id="aracao" name="ocorrencia" value="aracao">
         <label for="aracao"> Aração </label><br>
         <input type="checkbox" id="gradagem" name="ocorrencia" value="gradagem">
@@ -35,7 +39,7 @@
         <label for="outro"> Outro </label><br>
         </fieldset>
 
-        <fieldset> <legend> Manejo/Tratos Culturais </legend>
+        <fieldset id="manejo-tratos" class="tabela"> <legend> Manejo/Tratos Culturais </legend>
         <input type="checkbox" id="capina" name="ocorrencia" value="capina">
         <label for="capina"> Capina manual </label><br>
         <input type="checkbox" id="limpeza" name="ocorrencia" value="limpeza">
@@ -44,7 +48,7 @@
         <label for="outro"> Outro </label><br>
         </fieldset>
 
-        <fieldset> <legend> Adubação de Cobertura </legend>
+        <fieldset id="adubacao-cobertura" class="tabela"> <legend> Adubação de Cobertura </legend>
         <input type="checkbox" id="n" name="ocorrencia" value="n">
         <label for="n"> Aplicação de N </label><br>
         <input type="checkbox" id="k" name="ocorrencia" value="k">
@@ -53,7 +57,7 @@
         <label for="outro"> Outro </label><br>
         </fieldset>
 
-        <fieldset> <legend> Tratamento fitossanitário </legend>
+        <fieldset id="tratamento-fitossanitario" class="tabela"> <legend> Tratamento fitossanitário </legend>
         <input type="checkbox" id="formigas" name="ocorrencia" value="formigas">
         <label for="formigas"> Formigas </label><br>
         <input type="checkbox" id="acaros" name="ocorrencia" value="acaros">
@@ -64,7 +68,7 @@
         <label for="outro"> Outro </label><br>
         </fieldset>
 
-        <fieldset> <legend> Evento Climático </legend>
+        <fieldset id="evento-climatico" class="tabela"> <legend> Evento Climático </legend>
         <input type="checkbox" id="chuva" name="ocorrencia" value="chuva">
         <label for="chuva"> Chuva forte </label><br>
         <input type="checkbox" id="geada" name="ocorrencia" value="geada">
@@ -87,7 +91,10 @@
         <br> <br>
         <label for= "detalhe"> detalhe do ocorrido </label>
         <textarea id="detalhe" rows="4" cols="50"> </textarea>
+
+        <button type="submit" class="btn-salvar">Salvar Registro</button>
     </form>
 
+    <script src="{% static 'diario_campo/diario.js' %}"></script>
 </div>
 {% endblock content %}
