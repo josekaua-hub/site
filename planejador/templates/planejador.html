@@ -57,7 +57,7 @@
 
                 <div class="form-grupo">
                     <label for="id_nitrogenio">Dose de Nitrogênio (kg/ha):</label>
-                    <input id="id_nitrogenio" type="number" step="0.01" name="nitrogenio" value="30" placeholder="ex: 30">
+                    <input id="id_nitrogenio" type="number" step="0.01" name="nitrogenio" placeholder="ex: 30">
                 </div>
 
                 <div class="form-grupo">
@@ -81,6 +81,26 @@
                 <div class="form-grupo">
                     <label for="id_preco">Preço por saco (R$):</label>
                     <input id="id_preco" type="number" step="0.01" name="preco" placeholder="ex: 10">
+                </div>
+
+                <div class="form-grupo">
+                    <label for="id_preco_fosforo">Preço do Fósforo (R$/saco):</label>
+                    <input id="id_preco_fosforo" type="number" step="0.01" name="preco_fosforo" placeholder="ex: 210">
+                </div>
+
+                <div class="form-grupo">
+                    <label for="id_preco_potassio">Preço do Potássio (R$/saco):</label>
+                    <input id="id_preco_potassio" type="number" step="0.01" name="preco_potassio" placeholder="ex: 230">
+                </div>
+
+                <div class="form-grupo">
+                    <label for="id_preco_nitrogenio">Preço do Nitrogênio (R$/saco):</label>
+                    <input id="id_preco_nitrogenio" type="number" step="0.01" name="preco_nitrogenio" placeholder="ex: 260">
+                </div>
+
+                <div class="form-grupo">
+                    <label for="id_preco_calcario">Preço do Calcário (R$/saco):</label>
+                    <input id="id_preco_calcario" type="number" step="0.01" name="preco_calcario" placeholder="ex: 35">
                 </div>
 
                 <button id="botao-calcular" type="button">Calcular Insumos ou Plantio</button> 
@@ -119,14 +139,14 @@
                 <li><strong>Alto (>0.15 cmolc/dm³):</strong> 0 kg/ha</li>
             </ul>
 
-            <p><strong>🚜 Nitrogênio (N):</strong> Área + Dose (kg/ha) informada no formulário (padrão 30)</p>
+            <p><strong>🚜 Nitrogênio (N):</strong> Área + Dose (kg/ha) informada no formulário. Se vazio, usa padrão 30.</p>
 
             <p><strong>⚗️ Calcário:</strong> Saturação + CTC + PRNT + Área → Para elevar saturação a 60%</p>
 
-            <p class="guia-dica"><strong>💡 Dica:</strong> Preencha apenas os campos do cálculo que deseja fazer. A área deve ser informada sempre.</p>
+            <p class="guia-dica"><strong>💡 Dica:</strong> Para custo recomendado, preencha os preços por insumo. O preço por saco geral pode ser usado como apoio rápido.</p>
         </aside>
     </div>
 
-    <script src="{% static 'planejador/calculadora.js' %}?v=20260410-4"></script>
+    <script src="{% static 'planejador/calculadora.js' %}?v=20260411-3"></script>
 
 {% endblock content %}

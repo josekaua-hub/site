@@ -25,6 +25,7 @@ urlpatterns = [
     path('planejador/', include('planejador.urls')),
     path('diario_campo/', include('diario_campo.urls')),
     path('financeiro/', include('financeiro.urls')),
+    path('fitopatologia/', include('Fitopatologia.urls')),
     
 
 ]

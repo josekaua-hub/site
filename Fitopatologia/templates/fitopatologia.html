@@ -1,0 +1,82 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'Fitopatologia/style.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="container fitopatologia-content">
+    <header class="fitopatologia-header">
+        <h1>Fitopatologia</h1>
+        <p class="fitopatologia-subtitle">Consulte informações sobre doenças da mandioca por fungos ou bactérias.</p>
+    </header>
+
+    <article id="fungos" class="fitopatologia-section">
+        <h2>Doenças por fungos</h2>
+        <p>Estas doenças são causadas por fungos e costumam aparecer em condições de alta umidade ou estresse na planta.</p>
+        <div class="fitopatologia-grid">
+            <div class="disease-card" data-disease="antracnose">
+                <div class="disease-image">
+                    <img src="{% static 'images/default-disease.jpg' %}" alt="Antracnose">
+                </div>
+                <h3>Antracnose</h3>
+            </div>
+            <div class="disease-card" data-disease="oidio">
+                <div class="disease-image">
+                    <img src="{% static 'images/default-disease.jpg' %}" alt="Oídio">
+                </div>
+                <h3>Oídio</h3>
+            </div>
+            <div class="disease-card" data-disease="podridao-radicular">
+                <div class="disease-image">
+                    <img src="{% static 'images/default-disease.jpg' %}" alt="Podridão radicular">
+                </div>
+                <h3>Podridão radicular</h3>
+            </div>
+            <div class="disease-card" data-disease="ferrugem">
+                <div class="disease-image">
+                    <img src="{% static 'images/default-disease.jpg' %}" alt="Ferrugem">
+                </div>
+                <h3>Ferrugem</h3>
+            </div>
+        </div>
+    </article>
+
+    <article id="bacterias" class="fitopatologia-section">
+        <h2>Doenças por bactérias</h2>
+        <p>Estas doenças são causadas por bactérias e normalmente ocorrem quando a planta está com ferimentos ou em condições de estresse.</p>
+        <div class="fitopatologia-grid">
+            <div class="disease-card" data-disease="bacteriose">
+                <div class="disease-image">
+                    <img src="{% static 'images/default-disease.jpg' %}" alt="Bacteriose">
+                </div>
+                <h3>Bacteriose</h3>
+            </div>
+            <div class="disease-card" data-disease="mancha-bacteriana">
+                <div class="disease-image">
+                    <img src="{% static 'images/default-disease.jpg' %}" alt="Mancha bacteriana">
+                </div>
+                <h3>Mancha bacteriana</h3>
+            </div>
+            <div class="disease-card" data-disease="apodrecimento-bacteriano">
+                <div class="disease-image">
+                    <img src="{% static 'images/default-disease.jpg' %}" alt="Apodrecimento bacteriano">
+                </div>
+                <h3>Apodrecimento bacteriano</h3>
+            </div>
+        </div>
+    </article>
+</div>
+
+<!-- Modal para detalhes da doença -->
+<div id="diseaseModal" class="disease-modal">
+    <div class="disease-modal-content">
+        <span class="disease-modal-close">&times;</span>
+        <h2 id="diseaseModalTitle"></h2>
+        <div id="diseaseModalBody"></div>
+    </div>
+</div>
+
+<script src="{% static 'Fitopatologia/fitopatologia.js' %}"></script>
+{% endblock %}

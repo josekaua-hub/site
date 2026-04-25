@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'planejador',
     'diario_campo',
     "financeiro",
+    'Fitopatologia',
 ]
 
 MIDDLEWARE = [
