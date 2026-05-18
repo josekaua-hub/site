@@ -25,6 +25,7 @@
 /* ── Input texto / data ── */
 .container form input[type="date"],
 .container form input[type="text"],
+.container form input[type="number"],
 .container form textarea {
     width: 100%;
     padding: 10px 14px;
@@ -39,6 +40,7 @@
 
 .container form input[type="date"]:focus,
 .container form input[type="text"]:focus,
+.container form input[type="number"]:focus,
 .container form textarea:focus {
     box-shadow: 0 0 0 3px #28a74560;
 }
@@ -146,6 +148,44 @@
 
 .btn-salvar:active {
     transform: scale(0.98);
+}
+
+/* ── Histórico de registros ── */
+.registro-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.registro-list li {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+
+.registro-data,
+.registro-titulo {
+    display: inline-block;
+    font-size: 0.95rem;
+}
+
+.registro-data {
+    color: #d4f5e2;
+    margin-right: 12px;
+}
+
+.registro-titulo {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.registro-detalhe {
+    margin: 8px 0 0;
+    color: #f4f4f4;
+    line-height: 1.5;
 }
 
 /* ── Responsividade ── */

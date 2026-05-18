@@ -2,99 +2,480 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'diario_campo/style.css' %}">
+<link rel="stylesheet" href="{% static 'diario_campo/diario_campo/style.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
-<div class="container"> 
-    <form>
-        <h1> Diario de campo</h1>
-        <br> <br>
-        <label>Data </label>
-        <br>
-        <input type="date" id="data" name="data"> 
-        <br> <br>
-        <fieldset> <legend> Tipo de atividade </legend> 
-        <select id="tipo-atividade">
-            <option value="plantio">Plantio</option>
-            <option value="preparo">Preparo do Solo</option>
-            <option value="manejo">Manejo/Tratos Culturais</option>
-            <option value="adubacao">Adubação de Cobertura</option>
-            <option value="tratamento">Tratamento Fitossanitário</option>
-            <option value="colheita">Colheita</option>
-            <option value="climatico">Evento Climático</option>
-            <option value="outro">Outro</option>
-        </select>
-        </fieldset>
-        
+<div class="selection-container">
+    <section>
+        <div class="section-header">
+            <div>
+                <h2>Registrar novo registro</h2>
+                <p class="current-field">Campo selecionado: <strong>{{ campo.nome }}</strong></p>
+            </div>
+            <div>
+                <a class="change-field-link" href="{% url 'diario_campo' %}">Selecionar outro campo</a>
+                <a class="change-field-link" href="{% url 'editar_campo' campo.id %}">Configurar campo</a>
+            </div>
+        </div>
 
-        <fieldset id="preparo-solo"  class="tabela"> <legend> Preparo do Solo </legend>
-        <input type="checkbox" id="aracao" name="ocorrencia" value="aracao">
-        <label for="aracao"> Aração </label><br>
-        <input type="checkbox" id="gradagem" name="ocorrencia" value="gradagem">
-        <label for="gradagem"> Gradagem </label><br>
-        <input type="checkbox" id="calcario" name="ocorrencia" value="calcario">
-        <label for="calcario"> Aplicação de calcário </label><br>
-        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
-        <label for="outro"> Outro </label><br>
-        </fieldset>
+        {% if colheita_done %}
+            <div class="form-note">
+                A colheita já foi registrada para este campo. Não é mais possível adicionar novos registros aqui; apenas a visualização do histórico está disponível.
+            </div>
+        {% else %}
+            <form method="post" class="registro-form">
+                {% csrf_token %}
+                {% if error_message %}
+                    <div class="form-error">{{ error_message }}</div>
+                {% endif %}
 
-        <fieldset id="manejo-tratos" class="tabela"> <legend> Manejo/Tratos Culturais </legend>
-        <input type="checkbox" id="capina" name="ocorrencia" value="capina">
-        <label for="capina"> Capina manual </label><br>
-        <input type="checkbox" id="limpeza" name="ocorrencia" value="limpeza">
-        <label for="limpeza"> Limpeza de mato </label><br>
-        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
-        <label for="outro"> Outro </label><br>
-        </fieldset>
+                <label for="data">Data da Atividade</label>
+                <input type="date" id="data" name="data" required>
 
-        <fieldset id="adubacao-cobertura" class="tabela"> <legend> Adubação de Cobertura </legend>
-        <input type="checkbox" id="n" name="ocorrencia" value="n">
-        <label for="n"> Aplicação de N </label><br>
-        <input type="checkbox" id="k" name="ocorrencia" value="k">
-        <label for="k"> Aplicação de K </label><br>
-        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
-        <label for="outro"> Outro </label><br>
-        </fieldset>
+                <label for="tipo_atividade">Tipo de Atividade</label>
+                <select id="tipo_atividade" name="tipo_atividade" required>
+                <option value="" disabled selected>Selecione o tipo de atividade</option>
+                {% for atividade in atividade_info %}
+                    <option value="{{ atividade.value }}" {% if atividade.one_time and atividade.value in used_one_time_atividades %}disabled{% endif %}>
+                        {{ atividade.label }}{% if atividade.one_time and atividade.value in used_one_time_atividades %} (já registrado){% endif %}
+                    </option>
+                {% endfor %}
+            </select>
 
-        <fieldset id="tratamento-fitossanitario" class="tabela"> <legend> Tratamento fitossanitário </legend>
-        <input type="checkbox" id="formigas" name="ocorrencia" value="formigas">
-        <label for="formigas"> Formigas </label><br>
-        <input type="checkbox" id="acaros" name="ocorrencia" value="acaros">
-        <label for="acaros"> Ácaros </label><br>
-        <input type="checkbox" id="lagartas" name="ocorrencia" value="lagartas">
-        <label for="lagartas"> Lagartas </label><br>
-        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
-        <label for="outro"> Outro </label><br>
-        </fieldset>
+            <div id="recurso-container" style="display: none;">
+                <label for="recurso_tipo">O que foi utilizado</label>
+                <select id="recurso_tipo" name="recurso_tipo">
+                    <option value="" disabled selected>Selecione o recurso</option>
+                </select>
+            </div>
 
-        <fieldset id="evento-climatico" class="tabela"> <legend> Evento Climático </legend>
-        <input type="checkbox" id="chuva" name="ocorrencia" value="chuva">
-        <label for="chuva"> Chuva forte </label><br>
-        <input type="checkbox" id="geada" name="ocorrencia" value="geada">
-        <label for="geada"> Geada </label><br>
-        <input type="checkbox" id="seca" name="ocorrencia" value="seca">
-        <label for="seca"> Seca prolongada </label><br>
-        <input type="checkbox" id="outro" name="ocorrencia" value="outro">
-        <label for="outro"> Outro </label><br>
-        </fieldset>
+            <label for="quantidade_unidade">Unidade da Quantidade</label>
+            <select id="quantidade_unidade" name="quantidade_unidade" required>
+                <option value="" disabled selected>Selecione a unidade</option>
+            </select>
 
-    
+            <div id="medida-container" style="display: none;">
+                <label for="medida_tipo">Período / Medida</label>
+                <select id="medida_tipo" name="medida_tipo">
+                    <option value="" disabled selected>Selecione a medida</option>
+                </select>
+            </div>
 
+            <p id="tipo-description" class="tipo-description">Selecione uma atividade para ver o tipo de quantidade mais adequado.</p>
+            <p id="tipo-help" class="tipo-help">Cada atividade tem um contexto de quantidade diferente: horas, vezes ou unidade.</p>
 
-      
+            <label for="titulo">Título</label>
+            <input id="titulo" name="titulo" type="text" placeholder="Ex: Preparo do Solo" required>
 
-        <br> <br>
-        <label for="resumo"> Resumo</label>
-        <br>
-        <input id= "resumo" type = "text" required>
-        <br> <br>
-        <label for= "detalhe"> detalhe do ocorrido </label>
-        <textarea id="detalhe" rows="4" cols="50"> </textarea>
+            <label for="detalhe">Detalhe da Atividade</label>
+            <textarea id="detalhe" name="detalhe" rows="3"></textarea>
 
-        <button type="submit" class="btn-salvar">Salvar Registro</button>
-    </form>
+            <label for="quantidade" id="quantidade-label">Quantidade de Eventos (ou Escala)</label>
+            <input type="text" inputmode="decimal" id="quantidade" name="quantidade" step="0.01" value="1" required pattern="\d+(\.|,)?\d*" placeholder="1">
+            <p id="quantidade-note" class="quantidade-note">Se for atividade pontual, use 1. Para recorrentes, registre o número de vezes ou a duração.</p>
 
-    <script src="{% static 'diario_campo/diario.js' %}"></script>
+            <label for="valor_gasto">Valor/Gasto (R$)</label>
+            <input type="text" inputmode="decimal" id="valor_gasto" name="valor_gasto" step="0.01" value="0" placeholder="0.00" required pattern="\d+(\.|,)?\d*">
+
+            <fieldset id="producaoCustosFieldset" class="producao-custos" style="display: none;">
+                <legend>Dados de produção e custos</legend>
+
+                <label for="quantidade_produzida">Quantidade Produzida</label>
+                <input type="text" inputmode="decimal" id="quantidade_produzida" name="quantidade_produzida" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="preco_unitario">Preço Unitário (R$)</label>
+                <input type="text" inputmode="decimal" id="preco_unitario" name="preco_unitario" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_sementes">Custo Sementes/Mudas (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_sementes" name="custo_sementes" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_adubo">Custo Adubo/Fertilizantes (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_adubo" name="custo_adubo" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_defensivos">Custo Defensivos/Agrotóxicos (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_defensivos" name="custo_defensivos" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_agua">Custo Irrigação/Água (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_agua" name="custo_agua" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_mao_obra">Custo Mão de Obra (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_mao_obra" name="custo_mao_obra" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_energia">Custo Energia/Combustível (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_energia" name="custo_energia" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_colheita">Custo Colheita/Processamento (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_colheita" name="custo_colheita" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_transporte">Custo Transporte/Embalagem (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_transporte" name="custo_transporte" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_aluguel">Custo Aluguel/Uso da Terra (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_aluguel" name="custo_aluguel" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="custo_manutencao">Custo Manutenção de Equipamentos (R$)</label>
+                <input type="text" inputmode="decimal" id="custo_manutencao" name="custo_manutencao" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
+
+                <label for="ciclos_por_ano">Ciclos por Ano</label>
+                <input type="number" id="ciclos_por_ano" name="ciclos_por_ano" min="1" value="1" step="1" placeholder="1">
+            </fieldset>
+
+            <button type="submit">Salvar Registro</button>
+            </form>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Histórico de registros</h2>
+        {% if registros %}
+            <ul class="registro-list">
+                {% for registro in registros %}
+                    <li class="registro-item">
+                        <div class="registro-header" data-registro-id="{{ registro.id }}" data-titulo="{{ registro.titulo }}" data-tipo="{{ registro.get_tipo_atividade_display }}" data-data="{{ registro.data|date:'d/m/Y' }}" data-detalhe="{{ registro.detalhe }}" data-quantidade="{{ registro.quantidade }}" data-quantidade-unidade="{{ registro.quantidade_unidade }}" data-valor="{{ registro.valor_gasto }}" data-quantidade-produzida="{{ registro.quantidade_produzida }}" data-preco-unitario="{{ registro.preco_unitario }}">
+                            <div class="registro-header-left">
+                                <div class="registro-title-row">
+                                    <span class="registro-titulo">{{ registro.titulo }}</span>
+                                    <span class="registro-valor-header">R$ {{ registro.valor_gasto|floatformat:2 }}</span>
+                                </div>
+                                <div class="registro-meta">
+                                    <span class="registro-summary">{{ registro.get_tipo_atividade_display }}</span>
+                                    <span class="registro-date">{{ registro.data|date:'d/m/Y' }}</span>
+                                    {% if registro.tipo_atividade == 'colheita' %}
+                                        <span class="registro-prod">Qtd produzida: {{ registro.quantidade_produzida }} {% if registro.quantidade_unidade %}{{ registro.quantidade_unidade }}{% else %}unidades{% endif %}</span>
+                                        <span class="registro-preco">Preço unit.: R$ {{ registro.preco_unitario|floatformat:2 }}</span>
+                                    {% else %}
+                                        <span class="registro-qty">Quantidade: {{ registro.quantidade }} {% if registro.quantidade_unidade %}{{ registro.quantidade_unidade }}{% endif %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="registro-actions">
+                                <a href="{% url 'download_registro' registro.id %}" class="download-icon" title="Baixar Registro">📄</a>
+                                <form method="post" action="{% url 'excluir_registro' registro.id %}" class="registro-delete-form">
+                                    {% csrf_token %}
+                                    <button type="submit">Excluir</button>
+                                </form>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Não há registros para este campo ainda.</p>
+        {% endif %}
+    </section>
 </div>
+
+<div id="registro-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h3 id="modal-titulo"></h3>
+        <p id="modal-tipo"></p>
+        <p id="modal-data"></p>
+        <p id="modal-quantidade"></p>
+        <p id="modal-valor"></p>
+        <p id="modal-detalhe"></p>
+    </div>
+</div>
+<script src="{% static 'diario_campo/diario.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('tipo_atividade');
+    const quantidadeNote = document.getElementById('quantidade-note');
+    const tituloInput = document.getElementById('titulo');
+    const tipoHelp = document.getElementById('tipo-help');
+    const tipoDescription = document.getElementById('tipo-description');
+
+    const tipoData = {
+        'preparo_solo': {
+            label: 'Preparo do Solo',
+            description: 'Abertura de covas, aração ou uso de enxada.',
+            message: 'Quantidade: use 1 para preparo do solo. Esta atividade é única por campo.',
+            quantidadeLabel: 'Quantidade (Unidade)',
+            unitOptions: ['unidade']
+        },
+        'plantio': {
+            label: 'Plantio',
+            description: 'O ato de colocar as manivas no solo.',
+            message: 'Quantidade: registre o número de linhas e colunas no formato linhas x colunas (ex: 3x2).',
+            quantidadeLabel: 'Número de Linhas x Colunas',
+            unitOptions: [],  // No unit select for plantio
+            // No resourceOptions for plantio
+        },
+        'adubacao': {
+            label: 'Adubação',
+            description: 'Adubagem do solo ou das plantas.',
+            message: 'Quantidade: informe aplicações ou quantidade de insumo usado, conforme o plano.',
+            quantidadeLabel: 'Quantidade (Aplicações ou Sacas)',
+            unitOptions: ['aplicação', 'saca', 'kg'],
+            resourceOptions: ['adubo', 'fertilizante'],
+            resourceUnitMap: { 'adubo': 'saca', 'fertilizante': 'kg' }
+        },
+        'irrigacao': {
+            label: 'Irrigação',
+            description: 'Se houver controle de água.',
+            message: 'Quantidade: registre a duração em horas ou o número de irrigações.',
+            quantidadeLabel: 'Quantidade (Horas ou Irrigações)',
+            unitOptions: ['hora', 'irrigação', 'volume']
+        },
+        'capina': {
+            label: 'Capina / Controle de Mato',
+            description: 'Remoção de plantas daninhas.',
+            message: 'Quantidade: indique o número de vezes ou a duração em horas.',
+            quantidadeLabel: 'Quantidade (Vezes ou Horas)',
+            unitOptions: ['vez', 'hora', 'unidade'],
+            resourceOptions: ['capina', 'herbicida']
+        },
+        'controle_pragas_doencas': {
+            label: 'Controle de Pragas e Doenças',
+            description: 'remoção manual, aplicação de defensivos ou controle biológico.',
+            message: 'Quantidade: registre o número de aplicações ou o nível de controle realizado.',
+            quantidadeLabel: 'Quantidade (Aplicações ou Intensidade)',
+            unitOptions: ['aplicação', 'kg', 'litro'],
+            resourceOptions: ['defensivo', 'controle biológico', 'outro'],
+            resourceUnitMap: { 'defensivo': 'litro', 'controle biológico': 'aplicação', 'outro': 'kg' }
+        },
+        'energia_combustivel': {
+            label: 'Energia / Combustível',
+            description: 'Consumo de diesel, gasolina ou energia elétrica.',
+            message: 'Quantidade: selecione se foi energia ou combustível.',
+            quantidadeLabel: 'Quantidade',
+            unitOptions: [],  // No unit select, determined by resource
+            resourceOptions: ['energia', 'combustível'],
+            resourceUnitMap: { 'energia': 'kWh', 'combustível': 'litro' }
+            // Removed measureOptions
+        },
+        'transporte_embalagem': {
+            label: 'Transporte / Embalagem',
+            description: 'Custos com transporte, embalagens e logística.',
+            message: 'Quantidade: selecione transporte ou embalagem e registre o volume/unidade.',
+            quantidadeLabel: 'Quantidade (Viagens ou Unidades)',
+            unitOptions: ['viagem', 'unidade', 'embalagem'],
+            resourceOptions: ['transporte', 'embalagem'],
+            resourceUnitMap: { 'transporte': 'viagem', 'embalagem': 'unidade' },
+            measureOptions: ['hora', 'dia', 'mês']
+        },
+        'colheita': {
+            label: 'Colheita',
+            description: 'O fechamento do ciclo.',
+            message: 'Quantidade: use 1 para a colheita. Esta atividade é única por campo.',
+            quantidadeLabel: 'Quantidade (Unidade)',
+            unitOptions: ['kg', 'saca', 'unidade'],
+            // Removed resourceOptions and measureOptions
+        }
+    };
+
+    function updateTipoInfo(value) {
+        const tipoInfo = tipoData[value];
+        const quantidadeLabel = document.getElementById('quantidade-label');
+        const unidadeSelect = document.getElementById('quantidade_unidade');
+        const recursoSelect = document.getElementById('recurso_tipo');
+        const recursoContainer = document.getElementById('recurso-container');
+        const medidaSelect = document.getElementById('medida_tipo');
+        const medidaContainer = document.getElementById('medida-container');
+        
+        if (!tipoInfo) {
+            quantidadeNote.textContent = 'Registre a quantidade de eventos ou a escala.';
+            tipoHelp.textContent = 'Cada atividade tem um contexto de quantidade diferente: horas, vezes ou unidade.';
+            tipoDescription.textContent = 'Selecione uma atividade para ver o tipo de quantidade mais adequado.';
+            tituloInput.placeholder = 'Ex: Preparo do Solo';
+            quantidadeLabel.textContent = 'Quantidade de Eventos (ou Escala)';
+            unidadeSelect.innerHTML = '<option value="" disabled selected>Selecione a unidade</option><option value="unidade">Unidade</option>';
+            recursoContainer.style.display = 'none';
+            medidaContainer.style.display = 'none';
+            recursoSelect.value = '';
+            medidaSelect.value = '';
+            return;
+        }
+        
+        quantidadeNote.textContent = tipoInfo.message;
+        tipoHelp.textContent = `Atividade selecionada: ${tipoInfo.label}`;
+        tipoDescription.textContent = tipoInfo.description;
+        tituloInput.placeholder = `Título sugerido: ${tipoInfo.label}`;
+        quantidadeLabel.textContent = tipoInfo.quantidadeLabel;
+        if (tipoInfo.unitOptions && tipoInfo.unitOptions.length > 0) {
+            unidadeSelect.innerHTML = '<option value="" disabled selected>Selecione a unidade</option>' + tipoInfo.unitOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+            unidadeSelect.style.display = 'block';
+            document.querySelector('label[for="quantidade_unidade"]').style.display = 'block';
+            unidadeSelect.required = true;
+        } else {
+            unidadeSelect.style.display = 'none';
+            document.querySelector('label[for="quantidade_unidade"]').style.display = 'none';
+            unidadeSelect.value = '';
+            unidadeSelect.required = false;
+        }
+        
+        // Special handling for plantio
+        const quantidadeInput = document.getElementById('quantidade');
+        if (value === 'plantio') {
+            quantidadeInput.placeholder = '3x2';
+            quantidadeInput.pattern = '\\d+x\\d+';
+            quantidadeInput.title = 'Formato: linhas x colunas (ex: 3x2)';
+        } else {
+            quantidadeInput.placeholder = '1';
+            quantidadeInput.pattern = '\\d+(\\.|,)?\\d*';
+            quantidadeInput.title = '';
+        }
+        
+        // Mostrar/ocultar container de recurso
+        if (tipoInfo.resourceOptions && tipoInfo.resourceOptions.length > 0) {
+            recursoContainer.style.display = 'block';
+            recursoSelect.innerHTML = '<option value="" disabled selected>Selecione o recurso</option>' + tipoInfo.resourceOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+            recursoSelect.value = '';
+        } else {
+            recursoContainer.style.display = 'none';
+            recursoSelect.value = '';
+        }
+        
+        // Mostrar/ocultar container de medida
+        if (tipoInfo.measureOptions && tipoInfo.measureOptions.length > 0) {
+            medidaContainer.style.display = 'block';
+            medidaSelect.innerHTML = '<option value="" disabled selected>Selecione a medida</option>' + tipoInfo.measureOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+            medidaSelect.value = '';
+        } else {
+            medidaContainer.style.display = 'none';
+            medidaSelect.value = '';
+        }
+
+        const producaoFieldset = document.getElementById('producaoCustosFieldset');
+        const colheitaCampos = [
+            'quantidade_produzida', 'preco_unitario', 'custo_sementes', 'custo_adubo',
+            'custo_defensivos', 'custo_agua', 'custo_mao_obra', 'custo_energia',
+            'custo_colheita', 'custo_transporte', 'custo_aluguel', 'custo_manutencao',
+            'ciclos_por_ano'
+        ];
+
+        if (value === 'colheita') {
+            producaoFieldset.style.display = 'block';
+            colheitaCampos.forEach(function(nome) {
+                const campo = document.getElementById(nome);
+                if (campo) {
+                    campo.required = true;
+                }
+            });
+        } else {
+            producaoFieldset.style.display = 'none';
+            colheitaCampos.forEach(function(nome) {
+                const campo = document.getElementById(nome);
+                if (campo) {
+                    campo.required = false;
+                }
+            });
+        }
+    }
+
+    // Event listener para auto-selecionar unidade quando recurso é selecionado
+    const recursoSelect = document.getElementById('recurso_tipo');
+    if (recursoSelect) {
+        recursoSelect.addEventListener('change', function() {
+            const selectedTipo = tipoSelect.value;
+            const selectedRecurso = this.value;
+            
+            if (selectedTipo && tipoData[selectedTipo] && tipoData[selectedTipo].resourceUnitMap) {
+                const unidadeMap = tipoData[selectedTipo].resourceUnitMap;
+                if (unidadeMap[selectedRecurso]) {
+                    document.getElementById('quantidade_unidade').value = unidadeMap[selectedRecurso];
+                }
+            }
+        });
+    }
+
+    if (tipoSelect) {
+        tipoSelect.addEventListener('change', function() {
+            updateTipoInfo(this.value);
+        });
+        updateTipoInfo(tipoSelect.value);
+    }
+
+    const quantidadeInput = document.getElementById('quantidade');
+    const valorInput = document.getElementById('valor_gasto');
+
+    function sanitizeNumericInput(input) {
+        input.value = input.value
+            .replace(/[^0-9.,]/g, '')
+            .replace(/,/g, '.')
+            .replace(/(\..*?)\..*/g, '$1');
+    }
+
+    if (quantidadeInput) {
+        quantidadeInput.addEventListener('input', function() {
+            sanitizeNumericInput(this);
+        });
+    }
+
+    if (valorInput) {
+        valorInput.addEventListener('input', function() {
+            sanitizeNumericInput(this);
+        });
+    }
+
+    const registroHeaders = document.querySelectorAll('.registro-header');
+    const modal = document.getElementById('registro-modal');
+    const modalTitulo = document.getElementById('modal-titulo');
+    const modalTipo = document.getElementById('modal-tipo');
+    const modalData = document.getElementById('modal-data');
+    const modalQuantidade = document.getElementById('modal-quantidade');
+    const modalValor = document.getElementById('modal-valor');
+    const modalDetalhe = document.getElementById('modal-detalhe');
+    const modalClose = document.querySelector('.modal-close');
+
+    registroHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const tituloText = this.dataset.titulo;
+            const tipoText = 'Tipo: ' + this.dataset.tipo;
+            const dataText = 'Data: ' + this.dataset.data;
+
+            // Prefer mostrar quantidade produzida para colheita quando disponível
+            let quantidadeText = '';
+            const qtdProduzida = parseFloat(this.dataset.quantidadeProduzida || 0);
+            if (qtdProduzida && !isNaN(qtdProduzida) && qtdProduzida > 0) {
+                const unidade = this.dataset.quantidadeUnidade || 'unidades';
+                quantidadeText = `Quantidade Produzida: ${qtdProduzida} ${unidade}`;
+            } else {
+                quantidadeText = 'Quantidade: ' + this.dataset.quantidade + (this.dataset.quantidadeUnidade ? ` ${this.dataset.quantidadeUnidade}` : '');
+            }
+
+            const valorText = 'Valor: R$ ' + (this.dataset.valor ? parseFloat(this.dataset.valor).toFixed(2) : '0.00');
+            const detalheText = this.dataset.detalhe || 'Sem detalhes.';
+
+            modalTitulo.textContent = tituloText;
+            modalTipo.textContent = tipoText;
+            modalData.textContent = dataText;
+            modalQuantidade.textContent = quantidadeText;
+            modalValor.textContent = valorText;
+            modalDetalhe.textContent = detalheText;
+
+            // Mostrar preço unitário quando disponível
+            const precoUnit = parseFloat(this.dataset.precoUnitario || 0);
+            if (precoUnit && !isNaN(precoUnit) && precoUnit > 0) {
+                let precoNode = document.getElementById('modal-preco');
+                if (!precoNode) {
+                    precoNode = document.createElement('p');
+                    precoNode.id = 'modal-preco';
+                    modalDetalhe.parentNode.insertBefore(precoNode, modalDetalhe);
+                }
+                precoNode.textContent = `Preço unitário: R$ ${precoUnit.toFixed(2)}`;
+            } else {
+                const existing = document.getElementById('modal-preco');
+                if (existing) existing.remove();
+            }
+
+            modal.style.display = 'block';
+        });
+    });
+
+    modalClose.addEventListener('click', function() {
+        // remove preco node when closing modal to avoid duplicates
+        const existing = document.getElementById('modal-preco');
+        if (existing) existing.remove();
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock content %}

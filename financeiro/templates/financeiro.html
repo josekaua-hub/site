@@ -1,5 +1,375 @@
 {% extends "global/base.html" %}
 {% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'financeiro/style.css' %}">
+{% endblock extra_css %}
+
 {% block content %}
-<div class="container">
-    <h1>Financeiro</h1>
+<div class="container calculadora-container">
+    <header class="calculadora-header">
+        <h1>🧮 Calculadora - Análise Financeira de Cultivo</h1>
+    </header>
+
+    <!-- Seção Principal: Entrada e Resultados -->
+    <div class="row">
+        <!-- COLUNA 1: Entrada de Dados -->
+        <div class="col-lg-6">
+            <div class="card card-entrada">
+                <div class="card-header">
+                    <h5>💰 Dados de Entrada</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Dados do Diário de Campo -->
+                    <section class="form-section">
+                        <h6>📘 Dados do Diário de Campo</h6>
+                        <form method="get" class="diario-form">
+                            <div class="form-group">
+                                <label for="campo_id">Campo</label>
+                                <select name="campo_id" id="campo_id" class="form-control" onchange="this.form.submit()">
+                                    <option value="">Selecionar campo</option>
+                                    {% for campo in campos %}
+                                        <option value="{{ campo.id }}" {% if selected_campo and campo.id == selected_campo.id %}selected{% endif %}>
+                                            {{ campo.nome }}{% if not campo.has_colheita %} – sem colheita{% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text">Campos sem colheita ainda podem ser selecionados; preencha os custos manualmente ou use outro campo para auto-preenchimento.</small>
+                            </div>
+                        </form>
+                        {% if selected_campo %}
+                            <div class="diario-summary {% if show_colheita_warning %}diario-warning{% endif %}">
+                                <p><strong>{{ selected_campo.nome }}</strong> carregado do Diário de Campo.</p>
+                                {% if show_colheita_warning %}
+                                    <p>Este campo não possui colheita registrada; os custos foram carregados do diário.</p>
+                                {% endif %}
+                                <p>Total de gastos no diário: R$ {{ total_valor|floatformat:2 }}</p>
+                                {% if total_colheita_quantity and total_colheita_quantity|floatformat:2 != "0.00" %}
+                                    <p>Quantidade registrada na colheita: {{ total_colheita_quantity|floatformat:2 }} unidades</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </section>
+
+                    <!-- Dados de Produção -->
+                    <section class="form-section">
+                        <h6>🌱 Dados de Produção</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Quantidade Produzida</label>
+                                    <input type="number" class="form-control" id="qtdProduzida" 
+                                           placeholder="kg ou unidades" value="{{ prefill.qtdProduzida|default:'0.00' }}" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Preço Unitário de Venda</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="precoUnitario" 
+                                               placeholder="0.00" value="{{ prefill.precoUnitario|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Custos Variáveis -->
+                    <section class="form-section">
+                        <h6>📋 Custos Variáveis (por cultivo)</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Sementes/Mudas</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoSementes" 
+                                               placeholder="0.00" value="{{ prefill.custoSementes|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Adubo/Fertilizantes</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoAdubo" 
+                                               placeholder="0.00" value="{{ prefill.custoAdubo|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Defensivos/Agrotóxicos</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoDefensivos" 
+                                               placeholder="0.00" value="{{ prefill.custoDefensivos|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Irrigação/Água</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoAgua" 
+                                               placeholder="0.00" value="{{ prefill.custoAgua|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mão de Obra (Plantio/Tratos)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoMaoObra" 
+                                               placeholder="0.00" value="{{ prefill.custoMaoObra|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Energia/Combustível</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoEnergia" 
+                                               placeholder="0.00" value="{{ prefill.custoEnergia|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Colheita/Processamento</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoColheita" 
+                                               placeholder="0.00" value="{{ prefill.custoColheita|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Transporte/Embalagem</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoTransporte" 
+                                               placeholder="0.00" value="{{ prefill.custoTransporte|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Custos Fixos -->
+                    <section class="form-section">
+                        <h6>🏠 Custos Fixos (Anualizados)</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Aluguel/Uso da Terra</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoAluguel" 
+                                               placeholder="0.00" value="{{ prefill.custoAluguel|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Manutenção de Equipamentos</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="number" class="form-control" id="custoManutencao" 
+                                               placeholder="0.00" value="{{ prefill.custoManutencao|default:'0.00' }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Ciclos por Ano (para rateio de custos fixos)</label>
+                                    <input type="number" class="form-control" id="ciclosPorAno" 
+                                           placeholder="número" value="{{ prefill.ciclosPorAno|default:'1' }}" step="1" min="1">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Botões de Ação -->
+                    <div class="button-group">
+                        <button class="btn btn-primary btn-lg" onclick="calcularFinanceiro()">
+                            🧮 Calcular
+                        </button>
+                        <button class="btn btn-secondary" onclick="limparFormulario()">
+                            🔄 Limpar
+                        </button>
+                    </div>
+
+                    <form id="saveFixosForm" method="post" action="{% url 'financeiro:salvar_fixos' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="campo_id" value="{{ selected_campo_id }}" />
+                        <input type="hidden" name="custoAluguel" id="hiddenCustoAluguel" />
+                        <input type="hidden" name="custoManutencao" id="hiddenCustoManutencao" />
+                        <button type="button" class="btn btn-outline-success mt-2" onclick="submitSaveFixos()">💾 Salvar custos no Diário</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA 2: Resultados -->
+        <div class="col-lg-6">
+            <div class="card card-resultados">
+                <div class="card-header">
+                    <h5>📈 Resultados da Análise</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Resumo Principal -->
+                    <section class="resultado-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="resultado-box info">
+                                    <small>Receita Total</small>
+                                    <h5 id="receitaTotal">R$ 0,00</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="resultado-box warning">
+                                    <small>Custo Total</small>
+                                    <h5 id="custoTotal">R$ 0,00</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="resultado-box saldo" id="saldoAlert">
+                                    <small>Saldo Final (Lucro/Prejuízo)</small>
+                                    <h4 id="saldoFinal">R$ 0,00</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Indicadores de Desempenho -->
+                    <section class="resultado-section">
+                        <h6>📊 Indicadores de Desempenho</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="indicador">
+                                    <small>Margem de Lucro (%)</small>
+                                    <p id="margemLucro"><strong>0%</strong></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="indicador">
+                                    <small>ROI - Return on Investment (%)</small>
+                                    <p id="roi"><strong>0%</strong></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="indicador">
+                                    <small>Custo Unitário de Produção</small>
+                                    <p id="custoUnitario"><strong>R$ 0,00</strong></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="indicador">
+                                    <small>Lucro por Unidade</small>
+                                    <p id="lucroUnitario"><strong>R$ 0,00</strong></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="indicador">
+                                    <small>Ponto de Equilíbrio (unidades)</small>
+                                    <p id="pontoEquilibrio"><strong>0 unidades</strong></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="indicador">
+                                    <small>Ponto de Equilíbrio (R$)</small>
+                                    <p id="pontoEquilibrioValor"><strong>R$ 0,00</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Detalhamento de Custos -->
+                    <section class="resultado-section">
+                        <h6>💸 Detalhamento de Custos</h6>
+                        <div class="custo-item">
+                            <small>Custos Variáveis (por cultivo)</small>
+                            <h6 id="custosVariaveis">R$ 0,00</h6>
+                        </div>
+                        <div class="custo-item">
+                            <small>Custos Fixos (rateado neste ciclo)</small>
+                            <h6 id="custosFixosCiclo">R$ 0,00</h6>
+                        </div>
+                        <div class="custo-item destaque">
+                            <small>Custo Total (por ciclo)</small>
+                            <h6 id="custoTotalCiclo">R$ 0,00</h6>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção: Cenários e Sensibilidade -->
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card card-cenarios">
+                <div class="card-header">
+                    <h5>📉 Cenários e Sensibilidade</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Variação de Preço (%)</label>
+                                <input type="number" class="form-control" id="variacaoPreco" 
+                                       placeholder="Ex: -10" value="0" step="1">
+                                <small class="form-text">Negativo = redução | Positivo = aumento</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Variação de Quantidade (%)</label>
+                                <input type="number" class="form-control" id="variacaoQtd" 
+                                       placeholder="Ex: 20" value="0" step="1">
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button class="btn btn-info w-100 btn-simular" onclick="calcularCenario()">
+                                📊 Simular Cenário
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row" id="resultadosCenario" style="display: none;">
+                        <div class="col-md-4">
+                            <div class="resultado-box info">
+                                <small>Novo Preço</small>
+                                <h6 id="novoPreco">R$ 0,00</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="resultado-box info">
+                                <small>Nova Quantidade</small>
+                                <h6 id="novaQtd">0 unidades</h6>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="resultado-box saldo" id="novoSaldoAlert">
+                                <small>Novo Saldo</small>
+                                <h6 id="novoSaldo">R$ 0,00</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'financeiro/calculadora.js' %}"></script>
+
+{% endblock content %}
+

@@ -7,10 +7,17 @@ const mapaFieldsets = {
 };
 
 function atualizarFieldsets() {
-    const valor = document.getElementById('tipo-atividade').value;
+    const tipoSelect = document.getElementById('tipo_atividade');
+    if (!tipoSelect) {
+        return;
+    }
+    const valor = tipoSelect.value;
 
     Object.values(mapaFieldsets).forEach(function(id) {
-        document.getElementById(id).style.display = 'none';
+        const element = document.getElementById(id);
+        if (element) {
+            element.style.display = 'none';
+        }
     });
 
     if (mapaFieldsets[valor]) {
