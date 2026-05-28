@@ -83,6 +83,12 @@ def diario_campo(request, campo_id):
             custo_aluguel = request.POST.get('custo_aluguel', '').strip()
             custo_manutencao = request.POST.get('custo_manutencao', '').strip()
             ciclos_por_ano = clean_number(request.POST.get('ciclos_por_ano', '1'))
+            try:
+                ciclos_por_ano = int(float(ciclos_por_ano))
+                if ciclos_por_ano < 1:
+                    ciclos_por_ano = 1
+            except Exception:
+                ciclos_por_ano = 1
 
             # If this is a colheita, attempt to derive preco_unitario from valor_gasto / quantidade_produzida
             try:
@@ -187,6 +193,7 @@ def diario_campo(request, campo_id):
         'error_message': error_message,
         'atividade_info': atividade_info,
         'used_one_time_atividades': used_one_time_atividades,
+        'form_data': request.POST,
     })
 
 

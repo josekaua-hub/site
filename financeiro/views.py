@@ -84,7 +84,7 @@ def financeiro(request):
             custoAgua = pick('agua_sum', 'valor_irrigacao')
             custoMaoObra = pick('mao_obra_sum', 'valor_mao_obra')
             custoEnergia = pick('energia_sum', 'valor_energia')
-            custoColheita = pick('colheita_sum', 'valor_colheita')
+            custoColheita = float(specific_sums.get('colheita_sum') or 0)
             custoTransporte = pick('transporte_sum', 'valor_transporte')
 
             # Aluguel e manutenção: prefer specific sums, else 0
@@ -245,10 +245,16 @@ def salvar_fixos(request):
     except Campo.DoesNotExist:
         return redirect(reverse('financeiro:financeiro'))
 
-    # Parse values
+    # Parse values with support for comma or dot decimal separators and thousands separators
     def to_decimal(name):
+        value = request.POST.get(name) or 0
+        if isinstance(value, str):
+            value = value.strip()
+            if ',' in value and '.' in value:
+                value = value.replace('.', '')
+            value = value.replace(',', '.')
         try:
-            return float(request.POST.get(name) or 0)
+            return float(value)
         except Exception:
             return 0
 

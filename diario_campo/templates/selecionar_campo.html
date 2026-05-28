@@ -1,0 +1,52 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diario_campo/selecionar_campo/style.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="selection-container">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <p class="selection-description">Antes de registrar o diário de campo, deixe o nome do campo pronto e crie-o primeiro. Depois você verá o histórico de campos abaixo.</p>
+
+    <section>
+        <h2>Criar novo campo</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label for="nome_campo">Nome do campo</label>
+            <input id="nome_campo" name="nome_campo" type="text" required>
+            <button type="submit">Criar e iniciar diário</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Histórico de campos</h2>
+        {% if campos %}
+            <p>Selecione um campo já criado para abrir o diário.</p>
+            <ul class="campo-list">
+                {% for campo in campos %}
+                    <li>
+                        <div class="campo-name-download">
+                            <a href="{% url 'diario_campo_form' campo.id %}">{{ campo.nome }}</a>
+                            <a href="{% url 'download_campo_registros' campo.id %}" class="download-campo-btn" title="Baixar Registros">📄</a>
+                        </div>
+                        <form method="post" action="{% url 'excluir_campo' campo.id %}" class="delete-campo-form">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-campo-button">Apagar</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nenhum campo cadastrado ainda.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock content %}

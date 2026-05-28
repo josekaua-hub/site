@@ -45,7 +45,7 @@ class Registro(models.Model):
     quantidade_unidade = models.CharField(max_length=50, blank=True, default='', help_text='Unidade da quantidade')
     recurso_tipo = models.CharField(max_length=50, blank=True, default='', help_text='Recurso utilizado, se aplicável')
     medida_tipo = models.CharField(max_length=50, blank=True, default='', help_text='Período ou medida de consumo, se aplicável')
-    valor_gasto = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), help_text='Custo total da atividade')
+    valor_gasto = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'), help_text='Custo total da atividade')
 
     quantidade_produzida = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
     preco_unitario = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
@@ -80,6 +80,8 @@ class Registro(models.Model):
             self.custo_colheita,
             self.custo_transporte,
         ], Decimal('0.00'))
+        if self.tipo_atividade == 'colheita':
+            return custos
         if custos == Decimal('0.00') and self.valor_gasto:
             return self.valor_gasto
         return custos

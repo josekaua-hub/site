@@ -1,0 +1,199 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #2d5f43 0%, #376a4f 100%);
+    color: #f4f4f4;
+}
+
+body > .selection-container,
+.selection-container {
+    margin: 110px auto 40px;
+    width: min(980px, 92%);
+    padding: 28px;
+    background-color: rgba(21, 73, 44, 0.96);
+    border-radius: 20px;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+    display: block !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    text-align: left;
+}
+
+.selection-description {
+    margin: 0 0 22px;
+    color: #d8e9c7;
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 100%;
+}
+
+.selection-container section {
+    width: 100% !important;
+    margin-bottom: 28px;
+    padding: 22px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    display: block !important;
+}
+
+.selection-container section h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+    color: #f5f5f5;
+}
+
+.selection-container form {
+    display: grid !important;
+    gap: 16px;
+}
+
+.selection-container form label,
+.selection-container form input,
+.selection-container form button {
+    display: block;
+    width: 100%;
+}
+
+.selection-container form label {
+    font-weight: 600;
+    color: #e8f7e8;
+    margin-bottom: 8px;
+}
+
+.selection-container input[type="text"] {
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #f4f4f4;
+}
+
+.selection-container input[type="text"]:focus {
+    outline: none;
+    border-color: #bfe5b2;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.selection-container button {
+    border: none;
+    background: #f4f4f4;
+    color: #1f4428;
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-weight: 700;
+    cursor: pointer;
+    width: auto;
+    justify-self: start;
+}
+
+.selection-container button:hover {
+    filter: brightness(0.94);
+}
+
+.selection-container .campo-list {
+    display: grid;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.selection-container .campo-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 12px 16px;
+}
+
+.campo-name-download {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.selection-container .campo-list li > a {
+    flex: 1;
+}
+
+.selection-container .campo-list a {
+    display: inline-block;
+    text-decoration: none;
+    color: #e8f7e8;
+}
+
+.selection-container .campo-list a:hover {
+    color: #fff;
+}
+
+.delete-campo-form {
+    margin-left: auto;
+}
+
+.delete-campo-button {
+    border: none;
+    background: #d24f4f;
+    color: white;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    min-width: 70px;
+    cursor: pointer;
+}
+
+.delete-campo-button:hover {
+    filter: brightness(0.95);
+}
+
+.download-campo-btn {
+    font-size: 1.2rem;
+    color: #319138;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.download-campo-btn:hover {
+    color: #2c8f32;
+}
+
+.messages {
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.message.success {
+    background-color: rgba(49, 145, 56, 0.2);
+    border: 1px solid rgba(49, 145, 56, 0.4);
+    color: #d4f7d4;
+}
+
+.message.error {
+    background-color: rgba(210, 79, 79, 0.2);
+    border: 1px solid rgba(210, 79, 79, 0.4);
+    color: #f7d3d3;
+}
+
+@media (max-width: 760px) {
+    .selection-container {
+        padding: 20px;
+    }
+
+    .selection-description {
+        font-size: 0.98rem;
+    }
+}
+

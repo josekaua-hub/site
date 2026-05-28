@@ -1,0 +1,24 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Configurar Campo: {{ campo.nome }}</h2>
+    {% if error_message %}
+        <div class="form-error">{{ error_message }}</div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="saca_em_kg">Sacas (kg por saca)</label>
+        <input id="saca_em_kg" name="saca_em_kg" value="{{ campo.saca_em_kg }}" placeholder="kg por saca">
+
+        <label for="custo_aluguel_padrao">Custo Aluguel padrão (R$)</label>
+        <input id="custo_aluguel_padrao" name="custo_aluguel_padrao" value="{{ campo.custo_aluguel_padrao }}" placeholder="0.00">
+
+        <label for="custo_manutencao_padrao">Custo Manutenção padrão (R$)</label>
+        <input id="custo_manutencao_padrao" name="custo_manutencao_padrao" value="{{ campo.custo_manutencao_padrao }}" placeholder="0.00">
+
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+{% endblock content %}

@@ -58,7 +58,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Quantidade Produzida</label>
-                                    <input type="number" class="form-control" id="qtdProduzida" 
+                                    <input type="text" class="form-control br-number" id="qtdProduzida" 
                                            placeholder="kg ou unidades" value="{{ prefill.qtdProduzida|default:'0.00' }}" step="0.01">
                                 </div>
                             </div>
@@ -67,7 +67,7 @@
                                     <label>Preço Unitário de Venda</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="precoUnitario" 
+                                        <input type="text" class="form-control br-number" id="precoUnitario" 
                                                placeholder="0.00" value="{{ prefill.precoUnitario|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -84,7 +84,7 @@
                                     <label>Sementes/Mudas</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoSementes" 
+                                        <input type="text" class="form-control br-number" id="custoSementes" 
                                                placeholder="0.00" value="{{ prefill.custoSementes|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -94,7 +94,7 @@
                                     <label>Adubo/Fertilizantes</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoAdubo" 
+                                        <input type="text" class="form-control br-number" id="custoAdubo" 
                                                placeholder="0.00" value="{{ prefill.custoAdubo|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@
                                     <label>Defensivos/Agrotóxicos</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoDefensivos" 
+                                        <input type="text" class="form-control br-number" id="custoDefensivos" 
                                                placeholder="0.00" value="{{ prefill.custoDefensivos|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -114,7 +114,7 @@
                                     <label>Irrigação/Água</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoAgua" 
+                                        <input type="text" class="form-control br-number" id="custoAgua" 
                                                placeholder="0.00" value="{{ prefill.custoAgua|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -124,7 +124,7 @@
                                     <label>Mão de Obra (Plantio/Tratos)</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoMaoObra" 
+                                        <input type="text" class="form-control br-number" id="custoMaoObra" 
                                                placeholder="0.00" value="{{ prefill.custoMaoObra|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -134,7 +134,7 @@
                                     <label>Energia/Combustível</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoEnergia" 
+                                        <input type="text" class="form-control br-number" id="custoEnergia" 
                                                placeholder="0.00" value="{{ prefill.custoEnergia|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -144,7 +144,7 @@
                                     <label>Colheita/Processamento</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoColheita" 
+                                        <input type="text" class="form-control br-number" id="custoColheita" 
                                                placeholder="0.00" value="{{ prefill.custoColheita|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -154,7 +154,7 @@
                                     <label>Transporte/Embalagem</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoTransporte" 
+                                        <input type="text" class="form-control br-number" id="custoTransporte" 
                                                placeholder="0.00" value="{{ prefill.custoTransporte|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -171,7 +171,7 @@
                                     <label>Aluguel/Uso da Terra</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoAluguel" 
+                                        <input type="text" class="form-control br-number" id="custoAluguel" 
                                                placeholder="0.00" value="{{ prefill.custoAluguel|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -181,7 +181,7 @@
                                     <label>Manutenção de Equipamentos</label>
                                     <div class="input-group">
                                         <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoManutencao" 
+                                        <input type="text" class="form-control br-number" id="custoManutencao" 
                                                placeholder="0.00" value="{{ prefill.custoManutencao|default:'0.00' }}" step="0.01">
                                     </div>
                                 </div>
@@ -189,7 +189,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Ciclos por Ano (para rateio de custos fixos)</label>
-                                    <input type="number" class="form-control" id="ciclosPorAno" 
+                                    <input type="text" class="form-control br-number" id="ciclosPorAno" 
                                            placeholder="número" value="{{ prefill.ciclosPorAno|default:'1' }}" step="1" min="1">
                                 </div>
                             </div>
@@ -198,16 +198,18 @@
 
                     <!-- Botões de Ação -->
                     <div class="button-group">
-                        <button class="btn btn-primary btn-lg" onclick="calcularFinanceiro()">
+                        <button class="btn btn-outline-primary" type="button" id="editButton" onclick="toggleEditMode()">
+                            ✏️ Editar
+                        </button>
+                        <button class="btn btn-primary btn-lg" onclick="calcularFinanceiro()" type="button">
                             🧮 Calcular
                         </button>
-                        <button class="btn btn-secondary" onclick="limparFormulario()">
+                        <button class="btn btn-secondary" onclick="limparFormulario()" type="button">
                             🔄 Limpar
                         </button>
                     </div>
 
-                    <form id="saveFixosForm" method="post" action="{% url 'financeiro:salvar_fixos' %}">
-                        {% csrf_token %}
+                    <form id="saveFixosForm" method="post" action="{% url 'financeiro:salvar_fixos' %}">                        {% csrf_token %}
                         <input type="hidden" name="campo_id" value="{{ selected_campo_id }}" />
                         <input type="hidden" name="custoAluguel" id="hiddenCustoAluguel" />
                         <input type="hidden" name="custoManutencao" id="hiddenCustoManutencao" />
@@ -324,7 +326,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Variação de Preço (%)</label>
-                                <input type="number" class="form-control" id="variacaoPreco" 
+                                <input type="text" class="form-control br-number" id="variacaoPreco" 
                                        placeholder="Ex: -10" value="0" step="1">
                                 <small class="form-text">Negativo = redução | Positivo = aumento</small>
                             </div>
@@ -332,7 +334,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Variação de Quantidade (%)</label>
-                                <input type="number" class="form-control" id="variacaoQtd" 
+                                <input type="text" class="form-control br-number" id="variacaoQtd" 
                                        placeholder="Ex: 20" value="0" step="1">
                             </div>
                         </div>

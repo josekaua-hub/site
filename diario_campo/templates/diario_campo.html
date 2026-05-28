@@ -118,7 +118,7 @@
                 <input type="text" inputmode="decimal" id="custo_manutencao" name="custo_manutencao" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
 
                 <label for="ciclos_por_ano">Ciclos por Ano</label>
-                <input type="number" id="ciclos_por_ano" name="ciclos_por_ano" min="1" value="1" step="1" placeholder="1">
+                <input type="number" id="ciclos_por_ano" name="ciclos_por_ano" min="1" value="{{ form_data.ciclos_por_ano|default:'1' }}" step="1" placeholder="1">
             </fieldset>
 
             <button type="submit">Salvar Registro</button>
@@ -260,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
             description: 'O fechamento do ciclo.',
             message: 'Quantidade: use 1 para a colheita. Esta atividade é única por campo.',
             quantidadeLabel: 'Quantidade (Unidade)',
+            valorLabel: 'Valor Recebido (R$)',
             unitOptions: ['kg', 'saca', 'unidade'],
             // Removed resourceOptions and measureOptions
         }
@@ -293,6 +294,10 @@ document.addEventListener('DOMContentLoaded', function() {
         tipoDescription.textContent = tipoInfo.description;
         tituloInput.placeholder = `Título sugerido: ${tipoInfo.label}`;
         quantidadeLabel.textContent = tipoInfo.quantidadeLabel;
+        const valorLabel = document.querySelector('label[for="valor_gasto"]');
+        if (valorLabel) {
+            valorLabel.textContent = tipoInfo.valorLabel || 'Valor/Gasto (R$)';
+        }
         if (tipoInfo.unitOptions && tipoInfo.unitOptions.length > 0) {
             unidadeSelect.innerHTML = '<option value="" disabled selected>Selecione a unidade</option>' + tipoInfo.unitOptions.map(option => `<option value="${option}">${option}</option>`).join('');
             unidadeSelect.style.display = 'block';
