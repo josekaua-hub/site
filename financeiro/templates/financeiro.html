@@ -387,10 +387,14 @@
             </div>
 
             <div class="fin-field">
-              <label>Colheita / Processamento</label>
+              <label>Processamento Pós-Colheita
+                <span title="Custo de beneficiamento após colheita: secagem, debulha, ensacamento etc. Preencha manualmente — não vem do Diário."
+                      style="font-size:0.75rem; opacity:0.55; cursor:help; margin-left:3px;">ⓘ</span>
+              </label>
               <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
                 <input type="number" id="custoColheita" class="fin-input custo-input"
                        value="{{ prefill.custoColheita|default:'0.00' }}" step="0.01" min="0"></div>
+              <span class="fin-input-fonte" style="font-style:italic; opacity:0.50;">✏ Preencher manualmente</span>
             </div>
 
             <div class="fin-field">

@@ -150,7 +150,7 @@
             <!-- Descrição dinâmica do tipo -->
             <div id="dc-tipo-info" class="dc-tipo-info" style="display:none;"></div>
 
-            <!-- Título + Valor -->
+            <!-- Título + Valor gasto -->
             <div class="dc-grid-2">
               <div class="dc-field">
                 <label for="titulo">✏️ Título</label>
@@ -164,50 +164,124 @@
               </div>
             </div>
 
-            <!-- Campos de colheita -->
+            <!-- ═══ Bloco Quantidade (gastos) ═══ -->
+            <div id="bloco-quantidade" style="display:none;">
+              <!-- linha: unidade padrão (pill) + quantidade + valor total preview -->
+              <div id="dc-unidade-pills" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;"></div>
+
+              <div class="dc-grid-2" style="align-items:end;">
+                <div class="dc-field">
+                  <label id="quantidade-label" for="quantidade">Quantidade</label>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <input type="text" inputmode="decimal" id="quantidade" name="quantidade"
+                           placeholder="1" style="flex:1;">
+                    <span id="dc-unidade-display"
+                          style="font-size:0.82rem; color:rgba(255,255,255,0.55); white-space:nowrap; min-width:30px;"></span>
+                  </div>
+                  <!-- campo oculto que guarda a unidade real -->
+                  <input type="hidden" id="quantidade_unidade_gasto" name="quantidade_unidade" value="">
+                </div>
+                <div class="dc-field" id="bloco-unidade-outra" style="display:none;">
+                  <label for="outra-unidade-nome">Nome da unidade</label>
+                  <input type="text" id="outra-unidade-nome" placeholder="Ex: fardo, dia…">
+                </div>
+              </div>
+
+              <!-- Preview de gasto -->
+              <div id="dc-gasto-preview" style="display:none;
+                   background:rgba(220,53,69,0.10); border:1px solid rgba(220,53,69,0.25);
+                   border-radius:8px; padding:8px 14px; margin-top:2px;
+                   display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                <span style="font-size:0.80rem; color:rgba(255,255,255,0.55);">Gasto estimado:</span>
+                <strong id="dc-gasto-preview-val" style="font-size:1.0rem; color:#ff7b7b;">R$ 0,00</strong>
+              </div>
+            </div>
+
+            <!-- ═══ Bloco Plantio (especial) ═══ -->
+            <div id="bloco-plantio" style="display:none;">
+              <div class="dc-field">
+                <label for="qtd-plantio">Área / Linhas plantadas</label>
+                <input type="text" id="qtd-plantio" name="quantidade"
+                       placeholder="Ex: 2 (hectares), 10x3 (linhas)…">
+                <input type="hidden" name="quantidade_unidade" value="lote">
+              </div>
+            </div>
+
+            <!-- ═══ Bloco Colheita ═══ -->
             <div id="bloco-colheita" style="display:none;">
               <div class="dc-colheita-sep">🌾 Dados da Colheita</div>
-              <div class="dc-grid-3">
+
+              <!-- Seleção de unidade via pills -->
+              <div style="margin-bottom:10px;">
+                <label style="font-size:0.80rem; color:rgba(255,255,255,0.60); font-weight:700;
+                              display:block; margin-bottom:6px;">UNIDADE DA PRODUÇÃO</label>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;" id="colheita-unidade-pills">
+                  <button type="button" class="dc-pill dc-pill-ativo" data-unidade="kg" data-kg="1">kg</button>
+                  <button type="button" class="dc-pill" data-unidade="saca" data-kg="60">saca <span style="opacity:0.6;font-size:0.78em;">(60 kg)</span></button>
+                  <button type="button" class="dc-pill" data-unidade="tonelada" data-kg="1000">tonelada <span style="opacity:0.6;font-size:0.78em;">(1.000 kg)</span></button>
+                  <button type="button" class="dc-pill" data-unidade="caixa" data-kg="">caixa</button>
+                  <button type="button" class="dc-pill" data-unidade="outra" data-kg="">outra…</button>
+                </div>
+                <input type="hidden" id="colheita-unidade-val" name="quantidade_unidade" value="kg">
+              </div>
+
+              <!-- Peso personalizado (caixa / outra) -->
+              <div id="bloco-colheita-custom" style="display:none; margin-bottom:10px;">
+                <div class="dc-grid-2">
+                  <div class="dc-field">
+                    <label for="colheita-custom-nome">Nome da unidade</label>
+                    <input type="text" id="colheita-custom-nome" placeholder="Ex: engradado, lata…">
+                  </div>
+                  <div class="dc-field">
+                    <label for="colheita-custom-kg">Peso por unidade (kg) <span style="font-weight:400;opacity:0.55;">opcional</span></label>
+                    <input type="text" inputmode="decimal" id="colheita-custom-kg" placeholder="Ex: 25">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Info de equivalência kg -->
+              <div id="dc-conversao-kg" style="display:none; font-size:0.78rem; color:rgba(255,255,255,0.48);
+                   background:rgba(255,255,255,0.05); border-radius:8px; padding:6px 12px; margin-bottom:10px;"></div>
+
+              <!-- Quantidade + modo de preço -->
+              <div class="dc-grid-2" style="margin-bottom:10px;">
                 <div class="dc-field">
                   <label for="quantidade_produzida">Quantidade Colhida</label>
                   <input type="text" inputmode="decimal" id="quantidade_produzida"
                          name="quantidade_produzida" placeholder="0,00">
                 </div>
                 <div class="dc-field">
-                  <label for="quantidade_unidade_colheita">Unidade</label>
-                  <select id="quantidade_unidade_colheita" name="quantidade_unidade">
-                    <option value="kg">kg</option>
-                    <option value="saca">saca</option>
-                    <option value="unidade">unidade</option>
-                    <option value="caixa">caixa</option>
-                    <option value="tonelada">tonelada</option>
-                  </select>
+                  <label>Modo de Preço</label>
+                  <div style="display:flex; gap:6px; padding-top:2px;">
+                    <label class="dc-radio-btn">
+                      <input type="radio" name="_modo_preco" value="por_unidade" checked> Por unidade
+                    </label>
+                    <label class="dc-radio-btn">
+                      <input type="radio" name="_modo_preco" value="por_kg"> Por kg
+                    </label>
+                  </div>
                 </div>
+              </div>
+
+              <div class="dc-grid-2" style="margin-bottom:10px;">
                 <div class="dc-field">
-                  <label for="preco_unitario">Preço por Unidade (R$)</label>
+                  <label for="preco_unitario" id="label-preco">Preço / unidade (R$)</label>
                   <input type="text" inputmode="decimal" id="preco_unitario"
                          name="preco_unitario" placeholder="0,00">
                 </div>
+                <div class="dc-field" id="campo-preco-kg" style="display:none;">
+                  <label>Preço por kg (R$)</label>
+                  <input type="text" inputmode="decimal" id="preco_por_kg" placeholder="0,00">
+                </div>
               </div>
+
+              <!-- Preview de receita -->
               <div class="dc-receita-preview" id="dc-receita-preview" style="display:none;">
                 <span>Receita estimada:</span>
                 <strong id="dc-receita-valor">R$ 0,00</strong>
               </div>
-            </div>
-
-            <!-- Quantidade (para não-colheita) -->
-            <div id="bloco-quantidade" class="dc-grid-2">
-              <div class="dc-field">
-                <label id="quantidade-label" for="quantidade">Quantidade</label>
-                <input type="text" inputmode="decimal" id="quantidade" name="quantidade"
-                       placeholder="1">
-              </div>
-              <div class="dc-field" id="unidade-wrapper" style="display:none;">
-                <label for="quantidade_unidade_gasto">Unidade</label>
-                <select id="quantidade_unidade_gasto" name="quantidade_unidade">
-                  <option value="" disabled selected>Selecione</option>
-                </select>
-              </div>
+              <div id="dc-receita-detalhe" style="display:none; font-size:0.76rem;
+                   color:rgba(255,255,255,0.42); margin-top:4px; text-align:right;"></div>
             </div>
 
             <!-- Observações -->
@@ -235,7 +309,6 @@
         {% endif %}
       </div>
 
-      <!-- Busca e filtro -->
       <form method="get" style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
         <input type="text" name="q" value="{{ busca }}" placeholder="🔍 Buscar por título ou observação…"
                style="flex:2; min-width:140px; padding:7px 12px; border-radius:8px; border:none;
@@ -271,16 +344,11 @@
         <ul class="dc-lista">
           {% for r in registros %}
           <li class="dc-item {% if r.tipo_atividade == 'colheita' %}dc-item-receita{% else %}dc-item-gasto{% endif %}"
-              data-id="{{ r.id }}"
-              data-titulo="{{ r.titulo }}"
-              data-tipo="{{ r.get_tipo_atividade_display }}"
-              data-data="{{ r.data|date:'d/m/Y' }}"
-              data-detalhe="{{ r.detalhe }}"
-              data-quantidade="{{ r.quantidade }}"
-              data-unidade="{{ r.quantidade_unidade }}"
-              data-valor="{{ r.valor_gasto }}"
-              data-qtd-prod="{{ r.quantidade_produzida }}"
-              data-preco="{{ r.preco_unitario }}"
+              data-id="{{ r.id }}" data-titulo="{{ r.titulo }}"
+              data-tipo="{{ r.get_tipo_atividade_display }}" data-data="{{ r.data|date:'d/m/Y' }}"
+              data-detalhe="{{ r.detalhe }}" data-quantidade="{{ r.quantidade }}"
+              data-unidade="{{ r.quantidade_unidade }}" data-valor="{{ r.valor_gasto }}"
+              data-qtd-prod="{{ r.quantidade_produzida }}" data-preco="{{ r.preco_unitario }}"
               data-tipo-raw="{{ r.tipo_atividade }}">
 
             <div class="dc-item-icon">
@@ -343,10 +411,10 @@
       {% endif %}
     </section>
 
-  </div><!-- /.dc-body -->
-</div><!-- /.dc-page -->
+  </div>
+</div>
 
-<!-- ───── MODAL de detalhes ───── -->
+<!-- ───── MODAL ───── -->
 <div id="dc-modal" class="dc-modal" role="dialog" aria-modal="true">
   <div class="dc-modal-box">
     <button class="dc-modal-fechar" id="dc-modal-fechar">✕</button>
@@ -363,165 +431,481 @@
   </div>
 </div>
 
+<style>
+/* ── Pills de unidade ── */
+.dc-pill {
+  padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.20);
+  background: rgba(255,255,255,0.07); font-size: 0.80rem; color: rgba(255,255,255,0.75);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.5;
+}
+.dc-pill:hover { border-color: rgba(100,210,130,0.40); background: rgba(100,210,130,0.10); }
+.dc-pill-ativo {
+  background: rgba(40,167,69,0.22) !important;
+  border-color: rgba(40,167,69,0.55) !important;
+  color: #6fcf97 !important;
+}
+/* ── Radio pill ── */
+.dc-radio-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 13px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.07); font-size: 0.80rem; cursor: pointer;
+  color: rgba(255,255,255,0.70); transition: all 0.15s; user-select: none;
+}
+.dc-radio-btn:has(input:checked) {
+  background: rgba(40,167,69,0.22); border-color: rgba(40,167,69,0.45); color: #6fcf97;
+}
+.dc-radio-btn input[type=radio] { display: none; }
+/* Preview gasto oculto por padrão */
+#dc-gasto-preview { display: none; }
+</style>
+
 <script>
 (function () {
   'use strict';
 
+  /* ─── Configuração por tipo de atividade ──────────────────────────────────
+     units: lista de { valor, label, kg? }
+       - kg definido → unidade tem peso conhecido (para info)
+       - kg null    → unidade discreta (viagem, aplicação…) sem conversão
+     defaultUnit: qual unidade vem selecionada por padrão
+     noUnit: true → não mostra campo de quantidade/unidade
+     plantio: true → usa bloco especial
+  ─────────────────────────────────────────────────────────────────────────── */
   const TIPOS = {
-    preparo_solo:           { label:'Preparo do Solo',           icone:'🚜', gasto:true,  units:['unidade'],                        one:true  },
-    plantio:                { label:'Plantio',                   icone:'🌱', gasto:true,  units:[],           plantio:true,          one:true  },
-    adubacao:               { label:'Adubação',                  icone:'🧪', gasto:true,  units:['kg','saca','litro','aplicação']                },
-    irrigacao:              { label:'Irrigação',                 icone:'💧', gasto:true,  units:['hora','irrigação','m³']                        },
-    capina:                 { label:'Capina / Controle de Mato', icone:'🌿', gasto:true,  units:['vez','hora','dia']                             },
-    controle_pragas_doencas:{ label:'Controle de Pragas',        icone:'🐛', gasto:true,  units:['aplicação','litro','kg']                       },
-    energia_combustivel:    { label:'Energia / Combustível',     icone:'⛽', gasto:true,  units:['litro','kWh','dia']                            },
-    transporte_embalagem:   { label:'Transporte / Embalagem',    icone:'🚚', gasto:true,  units:['viagem','unidade','caixa']                     },
-    colheita:               { label:'Colheita',                  icone:'🌾', gasto:false, units:['kg','saca','unidade','caixa'],    one:true  },
+    preparo_solo: {
+      label:'Preparo do Solo', icone:'🚜', gasto:true, one:true,
+      noUnit: true   // operação única, não tem unidade que faça sentido
+    },
+    plantio: {
+      label:'Plantio', icone:'🌱', gasto:true, one:true,
+      plantio: true
+    },
+    adubacao: {
+      label:'Adubação', icone:'🧪', gasto:true,
+      defaultUnit: 'kg',
+      units: [
+        { valor:'kg',        label:'kg',              kg:1    },
+        { valor:'saca',      label:'saca (50 kg)',     kg:50   },
+        { valor:'litro',     label:'litro',            kg:null },
+        { valor:'aplicação', label:'aplicação',        kg:null },
+        { valor:'outra',     label:'outra unidade…',   kg:null },
+      ]
+    },
+    irrigacao: {
+      label:'Irrigação', icone:'💧', gasto:true,
+      defaultUnit: 'hora',
+      units: [
+        { valor:'hora',     label:'hora',     kg:null },
+        { valor:'m³',       label:'m³',       kg:null },
+        { valor:'irrigação',label:'irrigação', kg:null },
+        { valor:'outra',    label:'outra unidade…', kg:null },
+      ]
+    },
+    capina: {
+      label:'Capina / Controle de Mato', icone:'🌿', gasto:true,
+      defaultUnit: 'vez',
+      units: [
+        { valor:'vez',  label:'vez',  kg:null },
+        { valor:'hora', label:'hora', kg:null },
+        { valor:'dia',  label:'dia',  kg:null },
+        { valor:'outra',label:'outra unidade…', kg:null },
+      ]
+    },
+    controle_pragas_doencas: {
+      label:'Controle de Pragas e Doenças', icone:'🐛', gasto:true,
+      defaultUnit: 'aplicação',
+      units: [
+        { valor:'aplicação', label:'aplicação', kg:null },
+        { valor:'litro',     label:'litro',     kg:null },
+        { valor:'kg',        label:'kg',        kg:1    },
+        { valor:'outra',     label:'outra unidade…', kg:null },
+      ]
+    },
+    energia_combustivel: {
+      label:'Energia / Combustível', icone:'⛽', gasto:true,
+      defaultUnit: 'litro',
+      units: [
+        { valor:'litro', label:'litro', kg:null },
+        { valor:'kWh',   label:'kWh',   kg:null },
+        { valor:'dia',   label:'dia',   kg:null },
+        { valor:'outra', label:'outra unidade…', kg:null },
+      ]
+    },
+    transporte_embalagem: {
+      label:'Transporte / Embalagem', icone:'🚚', gasto:true,
+      defaultUnit: 'viagem',
+      units: [
+        { valor:'viagem',   label:'viagem',           kg:null },
+        { valor:'caixa',    label:'caixa',             kg:null },
+        { valor:'tonelada', label:'tonelada (1.000 kg)',kg:1000 },
+        { valor:'outra',    label:'outra unidade…',    kg:null },
+      ]
+    },
+    colheita: {
+      label:'Colheita', icone:'🌾', gasto:false, one:true
+    },
   };
 
-  const sel       = id => document.getElementById(id);
-  const tipoSel   = sel('tipo_atividade');
-  const dataInput = sel('data');
-  const tituloInp = sel('titulo');
-  const badge     = sel('dc-tipo-badge');
-  const tipoInfo  = sel('dc-tipo-info');
-  const btnSalvar = sel('dc-btn-salvar');
+  /* ─── Refs ────────────────────────────────────────────────────────────── */
+  const $ = id => document.getElementById(id);
 
-  const blocoColheita  = sel('bloco-colheita');
-  const blocoQtd       = sel('bloco-quantidade');
-  const unidadeWrapper = sel('unidade-wrapper');
-  const unidadeSel     = sel('quantidade_unidade_gasto');
-  const qtdLabel       = sel('quantidade-label');
-  const qtdInput       = sel('quantidade');
-  const valorInput     = sel('valor_gasto');
-  const labelValor     = sel('label-valor');
-  const qtdProdInput   = sel('quantidade_produzida');
-  const precoInput     = sel('preco_unitario');
-  const receitaPreview = sel('dc-receita-preview');
-  const receitaValor   = sel('dc-receita-valor');
+  const tipoSel        = $('tipo_atividade');
+  const dataInput      = $('data');
+  const tituloInp      = $('titulo');
+  const badge          = $('dc-tipo-badge');
+  const tipoInfoEl     = $('dc-tipo-info');
+  const btnSalvar      = $('dc-btn-salvar');
+  const labelValor     = $('label-valor');
+  const valorInput     = $('valor_gasto');
 
-  /* Preencher data de hoje por padrão */
-  if (dataInput && !dataInput.value) {
-    const h  = new Date();
-    const yy = h.getFullYear();
-    const mm = String(h.getMonth()+1).padStart(2,'0');
-    const dd = String(h.getDate()).padStart(2,'0');
-    dataInput.value = `${yy}-${mm}-${dd}`;
-  }
+  // Blocos
+  const blocoQtd       = $('bloco-quantidade');
+  const blocoPlantio   = $('bloco-plantio');
+  const blocoColheita  = $('bloco-colheita');
 
-  function onTipoChange() {
-    const v = tipoSel ? tipoSel.value : '';
-    const t = TIPOS[v];
-    if (!t) {
-      if (badge)    badge.style.display = 'none';
-      if (tipoInfo) tipoInfo.style.display = 'none';
-      if (blocoColheita) blocoColheita.style.display = 'none';
-      if (blocoQtd)      blocoQtd.style.display = 'grid';
-      return;
-    }
-    if (badge) {
-      badge.textContent  = t.icone + ' ' + t.label;
-      badge.className    = 'dc-badge ' + (t.gasto ? 'dc-badge-gasto' : 'dc-badge-receita');
-      badge.style.display = 'inline-flex';
-    }
-    if (tipoInfo) {
-      tipoInfo.textContent = t.gasto
-        ? '💸 Este registro será contabilizado como gasto (saída de dinheiro).'
-        : '💰 Este registro será contabilizado como receita (entrada de dinheiro).';
-      tipoInfo.className   = 'dc-tipo-info ' + (t.gasto ? 'dc-info-gasto' : 'dc-info-receita');
-      tipoInfo.style.display = 'block';
-    }
-    if (t.gasto) {
-      if (labelValor) labelValor.textContent = '💸 Valor Gasto (R$)';
-      if (btnSalvar)  btnSalvar.textContent  = '💾 Registrar Gasto';
-      if (valorInput) valorInput.closest('.dc-field').style.display = '';
-      if (blocoColheita) blocoColheita.style.display = 'none';
-      if (blocoQtd)      blocoQtd.style.display = 'grid';
-    } else {
-      if (labelValor) labelValor.textContent = '💰 Valor da Venda (R$)';
-      if (btnSalvar)  btnSalvar.textContent  = '🌾 Registrar Colheita';
-      if (valorInput) valorInput.closest('.dc-field').style.display = 'none';
-      if (blocoColheita) blocoColheita.style.display = 'block';
-      if (blocoQtd)      blocoQtd.style.display = 'none';
-    }
-    if (tituloInp && !tituloInp.value) tituloInp.placeholder = t.label;
-    if (t.plantio) {
-      if (qtdLabel) qtdLabel.textContent = 'Linhas × Colunas';
-      if (qtdInput) { qtdInput.placeholder = '3x2'; qtdInput.pattern = '\\d+x\\d+'; }
-      if (unidadeWrapper) unidadeWrapper.style.display = 'none';
-    } else {
-      if (qtdLabel) qtdLabel.textContent = 'Quantidade';
-      if (qtdInput) { qtdInput.placeholder = '1'; qtdInput.pattern = '\\d+([.,]\\d*)?'; }
-      if (t.units && t.units.length > 0) {
-        if (unidadeSel) {
-          unidadeSel.innerHTML = '<option value="" disabled selected>Selecione</option>' +
-            t.units.map(u => `<option value="${u}">${u}</option>`).join('');
-        }
-        if (unidadeWrapper) unidadeWrapper.style.display = 'block';
-      } else {
-        if (unidadeWrapper) unidadeWrapper.style.display = 'none';
-      }
-    }
-  }
+  // Gasto
+  const pillsContainer = $('dc-unidade-pills');
+  const unidadeDisplay = $('dc-unidade-display');
+  const unidadeHidden  = $('quantidade_unidade_gasto');
+  const qtdInput       = $('quantidade');
+  const outraNomeField = $('bloco-unidade-outra');
+  const outraNomeInp   = $('outra-unidade-nome');
+  const gastoPreview   = $('dc-gasto-preview');
+  const gastoPreviewVal= $('dc-gasto-preview-val');
 
-  if (tipoSel) { tipoSel.addEventListener('change', onTipoChange); onTipoChange(); }
+  // Colheita
+  const colheitaPills  = document.querySelectorAll('#colheita-unidade-pills .dc-pill');
+  const colheitaUnidHid= $('colheita-unidade-val');
+  const blocoCustomCol = $('bloco-colheita-custom');
+  const colCustomNome  = $('colheita-custom-nome');
+  const colCustomKg    = $('colheita-custom-kg');
+  const conversaoKgEl  = $('dc-conversao-kg');
+  const qtdProdInp     = $('quantidade_produzida');
+  const precoUnitInp   = $('preco_unitario');
+  const precoPorKgInp  = $('preco_por_kg');
+  const recPreview     = $('dc-receita-preview');
+  const recVal         = $('dc-receita-valor');
+  const recDetalhe     = $('dc-receita-detalhe');
+  const campoPrecoPorKg= $('campo-preco-kg');
+  const labelPreco     = $('label-preco');
 
-  function atualizarReceita() {
-    if (!qtdProdInput || !precoInput || !receitaPreview) return;
-    const qtd   = parseFloat(qtdProdInput.value.replace(',','.')) || 0;
-    const preco = parseFloat(precoInput.value.replace(',','.'))   || 0;
-    const total = qtd * preco;
-    if (qtd > 0 && preco > 0) {
-      receitaPreview.style.display = 'flex';
-      if (receitaValor) receitaValor.textContent = 'R$ ' + total.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-    } else {
-      receitaPreview.style.display = 'none';
-    }
-  }
+  /* ─── Helpers ─────────────────────────────────────────────────────────── */
+  function parseDec(v) { return parseFloat((v||'').toString().replace(',','.')) || 0; }
+  function fmtBRL(n) { return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
-  if (qtdProdInput) qtdProdInput.addEventListener('input', atualizarReceita);
-  if (precoInput)   precoInput.addEventListener('input', atualizarReceita);
-
-  [valorInput, qtdProdInput, precoInput].forEach(inp => {
-    if (!inp) return;
+  function enforceDecimal(inp) {
     inp.addEventListener('input', function() {
+      if (this.readOnly) return;
       this.value = this.value.replace(/[^0-9.,]/g,'').replace(',','.').replace(/(\.\d*)\./g,'$1');
+    });
+  }
+  [valorInput, qtdProdInp, precoUnitInp, precoPorKgInp].forEach(el => el && enforceDecimal(el));
+
+  /* Data de hoje por padrão */
+  if (dataInput && !dataInput.value) {
+    const h = new Date();
+    dataInput.value = `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`;
+  }
+
+  /* ─── Estado da unidade de gasto selecionada ──────────────────────────── */
+  let gastoUnidadeAtual = '';  // valor real (kg, litro, hora…) ou 'outra'
+
+  function selecionarUnidadeGasto(valorUnidade, labelUnidade) {
+    gastoUnidadeAtual = valorUnidade;
+
+    // Atualiza pills UI
+    if (pillsContainer) {
+      pillsContainer.querySelectorAll('.dc-pill').forEach(p => {
+        p.classList.toggle('dc-pill-ativo', p.dataset.valor === valorUnidade);
+      });
+    }
+
+    // Mostra campo "outra" ou esconde
+    const isOutra = (valorUnidade === 'outra');
+    if (outraNomeField) outraNomeField.style.display = isOutra ? 'block' : 'none';
+
+    // Atualiza hidden e display
+    if (!isOutra) {
+      if (unidadeHidden)  unidadeHidden.value = valorUnidade;
+      if (unidadeDisplay) unidadeDisplay.textContent = labelUnidade;
+    } else {
+      if (unidadeDisplay) unidadeDisplay.textContent = outraNomeInp ? (outraNomeInp.value || '') : '';
+    }
+
+    atualizarGastoPreview();
+  }
+
+  function atualizarGastoPreview() {
+    if (!gastoPreview) return;
+    const qtd   = parseDec(qtdInput ? qtdInput.value : 0);
+    const valor  = parseDec(valorInput ? valorInput.value : 0);
+    if (qtd > 1 && valor > 0) {
+      // Mostramos o total apenas quando qty > 1 (1 unidade não precisa de preview)
+      gastoPreview.style.display = 'flex';
+      if (gastoPreviewVal) gastoPreviewVal.textContent = fmtBRL(valor);
+    } else {
+      gastoPreview.style.display = 'none';
+    }
+  }
+
+  /* ─── Build pills para um tipo de gasto ──────────────────────────────── */
+  function buildPillsGasto(tipoConfig) {
+    if (!pillsContainer) return;
+    pillsContainer.innerHTML = '';
+    if (!tipoConfig.units || tipoConfig.units.length === 0) return;
+
+    tipoConfig.units.forEach((u, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dc-pill';
+      btn.dataset.valor = u.valor;
+      btn.dataset.label = u.label;
+      btn.innerHTML = u.label;
+      if (i === 0 || u.valor === tipoConfig.defaultUnit) {
+        // será ativado abaixo
+      }
+      btn.addEventListener('click', () => selecionarUnidadeGasto(u.valor, u.label));
+      pillsContainer.appendChild(btn);
+    });
+
+    // Seleciona a unidade padrão
+    const def = tipoConfig.defaultUnit || tipoConfig.units[0].valor;
+    const defObj = tipoConfig.units.find(u => u.valor === def) || tipoConfig.units[0];
+    selecionarUnidadeGasto(defObj.valor, defObj.label);
+  }
+
+  /* ─── Colheita: seleção de unidade via pills ──────────────────────────── */
+  const COL_KG = { kg:1, saca:60, tonelada:1000, caixa:null, outra:null };
+  let colUnidAtual = 'kg';
+
+  function getColKg() {
+    if (colUnidAtual === 'caixa' || colUnidAtual === 'outra') {
+      return parseDec(colCustomKg ? colCustomKg.value : 0) || null;
+    }
+    return COL_KG[colUnidAtual] || null;
+  }
+  function getColNome() {
+    if (colUnidAtual === 'caixa' || colUnidAtual === 'outra') {
+      return (colCustomNome && colCustomNome.value.trim()) || colUnidAtual;
+    }
+    return colUnidAtual;
+  }
+
+  colheitaPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      colheitaPills.forEach(p => p.classList.remove('dc-pill-ativo'));
+      pill.classList.add('dc-pill-ativo');
+      colUnidAtual = pill.dataset.unidade;
+
+      const isCustom = colUnidAtual === 'caixa' || colUnidAtual === 'outra';
+      if (blocoCustomCol) blocoCustomCol.style.display = isCustom ? 'block' : 'none';
+      if (colheitaUnidHid) colheitaUnidHid.value = isCustom ? '' : colUnidAtual;
+
+      atualizarConversaoKg();
+      atualizarReceita();
     });
   });
 
-  /* Modal */
-  const modal       = sel('dc-modal');
-  const modalFechar = sel('dc-modal-fechar');
+  function atualizarConversaoKg() {
+    if (!conversaoKgEl) return;
+    const kg   = getColKg();
+    const nome = getColNome();
+    const qtd  = parseDec(qtdProdInp ? qtdProdInp.value : 0);
+    if (kg) {
+      conversaoKgEl.style.display = 'block';
+      conversaoKgEl.textContent = `1 ${nome} = ${kg.toLocaleString('pt-BR')} kg` +
+        (qtd > 0 ? `  ·  ${qtd.toLocaleString('pt-BR')} ${nome} = ${(qtd*kg).toLocaleString('pt-BR')} kg` : '');
+    } else {
+      conversaoKgEl.style.display = 'none';
+    }
+  }
+
+  /* ─── Modo de preço (colheita) ────────────────────────────────────────── */
+  function getModoPreco() {
+    const r = document.querySelector('input[name="_modo_preco"]:checked');
+    return r ? r.value : 'por_unidade';
+  }
+
+  document.querySelectorAll('input[name="_modo_preco"]').forEach(r =>
+    r.addEventListener('change', () => { atualizarModoPreco(); atualizarReceita(); })
+  );
+
+  function atualizarModoPreco() {
+    const modo = getModoPreco();
+    const kg   = getColKg();
+    if (modo === 'por_kg' && kg) {
+      if (campoPrecoPorKg) campoPrecoPorKg.style.display = 'block';
+      if (labelPreco)     labelPreco.textContent = 'Preço / unidade (R$) — calculado';
+      if (precoUnitInp)   precoUnitInp.readOnly = true;
+    } else {
+      if (campoPrecoPorKg) campoPrecoPorKg.style.display = 'none';
+      if (labelPreco)     labelPreco.textContent = 'Preço / unidade (R$)';
+      if (precoUnitInp)   precoUnitInp.readOnly = false;
+    }
+  }
+
+  function atualizarReceita() {
+    const modo = getModoPreco();
+    const kg   = getColKg();
+    const qtd  = parseDec(qtdProdInp ? qtdProdInp.value : 0);
+    const nome = getColNome();
+    let   precoUnit = parseDec(precoUnitInp ? precoUnitInp.value : 0);
+
+    if (modo === 'por_kg' && kg && precoPorKgInp) {
+      const precoKg = parseDec(precoPorKgInp.value);
+      precoUnit = precoKg * kg;
+      if (precoUnitInp) precoUnitInp.value = precoUnit.toFixed(2).replace('.',',');
+    }
+
+    const total = qtd * precoUnit;
+    if (qtd > 0 && precoUnit > 0) {
+      if (recPreview) recPreview.style.display = 'flex';
+      if (recVal)     recVal.textContent = fmtBRL(total);
+      if (recDetalhe && modo === 'por_kg' && kg) {
+        const precoKg = parseDec(precoPorKgInp ? precoPorKgInp.value : 0);
+        recDetalhe.style.display = 'block';
+        recDetalhe.textContent =
+          `${qtd.toLocaleString('pt-BR')} ${nome} × ${fmtBRL(precoUnit)}/un` +
+          (precoKg ? ` (${fmtBRL(precoKg)}/kg × ${(qtd*kg).toLocaleString('pt-BR')} kg)` : '');
+      } else if (recDetalhe) {
+        recDetalhe.style.display = 'none';
+      }
+    } else {
+      if (recPreview) recPreview.style.display = 'none';
+      if (recDetalhe) recDetalhe.style.display = 'none';
+    }
+
+    atualizarConversaoKg();
+  }
+
+  if (qtdProdInp)   qtdProdInp.addEventListener('input',   atualizarReceita);
+  if (precoUnitInp) precoUnitInp.addEventListener('input',  atualizarReceita);
+  if (precoPorKgInp)precoPorKgInp.addEventListener('input', atualizarReceita);
+  if (colCustomKg)  colCustomKg.addEventListener('input',   () => { atualizarConversaoKg(); atualizarReceita(); });
+  if (colCustomNome)colCustomNome.addEventListener('input',  atualizarConversaoKg);
+
+  /* ─── Listeners gasto preview ─────────────────────────────────────────── */
+  if (qtdInput)    qtdInput.addEventListener('input',    atualizarGastoPreview);
+  if (valorInput)  valorInput.addEventListener('input',  atualizarGastoPreview);
+  if (outraNomeInp) outraNomeInp.addEventListener('input', () => {
+    if (unidadeHidden) unidadeHidden.value = outraNomeInp.value.trim();
+    if (unidadeDisplay) unidadeDisplay.textContent = outraNomeInp.value.trim();
+  });
+
+  /* ─── Troca de tipo de atividade ──────────────────────────────────────── */
+  function onTipoChange() {
+    const v = tipoSel ? tipoSel.value : '';
+    const t = TIPOS[v];
+
+    // Reset blocos
+    if (blocoQtd)     blocoQtd.style.display = 'none';
+    if (blocoPlantio) blocoPlantio.style.display = 'none';
+    if (blocoColheita)blocoColheita.style.display = 'none';
+    if (badge)        badge.style.display = 'none';
+    if (tipoInfoEl)   tipoInfoEl.style.display = 'none';
+    if (valorInput)   valorInput.closest('.dc-field').style.display = '';
+
+    if (!t) return;
+
+    // Badge
+    if (badge) {
+      badge.textContent = t.icone + ' ' + t.label;
+      badge.className   = 'dc-badge ' + (t.gasto ? 'dc-badge-gasto' : 'dc-badge-receita');
+      badge.style.display = 'inline-flex';
+    }
+    // Info
+    if (tipoInfoEl) {
+      tipoInfoEl.textContent = t.gasto
+        ? '💸 Este registro será contabilizado como gasto (saída de dinheiro).'
+        : '💰 Este registro será contabilizado como receita (entrada de dinheiro).';
+      tipoInfoEl.className   = 'dc-tipo-info ' + (t.gasto ? 'dc-info-gasto' : 'dc-info-receita');
+      tipoInfoEl.style.display = 'block';
+    }
+
+    if (tituloInp && !tituloInp.value) tituloInp.placeholder = t.label;
+
+    if (!t.gasto) {
+      // Colheita
+      if (labelValor) labelValor.textContent = '💰 Valor da Venda (R$)';
+      if (btnSalvar)  btnSalvar.textContent   = '🌾 Registrar Colheita';
+      if (valorInput) valorInput.closest('.dc-field').style.display = 'none';
+      if (blocoColheita) blocoColheita.style.display = 'block';
+      atualizarConversaoKg();
+      atualizarModoPreco();
+    } else if (t.plantio) {
+      // Plantio
+      if (labelValor) labelValor.textContent = '💸 Valor Gasto (R$)';
+      if (btnSalvar)  btnSalvar.textContent   = '💾 Registrar Gasto';
+      if (blocoPlantio) blocoPlantio.style.display = 'block';
+    } else if (t.noUnit) {
+      // Preparo do solo — sem bloco de quantidade
+      if (labelValor) labelValor.textContent = '💸 Valor Gasto (R$)';
+      if (btnSalvar)  btnSalvar.textContent   = '💾 Registrar Gasto';
+    } else {
+      // Demais gastos com unidade
+      if (labelValor) labelValor.textContent = '💸 Valor Gasto (R$)';
+      if (btnSalvar)  btnSalvar.textContent   = '💾 Registrar Gasto';
+      if (blocoQtd)   blocoQtd.style.display = 'block';
+      buildPillsGasto(t);
+    }
+  }
+
+  if (tipoSel) tipoSel.addEventListener('change', onTipoChange);
+  onTipoChange();
+
+  /* ─── Submit: garantir unidade correta ────────────────────────────────── */
+  const dcForm = $('dc-form');
+  if (dcForm) {
+    dcForm.addEventListener('submit', () => {
+      // Colheita custom
+      if (tipoSel && tipoSel.value === 'colheita' && colheitaUnidHid) {
+        const isCustom = colUnidAtual === 'caixa' || colUnidAtual === 'outra';
+        if (isCustom && colCustomNome && colCustomNome.value.trim()) {
+          colheitaUnidHid.value = colCustomNome.value.trim();
+        } else if (!isCustom) {
+          colheitaUnidHid.value = colUnidAtual;
+        }
+      }
+      // Gasto outra unidade
+      if (unidadeHidden && gastoUnidadeAtual === 'outra' && outraNomeInp) {
+        unidadeHidden.value = outraNomeInp.value.trim() || 'outra';
+      }
+    });
+  }
+
+  /* ─── Modal ───────────────────────────────────────────────────────────── */
+  const modal       = $('dc-modal');
+  const modalFechar = $('dc-modal-fechar');
 
   document.querySelectorAll('.dc-item').forEach(item => {
     item.querySelector('.dc-item-body').addEventListener('click', function() {
       const d = item.dataset;
-      sel('dc-modal-icone').textContent  = TIPOS[d.tipoRaw] ? TIPOS[d.tipoRaw].icone : '📌';
-      sel('dc-modal-titulo').textContent = d.titulo;
-      sel('dc-modal-tipo').textContent   = d.tipo;
-      sel('dc-modal-data').textContent   = d.data;
+      $('dc-modal-icone').textContent  = TIPOS[d.tipoRaw] ? TIPOS[d.tipoRaw].icone : '📌';
+      $('dc-modal-titulo').textContent = d.titulo;
+      $('dc-modal-tipo').textContent   = d.tipo;
+      $('dc-modal-data').textContent   = d.data;
 
       const isColheita = d.tipoRaw === 'colheita';
-      const lrec = sel('dc-modal-linha-receita');
-      const mval = sel('dc-modal-valor');
+      const lrec = $('dc-modal-linha-receita');
+      const mval = $('dc-modal-valor');
 
       if (isColheita) {
-        sel('dc-modal-qtd').textContent = `${d.qtdProd} ${d.unidade}`;
+        $('dc-modal-qtd').textContent = `${d.qtdProd} ${d.unidade}`;
         const receita = (parseFloat(d.qtdProd)||0) * (parseFloat(d.preco)||0);
-        sel('dc-modal-receita').textContent = 'R$ ' + receita.toLocaleString('pt-BR',{minimumFractionDigits:2});
+        $('dc-modal-receita').textContent = fmtBRL(receita);
         if (lrec) lrec.style.display = 'flex';
-        mval.textContent = 'R$ ' + parseFloat(d.preco||0).toFixed(2) + '/' + d.unidade;
-        sel('dc-modal-linha-qtd').querySelector('span').textContent = 'Produção';
+        mval.textContent = fmtBRL(parseFloat(d.preco||0)) + '/' + d.unidade;
+        $('dc-modal-linha-qtd').querySelector('span').textContent = 'Produção';
       } else {
-        sel('dc-modal-qtd').textContent = `${d.quantidade||'—'} ${d.unidade||''}`.trim();
+        $('dc-modal-qtd').textContent = `${d.quantidade||'—'} ${d.unidade||''}`.trim();
         if (lrec) lrec.style.display = 'none';
-        mval.textContent = '− R$ ' + parseFloat(d.valor||0).toFixed(2);
-        sel('dc-modal-linha-qtd').querySelector('span').textContent = 'Quantidade';
+        mval.textContent = '− ' + fmtBRL(parseFloat(d.valor||0));
+        $('dc-modal-linha-qtd').querySelector('span').textContent = 'Quantidade';
       }
 
       const obs  = d.detalhe ? d.detalhe.trim() : '';
-      const lobs = sel('dc-modal-linha-obs');
-      if (obs) { sel('dc-modal-obs').textContent = obs; if (lobs) lobs.style.display = 'flex'; }
+      const lobs = $('dc-modal-linha-obs');
+      if (obs) { $('dc-modal-obs').textContent = obs; if (lobs) lobs.style.display = 'flex'; }
       else     { if (lobs) lobs.style.display = 'none'; }
 
       if (modal) modal.classList.add('dc-modal-ativo');
