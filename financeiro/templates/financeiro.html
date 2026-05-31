@@ -2,374 +2,555 @@
 {% load static %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'financeiro/style.css' %}">
+<link rel="stylesheet" href="{% static 'financeiro/style.css' %}">
+<style>
+/* ── Seletor de campos em cards ── */
+.fin-campos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  padding: 20px 28px;
+  background: rgba(0,0,0,0.10);
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+
+.fin-campo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.fin-campo-card:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.28);
+  transform: translateY(-2px);
+}
+
+.fin-campo-card.ativo {
+  background: rgba(90,160,74,0.20);
+  border-color: #5aa04a;
+}
+
+.fin-campo-card.sem-colheita {
+  border-color: rgba(255,180,40,0.35);
+}
+
+.fin-campo-card.sem-colheita.ativo {
+  background: rgba(255,180,40,0.15);
+  border-color: rgba(255,180,40,0.60);
+}
+
+.fin-campo-card-nome {
+  font-weight: 800;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fin-campo-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.fin-campo-card-badge.ok {
+  background: rgba(90,160,74,0.25);
+  color: #90ff80;
+  border: 1px solid rgba(90,160,74,0.40);
+}
+
+.fin-campo-card-badge.aviso {
+  background: rgba(255,180,40,0.20);
+  color: #ffd97a;
+  border: 1px solid rgba(255,180,40,0.40);
+}
+
+/* Painel "origem dos dados" */
+.fin-origem-panel {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.fin-origem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.15);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  width: 100%;
+  color: rgba(255,255,255,0.75);
+}
+
+.fin-origem-lista {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.fin-origem-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  font-size: 0.81rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.fin-origem-item:last-child { border-bottom: none; }
+
+.fin-origem-icone { font-size: 1.1rem; flex-shrink: 0; }
+
+.fin-origem-info { flex: 1; min-width: 0; }
+.fin-origem-titulo { font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fin-origem-meta { font-size: 0.74rem; color: rgba(255,255,255,0.45); }
+
+.fin-origem-valor { font-weight: 800; flex-shrink: 0; }
+.fin-origem-valor.receita { color: #6dda7c; }
+.fin-origem-valor.gasto   { color: #ff9090; }
+
+/* Badge "preenchido do diário" nos inputs */
+.fin-input-fonte {
+  font-size: 0.70rem;
+  color: rgba(109,218,124,0.85);
+  font-weight: 600;
+  margin-top: 2px;
+  display: none;
+}
+
+.fin-input-fonte.visivel { display: block; }
+
+/* Aviso sem colheita melhorado */
+.fin-aviso-colheita {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,180,40,0.12);
+  border: 1px solid rgba(255,180,40,0.35);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.84rem;
+  color: #ffd97a;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.fin-aviso-colheita a {
+  color: #ffd97a;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+</style>
 {% endblock extra_css %}
 
 {% block content %}
-<div class="container calculadora-container">
-    <header class="calculadora-header">
-        <h1>🧮 Calculadora - Análise Financeira de Cultivo</h1>
-    </header>
+<div class="fin-page">
 
-    <!-- Seção Principal: Entrada e Resultados -->
-    <div class="row">
-        <!-- COLUNA 1: Entrada de Dados -->
-        <div class="col-lg-6">
-            <div class="card card-entrada">
-                <div class="card-header">
-                    <h5>💰 Dados de Entrada</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Dados do Diário de Campo -->
-                    <section class="form-section">
-                        <h6>📘 Dados do Diário de Campo</h6>
-                        <form method="get" class="diario-form">
-                            <div class="form-group">
-                                <label for="campo_id">Campo</label>
-                                <select name="campo_id" id="campo_id" class="form-control" onchange="this.form.submit()">
-                                    <option value="">Selecionar campo</option>
-                                    {% for campo in campos %}
-                                        <option value="{{ campo.id }}" {% if selected_campo and campo.id == selected_campo.id %}selected{% endif %}>
-                                            {{ campo.nome }}{% if not campo.has_colheita %} – sem colheita{% endif %}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                <small class="form-text">Campos sem colheita ainda podem ser selecionados; preencha os custos manualmente ou use outro campo para auto-preenchimento.</small>
-                            </div>
-                        </form>
-                        {% if selected_campo %}
-                            <div class="diario-summary {% if show_colheita_warning %}diario-warning{% endif %}">
-                                <p><strong>{{ selected_campo.nome }}</strong> carregado do Diário de Campo.</p>
-                                {% if show_colheita_warning %}
-                                    <p>Este campo não possui colheita registrada; os custos foram carregados do diário.</p>
-                                {% endif %}
-                                <p>Total de gastos no diário: R$ {{ total_valor|floatformat:2 }}</p>
-                                {% if total_colheita_quantity and total_colheita_quantity|floatformat:2 != "0.00" %}
-                                    <p>Quantidade registrada na colheita: {{ total_colheita_quantity|floatformat:2 }} unidades</p>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </section>
-
-                    <!-- Dados de Produção -->
-                    <section class="form-section">
-                        <h6>🌱 Dados de Produção</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Quantidade Produzida</label>
-                                    <input type="number" class="form-control" id="qtdProduzida" 
-                                           placeholder="kg ou unidades" value="{{ prefill.qtdProduzida|default:'0.00' }}" step="0.01">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Preço Unitário de Venda</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="precoUnitario" 
-                                               placeholder="0.00" value="{{ prefill.precoUnitario|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Custos Variáveis -->
-                    <section class="form-section">
-                        <h6>📋 Custos Variáveis (por cultivo)</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Sementes/Mudas</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoSementes" 
-                                               placeholder="0.00" value="{{ prefill.custoSementes|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Adubo/Fertilizantes</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoAdubo" 
-                                               placeholder="0.00" value="{{ prefill.custoAdubo|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Defensivos/Agrotóxicos</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoDefensivos" 
-                                               placeholder="0.00" value="{{ prefill.custoDefensivos|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Irrigação/Água</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoAgua" 
-                                               placeholder="0.00" value="{{ prefill.custoAgua|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Mão de Obra (Plantio/Tratos)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoMaoObra" 
-                                               placeholder="0.00" value="{{ prefill.custoMaoObra|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Energia/Combustível</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoEnergia" 
-                                               placeholder="0.00" value="{{ prefill.custoEnergia|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Colheita/Processamento</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoColheita" 
-                                               placeholder="0.00" value="{{ prefill.custoColheita|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Transporte/Embalagem</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoTransporte" 
-                                               placeholder="0.00" value="{{ prefill.custoTransporte|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Custos Fixos -->
-                    <section class="form-section">
-                        <h6>🏠 Custos Fixos (Anualizados)</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Aluguel/Uso da Terra</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoAluguel" 
-                                               placeholder="0.00" value="{{ prefill.custoAluguel|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Manutenção de Equipamentos</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">R$</span>
-                                        <input type="number" class="form-control" id="custoManutencao" 
-                                               placeholder="0.00" value="{{ prefill.custoManutencao|default:'0.00' }}" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Ciclos por Ano (para rateio de custos fixos)</label>
-                                    <input type="number" class="form-control" id="ciclosPorAno" 
-                                           placeholder="número" value="{{ prefill.ciclosPorAno|default:'1' }}" step="1" min="1">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Botões de Ação -->
-                    <div class="button-group">
-                        <button class="btn btn-primary btn-lg" onclick="calcularFinanceiro()">
-                            🧮 Calcular
-                        </button>
-                        <button class="btn btn-secondary" onclick="limparFormulario()">
-                            🔄 Limpar
-                        </button>
-                    </div>
-
-                    <form id="saveFixosForm" method="post" action="{% url 'financeiro:salvar_fixos' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="campo_id" value="{{ selected_campo_id }}" />
-                        <input type="hidden" name="custoAluguel" id="hiddenCustoAluguel" />
-                        <input type="hidden" name="custoManutencao" id="hiddenCustoManutencao" />
-                        <button type="button" class="btn btn-outline-success mt-2" onclick="submitSaveFixos()">💾 Salvar custos no Diário</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- COLUNA 2: Resultados -->
-        <div class="col-lg-6">
-            <div class="card card-resultados">
-                <div class="card-header">
-                    <h5>📈 Resultados da Análise</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Resumo Principal -->
-                    <section class="resultado-section">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="resultado-box info">
-                                    <small>Receita Total</small>
-                                    <h5 id="receitaTotal">R$ 0,00</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="resultado-box warning">
-                                    <small>Custo Total</small>
-                                    <h5 id="custoTotal">R$ 0,00</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="resultado-box saldo" id="saldoAlert">
-                                    <small>Saldo Final (Lucro/Prejuízo)</small>
-                                    <h4 id="saldoFinal">R$ 0,00</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Indicadores de Desempenho -->
-                    <section class="resultado-section">
-                        <h6>📊 Indicadores de Desempenho</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="indicador">
-                                    <small>Margem de Lucro (%)</small>
-                                    <p id="margemLucro"><strong>0%</strong></p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="indicador">
-                                    <small>ROI - Return on Investment (%)</small>
-                                    <p id="roi"><strong>0%</strong></p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="indicador">
-                                    <small>Custo Unitário de Produção</small>
-                                    <p id="custoUnitario"><strong>R$ 0,00</strong></p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="indicador">
-                                    <small>Lucro por Unidade</small>
-                                    <p id="lucroUnitario"><strong>R$ 0,00</strong></p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="indicador">
-                                    <small>Ponto de Equilíbrio (unidades)</small>
-                                    <p id="pontoEquilibrio"><strong>0 unidades</strong></p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="indicador">
-                                    <small>Ponto de Equilíbrio (R$)</small>
-                                    <p id="pontoEquilibrioValor"><strong>R$ 0,00</strong></p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Detalhamento de Custos -->
-                    <section class="resultado-section">
-                        <h6>💸 Detalhamento de Custos</h6>
-                        <div class="custo-item">
-                            <small>Custos Variáveis (por cultivo)</small>
-                            <h6 id="custosVariaveis">R$ 0,00</h6>
-                        </div>
-                        <div class="custo-item">
-                            <small>Custos Fixos (rateado neste ciclo)</small>
-                            <h6 id="custosFixosCiclo">R$ 0,00</h6>
-                        </div>
-                        <div class="custo-item destaque">
-                            <small>Custo Total (por ciclo)</small>
-                            <h6 id="custoTotalCiclo">R$ 0,00</h6>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
+  <!-- ── CABEÇALHO ── -->
+  <header class="fin-header">
+    <div class="fin-header-left">
+      <span class="fin-icon">🧮</span>
+      <div>
+        <h1 class="fin-titulo">Calculadora Financeira</h1>
+        <p class="fin-subtitulo">Análise de viabilidade do ciclo de cultivo</p>
+      </div>
     </div>
-
-    <!-- Seção: Cenários e Sensibilidade -->
-    <div class="row mt-4">
-        <div class="col-lg-12">
-            <div class="card card-cenarios">
-                <div class="card-header">
-                    <h5>📉 Cenários e Sensibilidade</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Variação de Preço (%)</label>
-                                <input type="number" class="form-control" id="variacaoPreco" 
-                                       placeholder="Ex: -10" value="0" step="1">
-                                <small class="form-text">Negativo = redução | Positivo = aumento</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Variação de Quantidade (%)</label>
-                                <input type="number" class="form-control" id="variacaoQtd" 
-                                       placeholder="Ex: 20" value="0" step="1">
-                            </div>
-                        </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button class="btn btn-info w-100 btn-simular" onclick="calcularCenario()">
-                                📊 Simular Cenário
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="row" id="resultadosCenario" style="display: none;">
-                        <div class="col-md-4">
-                            <div class="resultado-box info">
-                                <small>Novo Preço</small>
-                                <h6 id="novoPreco">R$ 0,00</h6>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="resultado-box info">
-                                <small>Nova Quantidade</small>
-                                <h6 id="novaQtd">0 unidades</h6>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="resultado-box saldo" id="novoSaldoAlert">
-                                <small>Novo Saldo</small>
-                                <h6 id="novoSaldo">R$ 0,00</h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    {% if selected_campo %}
+    <div style="display:flex;align-items:center;gap:10px;font-size:.85rem;color:rgba(255,255,255,.65);">
+      <span>Campo selecionado:</span>
+      <strong style="color:#fff;font-size:.95rem;">{{ selected_campo.nome }}</strong>
+      <a href="{% url 'financeiro:financeiro' %}"
+         style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.70);border:1px solid rgba(255,255,255,.20);
+                border-radius:20px;padding:5px 14px;font-size:.80rem;font-weight:700;text-decoration:none;">
+        ✕ Trocar
+      </a>
     </div>
-</div>
+    {% endif %}
+  </header>
+
+  <!-- ── SELETOR DE CAMPOS ── -->
+  {% if not selected_campo %}
+  <div style="padding:20px 28px 10px;background:rgba(0,0,0,.10);border-bottom:1px solid rgba(255,255,255,.10);">
+    <p style="font-size:.85rem;color:rgba(255,255,255,.55);margin:0 0 14px;font-weight:600;">
+      📋 Selecione um campo do Diário para carregar os dados automaticamente:
+    </p>
+  </div>
+  <div class="fin-campos-grid">
+    {% for campo in campos %}
+    <a href="?campo_id={{ campo.id }}"
+       class="fin-campo-card {% if campo.colheita_anotada %}{% else %}sem-colheita{% endif %}">
+      <span class="fin-campo-card-nome">{{ campo.nome }}</span>
+      {% if campo.colheita_anotada %}
+        <span class="fin-campo-card-badge ok">✔ Com colheita</span>
+      {% else %}
+        <span class="fin-campo-card-badge aviso">⚠ Sem colheita</span>
+      {% endif %}
+    </a>
+    {% empty %}
+    <p style="color:rgba(255,255,255,.45);font-size:.88rem;grid-column:1/-1;padding:10px 0;">
+      Nenhum campo cadastrado. Crie um no <a href="{% url 'diario_campo' %}" style="color:#6dda7c;">Diário de Campo</a>.
+    </p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── BARRA DE SALDO (quando campo selecionado) ── -->
+  {% if selected_campo %}
+  <div class="fin-saldo-bar">
+    <div class="fin-saldo-item">
+      <span class="fin-saldo-label">Total de Gastos do Ciclo</span>
+      <span class="fin-saldo-val fin-vermelho">− R$ {{ resumo.total_gastos|floatformat:2 }}</span>
+    </div>
+    <div class="fin-saldo-sep"></div>
+    <div class="fin-saldo-item">
+      <span class="fin-saldo-label">Receita da Colheita</span>
+      <span class="fin-saldo-val fin-verde">+ R$ {{ resumo.total_receita|floatformat:2 }}</span>
+    </div>
+    <div class="fin-saldo-sep"></div>
+    <div class="fin-saldo-item">
+      <span class="fin-saldo-label">Saldo Real do Ciclo</span>
+      <span class="fin-saldo-val fin-bold {% if resumo.saldo >= 0 %}fin-verde{% else %}fin-vermelho{% endif %}">
+        {% if resumo.saldo >= 0 %}+{% endif %} R$ {{ resumo.saldo|floatformat:2 }}
+      </span>
+    </div>
+    <div class="fin-saldo-sep"></div>
+    <div class="fin-saldo-item">
+      <span class="fin-saldo-label">Registros</span>
+      <span class="fin-saldo-val">{{ resumo.num_registros }}</span>
+    </div>
+    {% if resumo.qtd_produzida %}
+    <div class="fin-saldo-sep"></div>
+    <div class="fin-saldo-item">
+      <span class="fin-saldo-label">Produção</span>
+      <span class="fin-saldo-val">{{ resumo.qtd_produzida|floatformat:2 }} {{ resumo.unidade }}</span>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- ── CORPO ── -->
+  {% if selected_campo %}
+  <div class="fin-body">
+
+    <!-- COLUNA ESQUERDA: Inputs -->
+    <div class="fin-col-entrada">
+
+      {% if show_colheita_warning %}
+      <div class="fin-aviso-colheita">
+        <span style="font-size:1.4rem;">⚠</span>
+        <div>
+          Este campo ainda não tem colheita registrada.
+          Os valores de receita podem ser preenchidos manualmente abaixo,
+          ou <a href="{% url 'diario_campo_form' selected_campo.id %}">registre a colheita no Diário</a> primeiro.
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Origem dos dados -->
+      {% if registros_lista %}
+      <div class="fin-origem-panel">
+        <button class="fin-origem-header" onclick="toggleOrigem(this)">
+          <span>📋 Registros do Diário de Campo ({{ registros_lista|length }})</span>
+          <span id="origem-seta">▼</span>
+        </button>
+        <div class="fin-origem-lista" id="fin-origem-lista">
+          {% for r in registros_lista %}
+          <div class="fin-origem-item">
+            <span class="fin-origem-icone">{{ r.icone }}</span>
+            <div class="fin-origem-info">
+              <div class="fin-origem-titulo">{{ r.titulo }}</div>
+              <div class="fin-origem-meta">{{ r.tipo }} · {{ r.data }}</div>
+            </div>
+            <span class="fin-origem-valor {% if r.eh_receita %}receita{% else %}gasto{% endif %}">
+              {% if r.eh_receita %}+{% else %}−{% endif %} R$ {{ r.valor|floatformat:2 }}
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Dados de Produção -->
+      <div class="fin-card">
+        <div class="fin-card-titulo">🌾 Produção e Venda</div>
+        <div class="fin-card-corpo">
+          <div class="fin-grid-2">
+            <div class="fin-field">
+              <label>Quantidade Produzida</label>
+              <div class="fin-input-wrap">
+                <input type="number" id="qtdProduzida" class="fin-input"
+                       value="{{ prefill.qtdProduzida|default:'0.00' }}" step="0.01" min="0">
+              </div>
+              {% if prefill.qtdProduzida and prefill.qtdProduzida != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Importado do diário · {{ resumo.unidade }}</span>
+              {% endif %}
+            </div>
+            <div class="fin-field">
+              <label>Preço Unitário de Venda (R$)</label>
+              <div class="fin-input-wrap">
+                <span class="fin-prefix">R$</span>
+                <input type="number" id="precoUnitario" class="fin-input"
+                       value="{{ prefill.precoUnitario|default:'0.00' }}" step="0.01" min="0">
+              </div>
+              {% if prefill.precoUnitario and prefill.precoUnitario != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Importado do diário</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="fin-receita-preview" id="fin-receita-preview">
+            <span>Receita estimada:</span>
+            <strong id="fin-receita-est">R$ 0,00</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custos Variáveis -->
+      <div class="fin-card">
+        <div class="fin-card-titulo">💸 Custos Variáveis (por cultivo)</div>
+        <div class="fin-card-corpo">
+          <div class="fin-grid-2">
+
+            <div class="fin-field">
+              <label>Sementes / Mudas</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoSementes" class="fin-input custo-input"
+                       value="{{ prefill.custoSementes|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoSementes and prefill.custoSementes != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Plantio</span>{% endif %}
+            </div>
+
+            <div class="fin-field">
+              <label>Adubo / Fertilizantes</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoAdubo" class="fin-input custo-input"
+                       value="{{ prefill.custoAdubo|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoAdubo and prefill.custoAdubo != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Adubação</span>{% endif %}
+            </div>
+
+            <div class="fin-field">
+              <label>Defensivos / Agrotóxicos</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoDefensivos" class="fin-input custo-input"
+                       value="{{ prefill.custoDefensivos|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoDefensivos and prefill.custoDefensivos != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Controle de pragas</span>{% endif %}
+            </div>
+
+            <div class="fin-field">
+              <label>Irrigação / Água</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoAgua" class="fin-input custo-input"
+                       value="{{ prefill.custoAgua|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoAgua and prefill.custoAgua != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Irrigação</span>{% endif %}
+            </div>
+
+            <div class="fin-field">
+              <label>Mão de Obra</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoMaoObra" class="fin-input custo-input"
+                       value="{{ prefill.custoMaoObra|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoMaoObra and prefill.custoMaoObra != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Preparo do solo / Capina</span>{% endif %}
+            </div>
+
+            <div class="fin-field">
+              <label>Energia / Combustível</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoEnergia" class="fin-input custo-input"
+                       value="{{ prefill.custoEnergia|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoEnergia and prefill.custoEnergia != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Energia / Combustível</span>{% endif %}
+            </div>
+
+            <div class="fin-field">
+              <label>Colheita / Processamento</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoColheita" class="fin-input custo-input"
+                       value="{{ prefill.custoColheita|default:'0.00' }}" step="0.01" min="0"></div>
+            </div>
+
+            <div class="fin-field">
+              <label>Transporte / Embalagem</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoTransporte" class="fin-input custo-input"
+                       value="{{ prefill.custoTransporte|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoTransporte and prefill.custoTransporte != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Transporte / Embalagem</span>{% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Custos Fixos -->
+      <div class="fin-card">
+        <div class="fin-card-titulo">🏗 Custos Fixos (anualizados)</div>
+        <div class="fin-card-corpo">
+          <div class="fin-grid-2">
+            <div class="fin-field">
+              <label>Aluguel / Uso da Terra</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoAluguel" class="fin-input custo-input"
+                       value="{{ prefill.custoAluguel|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoAluguel and prefill.custoAluguel != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Importado do diário</span>{% endif %}
+            </div>
+            <div class="fin-field">
+              <label>Manutenção de Equipamentos</label>
+              <div class="fin-input-wrap"><span class="fin-prefix">R$</span>
+                <input type="number" id="custoManutencao" class="fin-input custo-input"
+                       value="{{ prefill.custoManutencao|default:'0.00' }}" step="0.01" min="0"></div>
+              {% if prefill.custoManutencao and prefill.custoManutencao != "0.00" %}
+              <span class="fin-input-fonte visivel">✔ Importado do diário</span>{% endif %}
+            </div>
+            <div class="fin-field fin-field--full">
+              <label>Ciclos por Ano <small>(para rateio dos fixos)</small></label>
+              <input type="number" id="ciclosPorAno" class="fin-input"
+                     value="{{ prefill.ciclosPorAno|default:'1' }}" step="1" min="1">
+            </div>
+          </div>
+
+          <div class="fin-acoes">
+            <button class="fin-btn-calcular" onclick="calcularFinanceiro()">🧮 Calcular</button>
+            <button class="fin-btn-limpar"   onclick="limparFormulario()">🗑 Limpar</button>
+          </div>
+
+          <form id="saveFixosForm" method="post" action="{% url 'financeiro:salvar_fixos' %}">
+            {% csrf_token %}
+            <input type="hidden" name="campo_id" value="{{ selected_campo.id }}">
+            <input type="hidden" name="custoAluguel"    id="saveAluguel">
+            <input type="hidden" name="custoManutencao" id="saveManutencao">
+            <button type="button" class="fin-btn-salvar" onclick="salvarFixos()">
+              💾 Salvar custos fixos no Diário
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div><!-- /.fin-col-entrada -->
+
+    <!-- COLUNA DIREITA: Resultados -->
+    <div class="fin-col-resultado">
+
+      <div class="fin-card fin-card-saldo" id="fin-saldo-card">
+        <div class="fin-card-titulo">📈 Resultado do Ciclo</div>
+        <div class="fin-card-corpo">
+          <div class="fin-trio">
+            <div class="fin-trio-item">
+              <span class="fin-trio-label">Receita Total</span>
+              <span class="fin-trio-val fin-verde" id="receitaTotal">R$ 0,00</span>
+            </div>
+            <div class="fin-trio-item">
+              <span class="fin-trio-label">Custo Total</span>
+              <span class="fin-trio-val fin-vermelho" id="custoTotal">R$ 0,00</span>
+            </div>
+          </div>
+          <div class="fin-saldo-destaque" id="saldoAlert">
+            <span class="fin-saldo-destaque-label">Saldo Final (Lucro / Prejuízo)</span>
+            <span class="fin-saldo-destaque-val" id="saldoFinal">R$ 0,00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fin-card">
+        <div class="fin-card-titulo">📊 Indicadores</div>
+        <div class="fin-card-corpo">
+          <div class="fin-ind-grid">
+            <div class="fin-ind"><span class="fin-ind-label">Margem de Lucro</span><span class="fin-ind-val" id="margemLucro">0%</span></div>
+            <div class="fin-ind"><span class="fin-ind-label">ROI</span><span class="fin-ind-val" id="roi">0%</span></div>
+            <div class="fin-ind"><span class="fin-ind-label">Custo Unitário</span><span class="fin-ind-val" id="custoUnitario">R$ 0,00</span></div>
+            <div class="fin-ind"><span class="fin-ind-label">Lucro por Unidade</span><span class="fin-ind-val" id="lucroUnitario">R$ 0,00</span></div>
+            <div class="fin-ind"><span class="fin-ind-label">Ponto de Equilíbrio</span><span class="fin-ind-val" id="pontoEquilibrio">0 unid.</span></div>
+            <div class="fin-ind"><span class="fin-ind-label">Equilíbrio em R$</span><span class="fin-ind-val" id="pontoEquilibrioValor">R$ 0,00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fin-card">
+        <div class="fin-card-titulo">💸 Detalhamento de Custos</div>
+        <div class="fin-card-corpo">
+          <div class="fin-detalhe-lista">
+            <div class="fin-detalhe-item"><span>Custos Variáveis</span><span id="custosVariaveis">R$ 0,00</span></div>
+            <div class="fin-detalhe-item"><span>Custos Fixos (rateado)</span><span id="custosFixosCiclo">R$ 0,00</span></div>
+            <div class="fin-detalhe-item fin-detalhe-total"><span>Custo Total do Ciclo</span><span id="custoTotalCiclo">R$ 0,00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fin-card">
+        <div class="fin-card-titulo">📉 Simulador de Cenários</div>
+        <div class="fin-card-corpo">
+          <div class="fin-grid-2">
+            <div class="fin-field">
+              <label>Variação de Preço (%)</label>
+              <input type="number" id="variacaoPreco" class="fin-input" placeholder="Ex: -10" value="0" step="1">
+              <small>Negativo = redução</small>
+            </div>
+            <div class="fin-field">
+              <label>Variação de Quantidade (%)</label>
+              <input type="number" id="variacaoQtd" class="fin-input" placeholder="Ex: 20" value="0" step="1">
+            </div>
+          </div>
+          <button class="fin-btn-simular" onclick="calcularCenario()">📊 Simular Cenário</button>
+          <div id="resultadosCenario" class="fin-cenario-resultado" style="display:none;">
+            <div class="fin-detalhe-item"><span>Novo Preço</span><span id="novoPreco">R$ 0,00</span></div>
+            <div class="fin-detalhe-item"><span>Nova Quantidade</span><span id="novaQtd">0</span></div>
+            <div class="fin-detalhe-item fin-detalhe-total" id="novoSaldoAlert"><span>Novo Saldo</span><span id="novoSaldo">R$ 0,00</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.fin-col-resultado -->
+  </div><!-- /.fin-body -->
+  {% endif %}
+
+</div><!-- /.fin-page -->
 
 <script src="{% static 'financeiro/calculadora.js' %}"></script>
+<script>
+function toggleOrigem(btn) {
+  var lista = document.getElementById('fin-origem-lista');
+  var seta  = document.getElementById('origem-seta');
+  if (lista.style.display === 'none') {
+    lista.style.display = 'flex';
+    seta.textContent = '▼';
+  } else {
+    lista.style.display = 'none';
+    seta.textContent = '▶';
+  }
+}
 
+// Dispara o cálculo automaticamente se os dados do diário foram carregados
+document.addEventListener('DOMContentLoaded', function() {
+  {% if prefill %}
+  if (typeof calcularFinanceiro === 'function') {
+    calcularFinanceiro();
+  }
+  {% endif %}
+});
+</script>
 {% endblock content %}
-

@@ -1,7 +1,15 @@
 {% extends "global/base.html" %}
 
-
 {% block content %}
-
-    
-{% endblock %}
+<div class="container" style="text-align:center;">
+  <nav>
+    <ul>
+      <li><h1>Otimize a sua cultura de mandioca</h1></li>
+      <li><h3>Ferramentas inteligentes para análise de solo e planejamento de safra</h3></li>
+      <a href="{% url 'planejador' %}">
+        <li class="centralizado"><h4>Começar o Planejamento</h4></li>
+      </a>
+    </ul>
+  </nav>
+</div>
+{% endblock content %}

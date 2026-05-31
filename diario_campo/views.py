@@ -1,26 +1,140 @@
+from decimal import Decimal, InvalidOperation
+
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
-import csv
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-
-from .models import Campo, Registro
 from django.views.decorators.http import require_http_methods
 
-# Create your views here.
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+
+from .models import Campo, Registro
+
+
+# ─── helpers ────────────────────────────────────────────────────────────────
+
+TIPOS_GASTO   = {'preparo_solo', 'plantio', 'adubacao', 'irrigacao',
+                 'capina', 'controle_pragas_doencas', 'energia_combustivel',
+                 'transporte_embalagem'}
+TIPOS_RECEITA = {'colheita'}
+TIPOS_ONE_TIME = {'preparo_solo', 'plantio', 'colheita'}
+
+ATIVIDADE_INFO = [
+    {'value': 'preparo_solo',            'label': 'Preparo do Solo',             'tipo': 'gasto',   'one_time': True},
+    {'value': 'plantio',                 'label': 'Plantio',                     'tipo': 'gasto',   'one_time': True},
+    {'value': 'adubacao',                'label': 'Adubação',                    'tipo': 'gasto',   'one_time': False},
+    {'value': 'irrigacao',               'label': 'Irrigação',                   'tipo': 'gasto',   'one_time': False},
+    {'value': 'capina',                  'label': 'Capina / Controle de Mato',   'tipo': 'gasto',   'one_time': False},
+    {'value': 'controle_pragas_doencas', 'label': 'Controle de Pragas e Doenças','tipo': 'gasto',   'one_time': False},
+    {'value': 'energia_combustivel',     'label': 'Energia / Combustível',       'tipo': 'gasto',   'one_time': False},
+    {'value': 'transporte_embalagem',    'label': 'Transporte / Embalagem',      'tipo': 'gasto',   'one_time': False},
+    {'value': 'colheita',                'label': 'Colheita',                    'tipo': 'receita', 'one_time': True},
+]
+
+
+def _clean_dec(val, default='0'):
+    try:
+        return str(Decimal(str(val).replace(',', '.').strip()))
+    except (InvalidOperation, AttributeError):
+        return default
+
+
+def _build_pdf_table(registros):
+    """Monta a tabela de registros para PDF."""
+    header = ['Data', 'Tipo', 'Título', 'Qtd', 'Unidade', 'Valor Gasto', 'Qtd Produzida', 'Preço Unit.']
+    rows = [header]
+    for r in registros:
+        rows.append([
+            r.data.strftime('%d/%m/%Y'),
+            r.get_tipo_atividade_display() if r.tipo_atividade else '—',
+            r.titulo,
+            str(r.quantidade),
+            r.quantidade_unidade or '—',
+            f"R$ {r.valor_gasto:.2f}",
+            str(r.quantidade_produzida) if r.tipo_atividade == 'colheita' else '—',
+            f"R$ {r.preco_unitario:.2f}" if r.tipo_atividade == 'colheita' else '—',
+        ])
+    return rows
+
+
+def _render_pdf(response, campo, registros):
+    """Gera PDF de registros e escreve em response."""
+    doc = SimpleDocTemplate(response, pagesize=A4,
+                            leftMargin=1.5*cm, rightMargin=1.5*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('title', parent=styles['Title'], fontSize=14, spaceAfter=6)
+    sub_style   = ParagraphStyle('sub',   parent=styles['Normal'], fontSize=9, textColor=colors.grey, spaceAfter=12)
+
+    # Calcular saldo
+    total_gastos  = sum(r.valor_gasto   for r in registros if r.tipo_atividade not in TIPOS_RECEITA)
+    total_receita = sum(r.receita_total for r in registros if r.tipo_atividade in TIPOS_RECEITA)
+    saldo         = total_receita - total_gastos
+
+    elements = [
+        Paragraph(f"Diário de Campo — {campo.nome}", title_style),
+        Paragraph(f"Ciclo {campo.numero_ciclo}  |  Registros: {len(registros)}  |  "
+                  f"Gastos: R$ {total_gastos:.2f}  |  Receita: R$ {total_receita:.2f}  |  "
+                  f"Saldo: R$ {saldo:.2f}", sub_style),
+    ]
+
+    if registros:
+        rows = _build_pdf_table(registros)
+        table = Table(rows, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND',    (0, 0), (-1, 0),  colors.HexColor('#2d6a4f')),
+            ('TEXTCOLOR',     (0, 0), (-1, 0),  colors.white),
+            ('FONTNAME',      (0, 0), (-1, 0),  'Helvetica-Bold'),
+            ('FONTSIZE',      (0, 0), (-1, -1), 8),
+            ('ALIGN',         (0, 0), (-1, -1), 'LEFT'),
+            ('ROWBACKGROUNDS',(0, 1), (-1, -1), [colors.white, colors.HexColor('#f0f7f3')]),
+            ('GRID',          (0, 0), (-1, -1), 0.4, colors.HexColor('#cccccc')),
+            ('TOPPADDING',    (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ]))
+        elements.append(table)
+    else:
+        elements.append(Paragraph("Nenhum registro neste ciclo.", styles['Normal']))
+
+    doc.build(elements)
+
+
+# ─── views ──────────────────────────────────────────────────────────────────
 
 def selecionar_campo(request):
+    error_message = None
     if request.method == 'POST':
         nome = request.POST.get('nome_campo', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
         if nome:
-            campo, created = Campo.objects.get_or_create(nome=nome)
+            campo, created = Campo.objects.get_or_create(
+                nome=nome,
+                defaults={'descricao': descricao}
+            )
             return redirect('diario_campo_form', campo_id=campo.id)
+        else:
+            error_message = 'Digite um nome para o campo.'
 
     campos = Campo.objects.all().order_by('nome')
-    return render(request, 'selecionar_campo.html', {'campos': campos})
+    # Anotar contagem de registros ativos
+    campos_data = []
+    for c in campos:
+        regs = c.registros_ciclo_atual
+        total_gastos  = sum(r.valor_gasto   for r in regs if r.tipo_atividade not in TIPOS_RECEITA)
+        total_receita = sum(r.receita_total for r in regs if r.tipo_atividade in TIPOS_RECEITA)
+        campos_data.append({
+            'campo': c,
+            'num_registros': regs.count(),
+            'total_gastos': total_gastos,
+            'total_receita': total_receita,
+            'saldo': total_receita - total_gastos,
+        })
+    return render(request, 'selecionar_campo.html', {
+        'campos_data': campos_data,
+        'error_message': error_message,
+    })
 
 
 def excluir_campo(request, campo_id):
@@ -34,263 +148,155 @@ def excluir_registro(request, registro_id):
     registro = get_object_or_404(Registro, id=registro_id)
     campo_id = registro.campo.id
     if request.method == 'POST':
+        # Se era o único registro de colheita, reativa o ciclo
+        campo = registro.campo
+        era_colheita = registro.tipo_atividade == 'colheita'
         registro.delete()
+        if era_colheita and not campo.registros.filter(tipo_atividade='colheita', arquivado=False).exists():
+            campo.ciclo_ativo = True
+            campo.save(update_fields=['ciclo_ativo'])
+    return redirect('diario_campo_form', campo_id=campo_id)
+
+
+def reiniciar_ciclo(request, campo_id):
+    campo = get_object_or_404(Campo, id=campo_id)
+    if request.method == 'POST':
+        campo.reiniciar_ciclo()
     return redirect('diario_campo_form', campo_id=campo_id)
 
 
 def diario_campo(request, campo_id):
     campo = get_object_or_404(Campo, id=campo_id)
-    colheita_done = campo.registros.filter(tipo_atividade='colheita').exists()
+    colheita_done = campo.registros.filter(tipo_atividade='colheita', arquivado=False).exists()
 
     error_message = None
+
     if request.method == 'POST':
+        action = request.POST.get('_action', '')
+
+        if action == 'reiniciar_ciclo':
+            campo.reiniciar_ciclo()
+            return redirect('diario_campo_form', campo_id=campo.id)
+
         if colheita_done:
-            error_message = 'A colheita já foi registrada para este campo. Novos registros não são permitidos.'
+            error_message = 'A colheita já foi registrada. Reinicie o ciclo para adicionar novos registros.'
         else:
-            data = request.POST.get('data')
-            titulo = request.POST.get('titulo', '').strip()
-            detalhe = request.POST.get('detalhe', '').strip()
+            data           = request.POST.get('data', '').strip()
+            titulo         = request.POST.get('titulo', '').strip()
+            detalhe        = request.POST.get('detalhe', '').strip()
             tipo_atividade = request.POST.get('tipo_atividade', '').strip()
             quantidade_unidade = request.POST.get('quantidade_unidade', '').strip()
-            recurso_tipo = request.POST.get('recurso_tipo', '').strip()
-            medida_tipo = request.POST.get('medida_tipo', '').strip()
-
-            def clean_number(value):
-                return value.replace(',', '.').strip() if value else '0'
-
-            quantidade_raw = request.POST.get('quantidade', '0').strip()
-            if tipo_atividade == 'plantio' and 'x' in quantidade_raw:
-                # Parse linhas x colunas
-                try:
-                    linhas, colunas = map(int, quantidade_raw.split('x'))
-                    quantidade = str(linhas * colunas)
-                    detalhe += f" (Linhas: {linhas}, Colunas: {colunas})"
-                except ValueError:
-                    quantidade = '0'
-            else:
-                quantidade = clean_number(quantidade_raw)
-            valor_gasto = clean_number(request.POST.get('valor_gasto', '0'))
-            quantidade_produzida = clean_number(request.POST.get('quantidade_produzida', '0'))
-            preco_unitario = clean_number(request.POST.get('preco_unitario', '0'))
-            custo_sementes = clean_number(request.POST.get('custo_sementes', '0'))
-            custo_adubo = clean_number(request.POST.get('custo_adubo', '0'))
-            custo_defensivos = clean_number(request.POST.get('custo_defensivos', '0'))
-            custo_agua = clean_number(request.POST.get('custo_agua', '0'))
-            custo_mao_obra = clean_number(request.POST.get('custo_mao_obra', '0'))
-            custo_energia = clean_number(request.POST.get('custo_energia', '0'))
-            custo_colheita = clean_number(request.POST.get('custo_colheita', '0'))
-            custo_transporte = clean_number(request.POST.get('custo_transporte', '0'))
-            custo_aluguel = request.POST.get('custo_aluguel', '').strip()
-            custo_manutencao = request.POST.get('custo_manutencao', '').strip()
-            ciclos_por_ano = clean_number(request.POST.get('ciclos_por_ano', '1'))
-
-            # If this is a colheita, attempt to derive preco_unitario from valor_gasto / quantidade_produzida
-            try:
-                qtd_prod_val = float(quantidade_produzida.replace(',', '.')) if quantidade_produzida else 0.0
-            except Exception:
-                qtd_prod_val = 0.0
-
-            try:
-                valor_gasto_val = float(valor_gasto.replace(',', '.')) if valor_gasto else 0.0
-            except Exception:
-                valor_gasto_val = 0.0
-
-            try:
-                preco_unit_val = float(preco_unitario.replace(',', '.')) if preco_unitario else 0.0
-            except Exception:
-                preco_unit_val = 0.0
-
-            if tipo_atividade == 'colheita' and (not preco_unit_val or preco_unit_val == 0) and qtd_prod_val and valor_gasto_val:
-                try:
-                    preco_unit_val = valor_gasto_val / qtd_prod_val
-                    preco_unitario = str(round(preco_unit_val, 2))
-                except Exception:
-                    preco_unitario = preco_unitario
 
             if not tipo_atividade:
-                error_message = 'Selecione um tipo de atividade antes de salvar.'
-            elif data and titulo:
-                detalhe_final = detalhe
-                detalhe_ciclos = []
-                if recurso_tipo:
-                    detalhe_ciclos.append(f"Recurso: {recurso_tipo}")
-                if medida_tipo:
-                    detalhe_ciclos.append(f"Medida: {medida_tipo}")
-                if detalhe_ciclos:
-                    detalhe_final = f"{detalhe_final} | {' | '.join(detalhe_ciclos)}" if detalhe_final else ' | '.join(detalhe_ciclos)
+                error_message = 'Selecione um tipo de atividade.'
+            elif not data or not titulo:
+                error_message = 'Preencha a data e o título.'
+            else:
+                # Quantidade
+                qtd_raw = request.POST.get('quantidade', '1').strip()
+                if tipo_atividade == 'plantio' and 'x' in qtd_raw.lower():
+                    try:
+                        linhas, colunas = map(int, qtd_raw.lower().split('x'))
+                        quantidade = str(linhas * colunas)
+                        detalhe = f"{detalhe} | Linhas: {linhas}, Colunas: {colunas}".strip(' |')
+                    except ValueError:
+                        quantidade = '1'
+                else:
+                    quantidade = _clean_dec(qtd_raw, '1')
 
-                # decide valores de aluguel/manutenção: usa valores informados ou default do campo
-                try:
-                    aluguel_to_save = float(custo_aluguel.replace(',', '.')) if custo_aluguel not in (None, '', '0') else float(campo.custo_aluguel_padrao)
-                except Exception:
-                    aluguel_to_save = float(campo.custo_aluguel_padrao)
-
-                try:
-                    manut_to_save = float(custo_manutencao.replace(',', '.')) if custo_manutencao not in (None, '', '0') else float(campo.custo_manutencao_padrao)
-                except Exception:
-                    manut_to_save = float(campo.custo_manutencao_padrao)
-
-                # Convert quantidade_produzida from 'saca' to kg if needed for internal consistency? We store raw value and unit;
-                # finance view will convert when aggregating.
+                if tipo_atividade in TIPOS_RECEITA:
+                    quantidade_produzida = _clean_dec(request.POST.get('quantidade_produzida', '0'))
+                    preco_unitario       = _clean_dec(request.POST.get('preco_unitario', '0'))
+                    valor_gasto          = '0'
+                    quantidade           = quantidade_produzida
+                else:
+                    valor_gasto          = _clean_dec(request.POST.get('valor_gasto', '0'))
+                    quantidade_produzida = '0'
+                    preco_unitario       = '0'
 
                 Registro.objects.create(
                     campo=campo,
                     data=data,
                     titulo=titulo,
-                    detalhe=detalhe_final,
+                    detalhe=detalhe,
                     tipo_atividade=tipo_atividade,
                     quantidade=quantidade,
                     quantidade_unidade=quantidade_unidade,
-                    recurso_tipo=recurso_tipo,
-                    medida_tipo=medida_tipo,
                     valor_gasto=valor_gasto,
                     quantidade_produzida=quantidade_produzida,
                     preco_unitario=preco_unitario,
-                    custo_sementes=custo_sementes,
-                    custo_adubo=custo_adubo,
-                    custo_defensivos=custo_defensivos,
-                    custo_agua=custo_agua,
-                    custo_mao_obra=custo_mao_obra,
-                    custo_energia=custo_energia,
-                    custo_colheita=custo_colheita,
-                    custo_transporte=custo_transporte,
-                    custo_aluguel=aluguel_to_save,
-                    custo_manutencao=manut_to_save,
-                    ciclos_por_ano=ciclos_por_ano,
+                    custo_aluguel=campo.custo_aluguel_padrao,
+                    custo_manutencao=campo.custo_manutencao_padrao,
+                    numero_ciclo=campo.numero_ciclo,
+                    ciclos_por_ano=1,
                 )
+
+                # Se registrou colheita, fecha o ciclo
+                if tipo_atividade == 'colheita':
+                    campo.ciclo_ativo = False
+                    campo.save(update_fields=['ciclo_ativo'])
+
                 return redirect('diario_campo_form', campo_id=campo.id)
-            else:
-                error_message = 'Preencha a data e o título antes de salvar.'
 
-    registros = campo.registros.all()
+    # Registros do ciclo atual
+    registros = campo.registros_ciclo_atual.order_by('-data', '-criado_em')
 
-    atividade_info = [
-        {'value': 'preparo_solo', 'label': 'Preparo do Solo', 'one_time': True},
-        {'value': 'plantio', 'label': 'Plantio', 'one_time': True},
-        {'value': 'adubacao', 'label': 'Adubação', 'one_time': False},
-        {'value': 'irrigacao', 'label': 'Irrigação', 'one_time': False},
-        {'value': 'capina', 'label': 'Capina / Controle de Mato', 'one_time': False},
-        {'value': 'controle_pragas_doencas', 'label': 'Controle de Pragas e Doenças', 'one_time': False},
-        {'value': 'energia_combustivel', 'label': 'Energia / Combustível', 'one_time': False},
-        {'value': 'transporte_embalagem', 'label': 'Transporte / Embalagem', 'one_time': False},
-        {'value': 'colheita', 'label': 'Colheita', 'one_time': True},
-    ]
+    # Filtro por tipo (GET)
+    filtro_tipo = request.GET.get('tipo', '')
+    if filtro_tipo:
+        registros = registros.filter(tipo_atividade=filtro_tipo)
 
-    used_one_time_atividades = []
-    if campo.registros.filter(tipo_atividade__in=['preparo_solo', 'plantio', 'colheita']).exists():
-        used_one_time_atividades = list(campo.registros.filter(tipo_atividade__in=['preparo_solo', 'plantio', 'colheita']).values_list('tipo_atividade', flat=True))
+    # Busca por título/detalhe
+    busca = request.GET.get('q', '').strip()
+    if busca:
+        from django.db.models import Q
+        registros = registros.filter(Q(titulo__icontains=busca) | Q(detalhe__icontains=busca))
+
+    # Totais (sempre do ciclo completo, não filtrado)
+    todos_registros = campo.registros_ciclo_atual
+    total_gastos  = sum(r.valor_gasto   for r in todos_registros if r.tipo_atividade not in TIPOS_RECEITA)
+    total_receita = sum(r.receita_total for r in todos_registros if r.tipo_atividade in TIPOS_RECEITA)
+    saldo_ciclo   = total_receita - total_gastos
+
+    # Progresso do ciclo (etapas concluídas)
+    etapas = ['preparo_solo', 'plantio', 'adubacao', 'colheita']
+    etapas_concluidas = list(
+        campo.registros.filter(tipo_atividade__in=etapas, arquivado=False)
+                       .values_list('tipo_atividade', flat=True).distinct()
+    )
+
+    used_one_time_atividades = list(
+        campo.registros.filter(tipo_atividade__in=TIPOS_ONE_TIME, arquivado=False)
+                       .values_list('tipo_atividade', flat=True)
+    )
 
     return render(request, 'diario_campo.html', {
-        'campo': campo,
-        'registros': registros,
-        'colheita_done': colheita_done,
-        'error_message': error_message,
-        'atividade_info': atividade_info,
+        'campo':                    campo,
+        'registros':                registros,
+        'colheita_done':            colheita_done,
+        'error_message':            error_message,
+        'atividade_info':           ATIVIDADE_INFO,
         'used_one_time_atividades': used_one_time_atividades,
+        'campo_criado_em':          campo.criado_em,
+        'total_gastos':             total_gastos,
+        'total_receita':            total_receita,
+        'saldo_ciclo':              saldo_ciclo,
+        'filtro_tipo':              filtro_tipo,
+        'busca':                    busca,
+        'etapas_concluidas':        etapas_concluidas,
+        'num_registros_total':      todos_registros.count(),
     })
-
-
-def download_registros(request, campo_id):
-    campo = get_object_or_404(Campo, id=campo_id)
-    registros = campo.registros.all().order_by('-data', '-criado_em')
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="historico_registros_{campo.nome}.pdf"'
-
-    doc = SimpleDocTemplate(response, pagesize=letter)
-    elements = []
-
-    styles = getSampleStyleSheet()
-    title = Paragraph(f"Histórico de Registros - Campo: {campo.nome}", styles['Title'])
-    elements.append(title)
-
-    data = [
-        ['Data', 'Tipo', 'Título', 'Quantidade', 'Unidade', 'Recurso', 'Medida', 'Valor Gasto', 'Qtd Produzida', 'Preço Unit.', 'Custo Total (R$)'],
-    ]
-    for registro in registros:
-        data.append([
-            registro.data.strftime('%d/%m/%Y'),
-            registro.get_tipo_atividade_display() if registro.tipo_atividade else 'N/A',
-            registro.titulo,
-            str(registro.quantidade),
-            registro.quantidade_unidade or 'N/A',
-            registro.recurso_tipo or 'N/A',
-            registro.medida_tipo or 'N/A',
-            f"R$ {registro.valor_gasto:.2f}",
-            str(registro.quantidade_produzida),
-            f"R$ {registro.preco_unitario:.2f}",
-            f"R$ {registro.custo_total_ciclo:.2f}"
-        ])
-
-    table = Table(data)
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 14),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-    ]))
-    elements.append(table)
-
-    doc.build(elements)
-    return response
-
-
-def download_registro(request, registro_id):
-    registro = get_object_or_404(Registro, id=registro_id)
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="registro_{registro.titulo}.pdf"'
-
-    doc = SimpleDocTemplate(response, pagesize=letter)
-    elements = []
-
-    styles = getSampleStyleSheet()
-    title = Paragraph(f"Registro: {registro.titulo}", styles['Title'])
-    elements.append(title)
-
-    data = [
-        ['Campo', registro.campo.nome],
-        ['Data', registro.data.strftime('%d/%m/%Y')],
-        ['Atividade', registro.get_tipo_atividade_display() if registro.tipo_atividade else 'N/A'],
-        ['Título', registro.titulo],
-        ['Detalhe', registro.detalhe],
-        ['Recurso', registro.recurso_tipo or 'N/A'],
-        ['Medida', registro.medida_tipo or 'N/A'],
-        ['Quantidade', f"{registro.quantidade} {registro.quantidade_unidade}".strip()],
-        ['Valor Gasto', f"R$ {registro.valor_gasto:.2f}"],
-        ['Quantidade Produzida', str(registro.quantidade_produzida)],
-        ['Preço Unitário', f"R$ {registro.preco_unitario:.2f}"],
-        ['Custo Total (por ciclo)', f"R$ {registro.custo_total_ciclo:.2f}"],
-        ['Receita Total', f"R$ {registro.receita_total:.2f}"],
-        ['Lucro Total', f"R$ {registro.lucro_total:.2f}"],
-    ]
-
-    table = Table(data)
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 14),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-    ]))
-    elements.append(table)
-
-    doc.build(elements)
-    return response
 
 
 @require_http_methods(['GET', 'POST'])
 def editar_campo(request, campo_id):
     campo = get_object_or_404(Campo, id=campo_id)
     error_message = None
+    success_message = None
+
     if request.method == 'POST':
+        novo_nome = request.POST.get('nome', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
         saca_em_kg = request.POST.get('saca_em_kg', '').strip()
         custo_aluguel_padrao = request.POST.get('custo_aluguel_padrao', '').strip()
         custo_manutencao_padrao = request.POST.get('custo_manutencao_padrao', '').strip()
@@ -301,62 +307,82 @@ def editar_campo(request, campo_id):
             except Exception:
                 return float(default)
 
-        campo.saca_em_kg = clean_num(saca_em_kg, str(campo.saca_em_kg))
-        campo.custo_aluguel_padrao = clean_num(custo_aluguel_padrao, str(campo.custo_aluguel_padrao))
-        campo.custo_manutencao_padrao = clean_num(custo_manutencao_padrao, str(campo.custo_manutencao_padrao))
-        campo.save()
-        return redirect('diario_campo_form', campo_id=campo.id)
+        if novo_nome and novo_nome != campo.nome:
+            if Campo.objects.filter(nome=novo_nome).exclude(id=campo.id).exists():
+                error_message = f'Já existe um campo com o nome "{novo_nome}".'
+            else:
+                campo.nome = novo_nome
+
+        if not error_message:
+            campo.descricao             = descricao
+            campo.saca_em_kg            = clean_num(saca_em_kg, str(campo.saca_em_kg))
+            campo.custo_aluguel_padrao  = clean_num(custo_aluguel_padrao, str(campo.custo_aluguel_padrao))
+            campo.custo_manutencao_padrao = clean_num(custo_manutencao_padrao, str(campo.custo_manutencao_padrao))
+            campo.save()
+            success_message = 'Configurações salvas com sucesso!'
 
     return render(request, 'editar_campo.html', {
         'campo': campo,
         'error_message': error_message,
+        'success_message': success_message,
     })
 
 
 def download_campo_registros(request, campo_id):
     campo = get_object_or_404(Campo, id=campo_id)
-    registros = campo.registros.all().order_by('-data', '-criado_em')
+    registros = list(campo.registros_ciclo_atual.order_by('-data', '-criado_em'))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="diario_{campo.nome}_ciclo{campo.numero_ciclo}.pdf"'
+    _render_pdf(response, campo, registros)
+    return response
+
+
+def download_registro(request, registro_id):
+    registro = get_object_or_404(Registro, id=registro_id)
+    campo = registro.campo
 
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="registros_{campo.nome}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="registro_{registro.id}.pdf"'
 
-    doc = SimpleDocTemplate(response, pagesize=letter)
-    elements = []
-
+    doc = SimpleDocTemplate(response, pagesize=A4,
+                            leftMargin=1.5*cm, rightMargin=1.5*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
     styles = getSampleStyleSheet()
-    title = Paragraph(f"Histórico de Registros - Campo: {campo.nome}", styles['Title'])
-    elements.append(title)
+    title_style = ParagraphStyle('title', parent=styles['Title'], fontSize=13, spaceAfter=12)
 
-    data = [
-        ['Data', 'Tipo', 'Título', 'Quantidade', 'Unidade', 'Recurso', 'Medida', 'Valor Gasto', 'Qtd Produzida', 'Preço Unit.', 'Custo Total (R$)'],
+    rows = [
+        ['Campo',        campo.nome],
+        ['Data',         registro.data.strftime('%d/%m/%Y')],
+        ['Atividade',    registro.get_tipo_atividade_display() if registro.tipo_atividade else '—'],
+        ['Título',       registro.titulo],
+        ['Observações',  registro.detalhe or '—'],
+        ['Quantidade',   f"{registro.quantidade} {registro.quantidade_unidade}".strip()],
+        ['Valor Gasto',  f"R$ {registro.valor_gasto:.2f}"],
     ]
-    for registro in registros:
-        data.append([
-            registro.data.strftime('%d/%m/%Y'),
-            registro.get_tipo_atividade_display() if registro.tipo_atividade else 'N/A',
-            registro.titulo,
-            str(registro.quantidade),
-            registro.quantidade_unidade or 'N/A',
-            registro.recurso_tipo or 'N/A',
-            registro.medida_tipo or 'N/A',
-            f"R$ {registro.valor_gasto:.2f}",
-            str(registro.quantidade_produzida),
-            f"R$ {registro.preco_unitario:.2f}",
-            f"R$ {registro.custo_total_ciclo:.2f}"
-        ])
+    if registro.tipo_atividade == 'colheita':
+        rows += [
+            ['Qtd Produzida', f"{registro.quantidade_produzida} {registro.quantidade_unidade}".strip()],
+            ['Preço Unit.',   f"R$ {registro.preco_unitario:.2f}"],
+            ['Receita Total', f"R$ {registro.receita_total:.2f}"],
+        ]
 
-    table = Table(data)
+    table = Table(rows, colWidths=[5*cm, None])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 14),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME',      (0, 0), (0, -1),  'Helvetica-Bold'),
+        ('FONTSIZE',      (0, 0), (-1, -1), 9),
+        ('ALIGN',         (0, 0), (-1, -1), 'LEFT'),
+        ('ROWBACKGROUNDS',(0, 0), (-1, -1), [colors.white, colors.HexColor('#f0f7f3')]),
+        ('GRID',          (0, 0), (-1, -1), 0.4, colors.HexColor('#cccccc')),
+        ('TOPPADDING',    (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
     ]))
-    elements.append(table)
 
-    doc.build(elements)
+    doc.build([
+        Paragraph(f"Registro — {registro.titulo}", title_style),
+        table,
+    ])
     return response
+
+
+# Mantido por compatibilidade com URL antiga
+download_registros = download_campo_registros

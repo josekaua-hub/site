@@ -6,476 +6,534 @@
 {% endblock extra_css %}
 
 {% block content %}
-<div class="selection-container">
-    <section>
-        <div class="section-header">
-            <div>
-                <h2>Registrar novo registro</h2>
-                <p class="current-field">Campo selecionado: <strong>{{ campo.nome }}</strong></p>
-            </div>
-            <div>
-                <a class="change-field-link" href="{% url 'diario_campo' %}">Selecionar outro campo</a>
-                <a class="change-field-link" href="{% url 'editar_campo' campo.id %}">Configurar campo</a>
-            </div>
-        </div>
+<div class="dc-page">
 
-        {% if colheita_done %}
-            <div class="form-note">
-                A colheita já foi registrada para este campo. Não é mais possível adicionar novos registros aqui; apenas a visualização do histórico está disponível.
-            </div>
-        {% else %}
-            <form method="post" class="registro-form">
-                {% csrf_token %}
-                {% if error_message %}
-                    <div class="form-error">{{ error_message }}</div>
-                {% endif %}
-
-                <label for="data">Data da Atividade</label>
-                <input type="date" id="data" name="data" required>
-
-                <label for="tipo_atividade">Tipo de Atividade</label>
-                <select id="tipo_atividade" name="tipo_atividade" required>
-                <option value="" disabled selected>Selecione o tipo de atividade</option>
-                {% for atividade in atividade_info %}
-                    <option value="{{ atividade.value }}" {% if atividade.one_time and atividade.value in used_one_time_atividades %}disabled{% endif %}>
-                        {{ atividade.label }}{% if atividade.one_time and atividade.value in used_one_time_atividades %} (já registrado){% endif %}
-                    </option>
-                {% endfor %}
-            </select>
-
-            <div id="recurso-container" style="display: none;">
-                <label for="recurso_tipo">O que foi utilizado</label>
-                <select id="recurso_tipo" name="recurso_tipo">
-                    <option value="" disabled selected>Selecione o recurso</option>
-                </select>
-            </div>
-
-            <label for="quantidade_unidade">Unidade da Quantidade</label>
-            <select id="quantidade_unidade" name="quantidade_unidade" required>
-                <option value="" disabled selected>Selecione a unidade</option>
-            </select>
-
-            <div id="medida-container" style="display: none;">
-                <label for="medida_tipo">Período / Medida</label>
-                <select id="medida_tipo" name="medida_tipo">
-                    <option value="" disabled selected>Selecione a medida</option>
-                </select>
-            </div>
-
-            <p id="tipo-description" class="tipo-description">Selecione uma atividade para ver o tipo de quantidade mais adequado.</p>
-            <p id="tipo-help" class="tipo-help">Cada atividade tem um contexto de quantidade diferente: horas, vezes ou unidade.</p>
-
-            <label for="titulo">Título</label>
-            <input id="titulo" name="titulo" type="text" placeholder="Ex: Preparo do Solo" required>
-
-            <label for="detalhe">Detalhe da Atividade</label>
-            <textarea id="detalhe" name="detalhe" rows="3"></textarea>
-
-            <label for="quantidade" id="quantidade-label">Quantidade de Eventos (ou Escala)</label>
-            <input type="text" inputmode="decimal" id="quantidade" name="quantidade" step="0.01" value="1" required pattern="\d+(\.|,)?\d*" placeholder="1">
-            <p id="quantidade-note" class="quantidade-note">Se for atividade pontual, use 1. Para recorrentes, registre o número de vezes ou a duração.</p>
-
-            <label for="valor_gasto">Valor/Gasto (R$)</label>
-            <input type="text" inputmode="decimal" id="valor_gasto" name="valor_gasto" step="0.01" value="0" placeholder="0.00" required pattern="\d+(\.|,)?\d*">
-
-            <fieldset id="producaoCustosFieldset" class="producao-custos" style="display: none;">
-                <legend>Dados de produção e custos</legend>
-
-                <label for="quantidade_produzida">Quantidade Produzida</label>
-                <input type="text" inputmode="decimal" id="quantidade_produzida" name="quantidade_produzida" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="preco_unitario">Preço Unitário (R$)</label>
-                <input type="text" inputmode="decimal" id="preco_unitario" name="preco_unitario" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_sementes">Custo Sementes/Mudas (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_sementes" name="custo_sementes" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_adubo">Custo Adubo/Fertilizantes (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_adubo" name="custo_adubo" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_defensivos">Custo Defensivos/Agrotóxicos (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_defensivos" name="custo_defensivos" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_agua">Custo Irrigação/Água (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_agua" name="custo_agua" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_mao_obra">Custo Mão de Obra (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_mao_obra" name="custo_mao_obra" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_energia">Custo Energia/Combustível (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_energia" name="custo_energia" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_colheita">Custo Colheita/Processamento (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_colheita" name="custo_colheita" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_transporte">Custo Transporte/Embalagem (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_transporte" name="custo_transporte" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_aluguel">Custo Aluguel/Uso da Terra (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_aluguel" name="custo_aluguel" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="custo_manutencao">Custo Manutenção de Equipamentos (R$)</label>
-                <input type="text" inputmode="decimal" id="custo_manutencao" name="custo_manutencao" step="0.01" value="0" placeholder="0.00" pattern="\d+(\.|,)?\d*">
-
-                <label for="ciclos_por_ano">Ciclos por Ano</label>
-                <input type="number" id="ciclos_por_ano" name="ciclos_por_ano" min="1" value="1" step="1" placeholder="1">
-            </fieldset>
-
-            <button type="submit">Salvar Registro</button>
-            </form>
-        {% endif %}
-    </section>
-
-    <section>
-        <h2>Histórico de registros</h2>
-        {% if registros %}
-            <ul class="registro-list">
-                {% for registro in registros %}
-                    <li class="registro-item">
-                        <div class="registro-header" data-registro-id="{{ registro.id }}" data-titulo="{{ registro.titulo }}" data-tipo="{{ registro.get_tipo_atividade_display }}" data-data="{{ registro.data|date:'d/m/Y' }}" data-detalhe="{{ registro.detalhe }}" data-quantidade="{{ registro.quantidade }}" data-quantidade-unidade="{{ registro.quantidade_unidade }}" data-valor="{{ registro.valor_gasto }}" data-quantidade-produzida="{{ registro.quantidade_produzida }}" data-preco-unitario="{{ registro.preco_unitario }}">
-                            <div class="registro-header-left">
-                                <div class="registro-title-row">
-                                    <span class="registro-titulo">{{ registro.titulo }}</span>
-                                    <span class="registro-valor-header">R$ {{ registro.valor_gasto|floatformat:2 }}</span>
-                                </div>
-                                <div class="registro-meta">
-                                    <span class="registro-summary">{{ registro.get_tipo_atividade_display }}</span>
-                                    <span class="registro-date">{{ registro.data|date:'d/m/Y' }}</span>
-                                    {% if registro.tipo_atividade == 'colheita' %}
-                                        <span class="registro-prod">Qtd produzida: {{ registro.quantidade_produzida }} {% if registro.quantidade_unidade %}{{ registro.quantidade_unidade }}{% else %}unidades{% endif %}</span>
-                                        <span class="registro-preco">Preço unit.: R$ {{ registro.preco_unitario|floatformat:2 }}</span>
-                                    {% else %}
-                                        <span class="registro-qty">Quantidade: {{ registro.quantidade }} {% if registro.quantidade_unidade %}{{ registro.quantidade_unidade }}{% endif %}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="registro-actions">
-                                <a href="{% url 'download_registro' registro.id %}" class="download-icon" title="Baixar Registro">📄</a>
-                                <form method="post" action="{% url 'excluir_registro' registro.id %}" class="registro-delete-form">
-                                    {% csrf_token %}
-                                    <button type="submit">Excluir</button>
-                                </form>
-                            </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Não há registros para este campo ainda.</p>
-        {% endif %}
-    </section>
-</div>
-
-<div id="registro-modal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <h3 id="modal-titulo"></h3>
-        <p id="modal-tipo"></p>
-        <p id="modal-data"></p>
-        <p id="modal-quantidade"></p>
-        <p id="modal-valor"></p>
-        <p id="modal-detalhe"></p>
+  <!-- ───── CABEÇALHO ───── -->
+  <header class="dc-header">
+    <div class="dc-header-left">
+      <span class="dc-icon">📓</span>
+      <div>
+        <h1 class="dc-titulo">Diário de Campo</h1>
+        <p class="dc-subtitulo">{{ campo.nome }}
+          <span style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-left:6px;">Ciclo {{ campo.numero_ciclo }}</span>
+        </p>
+      </div>
     </div>
+    <nav class="dc-nav">
+      <a href="{% url 'diario_campo' %}" class="dc-btn-nav">← Trocar campo</a>
+      <a href="{% url 'editar_campo' campo.id %}" class="dc-btn-nav">⚙ Configurar</a>
+      <a href="{% url 'download_campo_registros' campo.id %}" class="dc-btn-nav">📥 PDF</a>
+    </nav>
+  </header>
+
+  <!-- ───── PAINEL DE SALDO ───── -->
+  <div class="dc-saldo-bar">
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Total de Gastos</span>
+      <span class="dc-saldo-val dc-vermelho">− R$ {{ total_gastos|floatformat:2 }}</span>
+    </div>
+    <div class="dc-saldo-sep"></div>
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Receita da Colheita</span>
+      <span class="dc-saldo-val dc-verde">+ R$ {{ total_receita|floatformat:2 }}</span>
+    </div>
+    <div class="dc-saldo-sep"></div>
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Saldo do Ciclo</span>
+      <span class="dc-saldo-val {% if saldo_ciclo >= 0 %}dc-verde{% else %}dc-vermelho{% endif %} dc-bold">
+        {% if saldo_ciclo >= 0 %}+{% endif %} R$ {{ saldo_ciclo|floatformat:2 }}
+      </span>
+    </div>
+    <div class="dc-saldo-sep"></div>
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Registros</span>
+      <span class="dc-saldo-val">{{ num_registros_total }}</span>
+    </div>
+  </div>
+
+  <!-- ───── PROGRESSO DO CICLO ───── -->
+  <div style="padding:10px 20px; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.08);
+              display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+    <span style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-right:4px;">Etapas:</span>
+    <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
+      {% if 'preparo_solo' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
+      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      🚜 Preparo
+    </span>
+    <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
+      {% if 'plantio' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
+      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      🌱 Plantio
+    </span>
+    <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
+      {% if 'adubacao' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
+      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      🧪 Adubação
+    </span>
+    <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
+      {% if 'colheita' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
+      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      🌾 Colheita
+    </span>
+  </div>
+
+  <!-- ───── CORPO PRINCIPAL ───── -->
+  <div class="dc-body">
+
+    <!-- COLUNA ESQUERDA: Formulário -->
+    <aside class="dc-form-col">
+
+      {% if colheita_done %}
+        <div class="dc-aviso-colheita">
+          <div style="font-size:1.5rem; margin-bottom:6px;">🎉</div>
+          <strong>Ciclo {{ campo.numero_ciclo }} encerrado!</strong>
+          <p style="font-size:0.85rem; margin:6px 0 14px; opacity:0.80;">
+            A colheita foi registrada. Para iniciar um novo ciclo de plantio, clique abaixo.
+          </p>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="_action" value="reiniciar_ciclo">
+            <button type="submit"
+                    onclick="return confirm('Iniciar o Ciclo {{ campo.numero_ciclo|add:1 }}? Os registros atuais serão arquivados.')"
+                    style="background:#28a745; color:#fff; border:none; border-radius:50px;
+                           padding:10px 22px; font-weight:bold; font-size:0.93rem; cursor:pointer; width:100%;">
+              🔄 Iniciar Ciclo {{ campo.numero_ciclo|add:1 }}
+            </button>
+          </form>
+        </div>
+      {% else %}
+        <div class="dc-card">
+          <div class="dc-card-titulo">
+            <span>➕ Novo Registro</span>
+            <span id="dc-tipo-badge" class="dc-badge" style="display:none;"></span>
+          </div>
+
+          <form method="post" class="dc-form" id="dc-form">
+            {% csrf_token %}
+
+            {% if error_message %}
+              <div class="dc-erro">{{ error_message }}</div>
+            {% endif %}
+
+            <!-- Data + Tipo -->
+            <div class="dc-grid-2">
+              <div class="dc-field">
+                <label for="data">📅 Data</label>
+                <input type="date" id="data" name="data"
+                       min="{{ campo_criado_em|date:'Y-m-d' }}"
+                       max="{% now 'Y-m-d' %}" required>
+              </div>
+              <div class="dc-field">
+                <label for="tipo_atividade">🏷 Tipo de Atividade</label>
+                <select id="tipo_atividade" name="tipo_atividade" required>
+                  <option value="" disabled selected>Selecione…</option>
+                  <optgroup label="💸 Gastos (saídas)">
+                    {% for a in atividade_info %}{% if a.tipo == 'gasto' %}
+                    <option value="{{ a.value }}"
+                      {% if a.one_time and a.value in used_one_time_atividades %}disabled{% endif %}>
+                      {{ a.label }}{% if a.one_time and a.value in used_one_time_atividades %} ✓{% endif %}
+                    </option>
+                    {% endif %}{% endfor %}
+                  </optgroup>
+                  <optgroup label="🌾 Receita (entrada)">
+                    {% for a in atividade_info %}{% if a.tipo == 'receita' %}
+                    <option value="{{ a.value }}"
+                      {% if a.one_time and a.value in used_one_time_atividades %}disabled{% endif %}>
+                      {{ a.label }}{% if a.one_time and a.value in used_one_time_atividades %} ✓{% endif %}
+                    </option>
+                    {% endif %}{% endfor %}
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+
+            <!-- Descrição dinâmica do tipo -->
+            <div id="dc-tipo-info" class="dc-tipo-info" style="display:none;"></div>
+
+            <!-- Título + Valor -->
+            <div class="dc-grid-2">
+              <div class="dc-field">
+                <label for="titulo">✏️ Título</label>
+                <input type="text" id="titulo" name="titulo"
+                       placeholder="Ex: Adubação de cobertura" required>
+              </div>
+              <div class="dc-field" id="campo-valor-gasto">
+                <label for="valor_gasto" id="label-valor">💰 Valor Gasto (R$)</label>
+                <input type="text" inputmode="decimal" id="valor_gasto" name="valor_gasto"
+                       placeholder="0,00" pattern="\d+([.,]\d*)?" autocomplete="off">
+              </div>
+            </div>
+
+            <!-- Campos de colheita -->
+            <div id="bloco-colheita" style="display:none;">
+              <div class="dc-colheita-sep">🌾 Dados da Colheita</div>
+              <div class="dc-grid-3">
+                <div class="dc-field">
+                  <label for="quantidade_produzida">Quantidade Colhida</label>
+                  <input type="text" inputmode="decimal" id="quantidade_produzida"
+                         name="quantidade_produzida" placeholder="0,00">
+                </div>
+                <div class="dc-field">
+                  <label for="quantidade_unidade_colheita">Unidade</label>
+                  <select id="quantidade_unidade_colheita" name="quantidade_unidade">
+                    <option value="kg">kg</option>
+                    <option value="saca">saca</option>
+                    <option value="unidade">unidade</option>
+                    <option value="caixa">caixa</option>
+                    <option value="tonelada">tonelada</option>
+                  </select>
+                </div>
+                <div class="dc-field">
+                  <label for="preco_unitario">Preço por Unidade (R$)</label>
+                  <input type="text" inputmode="decimal" id="preco_unitario"
+                         name="preco_unitario" placeholder="0,00">
+                </div>
+              </div>
+              <div class="dc-receita-preview" id="dc-receita-preview" style="display:none;">
+                <span>Receita estimada:</span>
+                <strong id="dc-receita-valor">R$ 0,00</strong>
+              </div>
+            </div>
+
+            <!-- Quantidade (para não-colheita) -->
+            <div id="bloco-quantidade" class="dc-grid-2">
+              <div class="dc-field">
+                <label id="quantidade-label" for="quantidade">Quantidade</label>
+                <input type="text" inputmode="decimal" id="quantidade" name="quantidade"
+                       placeholder="1">
+              </div>
+              <div class="dc-field" id="unidade-wrapper" style="display:none;">
+                <label for="quantidade_unidade_gasto">Unidade</label>
+                <select id="quantidade_unidade_gasto" name="quantidade_unidade">
+                  <option value="" disabled selected>Selecione</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Observações -->
+            <div class="dc-field">
+              <label for="detalhe">📝 Observações</label>
+              <textarea id="detalhe" name="detalhe"
+                        placeholder="Detalhes adicionais sobre esta atividade…"></textarea>
+            </div>
+
+            <button type="submit" class="dc-btn-salvar" id="dc-btn-salvar">
+              💾 Salvar Registro
+            </button>
+          </form>
+        </div>
+      {% endif %}
+
+    </aside>
+
+    <!-- COLUNA DIREITA: Histórico -->
+    <section class="dc-historico-col">
+      <div class="dc-historico-header">
+        <h2>📋 Histórico</h2>
+        {% if num_registros_total %}
+          <span class="dc-contador">{{ num_registros_total }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Busca e filtro -->
+      <form method="get" style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+        <input type="text" name="q" value="{{ busca }}" placeholder="🔍 Buscar por título ou observação…"
+               style="flex:2; min-width:140px; padding:7px 12px; border-radius:8px; border:none;
+                      font-size:0.85rem; color:#2d2d2d; outline:none;">
+        <select name="tipo"
+                style="flex:1; min-width:120px; padding:7px 10px; border-radius:8px; border:none;
+                       font-size:0.83rem; color:#2d2d2d; outline:none;">
+          <option value="">Todos os tipos</option>
+          {% for a in atividade_info %}
+          <option value="{{ a.value }}" {% if filtro_tipo == a.value %}selected{% endif %}>{{ a.label }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit"
+                style="background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.25);
+                       border-radius:8px; padding:7px 14px; font-size:0.83rem; cursor:pointer; white-space:nowrap;">
+          Filtrar
+        </button>
+        {% if busca or filtro_tipo %}
+        <a href="{% url 'diario_campo_form' campo.id %}"
+           style="background:rgba(220,53,69,0.15); color:#ff8a8a; border:1px solid rgba(220,53,69,0.30);
+                  border-radius:8px; padding:7px 12px; font-size:0.83rem; text-decoration:none; white-space:nowrap;">
+          ✕ Limpar
+        </a>
+        {% endif %}
+      </form>
+
+      {% if registros %}
+        {% if busca or filtro_tipo %}
+          <p style="font-size:0.78rem; color:rgba(255,255,255,0.45); margin-bottom:8px;">
+            {{ registros|length }} resultado{{ registros|length|pluralize }} encontrado{{ registros|length|pluralize }}
+          </p>
+        {% endif %}
+        <ul class="dc-lista">
+          {% for r in registros %}
+          <li class="dc-item {% if r.tipo_atividade == 'colheita' %}dc-item-receita{% else %}dc-item-gasto{% endif %}"
+              data-id="{{ r.id }}"
+              data-titulo="{{ r.titulo }}"
+              data-tipo="{{ r.get_tipo_atividade_display }}"
+              data-data="{{ r.data|date:'d/m/Y' }}"
+              data-detalhe="{{ r.detalhe }}"
+              data-quantidade="{{ r.quantidade }}"
+              data-unidade="{{ r.quantidade_unidade }}"
+              data-valor="{{ r.valor_gasto }}"
+              data-qtd-prod="{{ r.quantidade_produzida }}"
+              data-preco="{{ r.preco_unitario }}"
+              data-tipo-raw="{{ r.tipo_atividade }}">
+
+            <div class="dc-item-icon">
+              {% if r.tipo_atividade == 'colheita' %}🌾
+              {% elif r.tipo_atividade == 'plantio' %}🌱
+              {% elif r.tipo_atividade == 'preparo_solo' %}🚜
+              {% elif r.tipo_atividade == 'adubacao' %}🧪
+              {% elif r.tipo_atividade == 'irrigacao' %}💧
+              {% elif r.tipo_atividade == 'capina' %}🌿
+              {% elif r.tipo_atividade == 'controle_pragas_doencas' %}🐛
+              {% elif r.tipo_atividade == 'energia_combustivel' %}⛽
+              {% elif r.tipo_atividade == 'transporte_embalagem' %}🚚
+              {% else %}📌{% endif %}
+            </div>
+
+            <div class="dc-item-body">
+              <div class="dc-item-top">
+                <span class="dc-item-titulo">{{ r.titulo }}</span>
+                <span class="dc-item-valor {% if r.tipo_atividade == 'colheita' %}dc-verde{% else %}dc-vermelho{% endif %}">
+                  {% if r.tipo_atividade == 'colheita' %}
+                    + R$ {{ r.receita_total|floatformat:2 }}
+                  {% else %}
+                    − R$ {{ r.valor_gasto|floatformat:2 }}
+                  {% endif %}
+                </span>
+              </div>
+              <div class="dc-item-meta">
+                <span class="dc-tag">{{ r.get_tipo_atividade_display }}</span>
+                <span class="dc-tag dc-tag-data">{{ r.data|date:"d/m/Y" }}</span>
+                {% if r.tipo_atividade == 'colheita' %}
+                  <span class="dc-tag dc-tag-colheita">{{ r.quantidade_produzida }} {{ r.quantidade_unidade }}</span>
+                  <span class="dc-tag">R$ {{ r.preco_unitario|floatformat:2 }}/{{ r.quantidade_unidade }}</span>
+                {% elif r.quantidade %}
+                  <span class="dc-tag">{{ r.quantidade }} {{ r.quantidade_unidade }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="dc-item-acoes">
+              <a href="{% url 'download_registro' r.id %}" class="dc-btn-pdf" title="Exportar PDF">📄</a>
+              <form method="post" action="{% url 'excluir_registro' r.id %}">
+                {% csrf_token %}
+                <button type="submit" class="dc-btn-excluir"
+                        onclick="return confirm('Excluir o registro «{{ r.titulo }}»?')">✕</button>
+              </form>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="dc-vazio">
+          <span class="dc-vazio-icon">{% if busca or filtro_tipo %}🔍{% else %}📭{% endif %}</span>
+          {% if busca or filtro_tipo %}
+            <p>Nenhum registro encontrado para este filtro.</p>
+          {% else %}
+            <p>Nenhum registro ainda.</p>
+            <small>Use o formulário ao lado para começar o ciclo.</small>
+          {% endif %}
+        </div>
+      {% endif %}
+    </section>
+
+  </div><!-- /.dc-body -->
+</div><!-- /.dc-page -->
+
+<!-- ───── MODAL de detalhes ───── -->
+<div id="dc-modal" class="dc-modal" role="dialog" aria-modal="true">
+  <div class="dc-modal-box">
+    <button class="dc-modal-fechar" id="dc-modal-fechar">✕</button>
+    <div class="dc-modal-icone" id="dc-modal-icone"></div>
+    <h3 id="dc-modal-titulo"></h3>
+    <div class="dc-modal-grid">
+      <div class="dc-modal-linha"><span>Tipo</span><strong id="dc-modal-tipo"></strong></div>
+      <div class="dc-modal-linha"><span>Data</span><strong id="dc-modal-data"></strong></div>
+      <div class="dc-modal-linha" id="dc-modal-linha-qtd"><span>Quantidade</span><strong id="dc-modal-qtd"></strong></div>
+      <div class="dc-modal-linha" id="dc-modal-linha-receita" style="display:none"><span>Receita</span><strong id="dc-modal-receita" class="dc-verde"></strong></div>
+      <div class="dc-modal-linha"><span>Valor</span><strong id="dc-modal-valor"></strong></div>
+      <div class="dc-modal-linha" id="dc-modal-linha-obs" style="display:none"><span>Observações</span><strong id="dc-modal-obs"></strong></div>
+    </div>
+  </div>
 </div>
-<script src="{% static 'diario_campo/diario.js' %}"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tipoSelect = document.getElementById('tipo_atividade');
-    const quantidadeNote = document.getElementById('quantidade-note');
-    const tituloInput = document.getElementById('titulo');
-    const tipoHelp = document.getElementById('tipo-help');
-    const tipoDescription = document.getElementById('tipo-description');
+(function () {
+  'use strict';
 
-    const tipoData = {
-        'preparo_solo': {
-            label: 'Preparo do Solo',
-            description: 'Abertura de covas, aração ou uso de enxada.',
-            message: 'Quantidade: use 1 para preparo do solo. Esta atividade é única por campo.',
-            quantidadeLabel: 'Quantidade (Unidade)',
-            unitOptions: ['unidade']
-        },
-        'plantio': {
-            label: 'Plantio',
-            description: 'O ato de colocar as manivas no solo.',
-            message: 'Quantidade: registre o número de linhas e colunas no formato linhas x colunas (ex: 3x2).',
-            quantidadeLabel: 'Número de Linhas x Colunas',
-            unitOptions: [],  // No unit select for plantio
-            // No resourceOptions for plantio
-        },
-        'adubacao': {
-            label: 'Adubação',
-            description: 'Adubagem do solo ou das plantas.',
-            message: 'Quantidade: informe aplicações ou quantidade de insumo usado, conforme o plano.',
-            quantidadeLabel: 'Quantidade (Aplicações ou Sacas)',
-            unitOptions: ['aplicação', 'saca', 'kg'],
-            resourceOptions: ['adubo', 'fertilizante'],
-            resourceUnitMap: { 'adubo': 'saca', 'fertilizante': 'kg' }
-        },
-        'irrigacao': {
-            label: 'Irrigação',
-            description: 'Se houver controle de água.',
-            message: 'Quantidade: registre a duração em horas ou o número de irrigações.',
-            quantidadeLabel: 'Quantidade (Horas ou Irrigações)',
-            unitOptions: ['hora', 'irrigação', 'volume']
-        },
-        'capina': {
-            label: 'Capina / Controle de Mato',
-            description: 'Remoção de plantas daninhas.',
-            message: 'Quantidade: indique o número de vezes ou a duração em horas.',
-            quantidadeLabel: 'Quantidade (Vezes ou Horas)',
-            unitOptions: ['vez', 'hora', 'unidade'],
-            resourceOptions: ['capina', 'herbicida']
-        },
-        'controle_pragas_doencas': {
-            label: 'Controle de Pragas e Doenças',
-            description: 'remoção manual, aplicação de defensivos ou controle biológico.',
-            message: 'Quantidade: registre o número de aplicações ou o nível de controle realizado.',
-            quantidadeLabel: 'Quantidade (Aplicações ou Intensidade)',
-            unitOptions: ['aplicação', 'kg', 'litro'],
-            resourceOptions: ['defensivo', 'controle biológico', 'outro'],
-            resourceUnitMap: { 'defensivo': 'litro', 'controle biológico': 'aplicação', 'outro': 'kg' }
-        },
-        'energia_combustivel': {
-            label: 'Energia / Combustível',
-            description: 'Consumo de diesel, gasolina ou energia elétrica.',
-            message: 'Quantidade: selecione se foi energia ou combustível.',
-            quantidadeLabel: 'Quantidade',
-            unitOptions: [],  // No unit select, determined by resource
-            resourceOptions: ['energia', 'combustível'],
-            resourceUnitMap: { 'energia': 'kWh', 'combustível': 'litro' }
-            // Removed measureOptions
-        },
-        'transporte_embalagem': {
-            label: 'Transporte / Embalagem',
-            description: 'Custos com transporte, embalagens e logística.',
-            message: 'Quantidade: selecione transporte ou embalagem e registre o volume/unidade.',
-            quantidadeLabel: 'Quantidade (Viagens ou Unidades)',
-            unitOptions: ['viagem', 'unidade', 'embalagem'],
-            resourceOptions: ['transporte', 'embalagem'],
-            resourceUnitMap: { 'transporte': 'viagem', 'embalagem': 'unidade' },
-            measureOptions: ['hora', 'dia', 'mês']
-        },
-        'colheita': {
-            label: 'Colheita',
-            description: 'O fechamento do ciclo.',
-            message: 'Quantidade: use 1 para a colheita. Esta atividade é única por campo.',
-            quantidadeLabel: 'Quantidade (Unidade)',
-            unitOptions: ['kg', 'saca', 'unidade'],
-            // Removed resourceOptions and measureOptions
-        }
-    };
+  const TIPOS = {
+    preparo_solo:           { label:'Preparo do Solo',           icone:'🚜', gasto:true,  units:['unidade'],                        one:true  },
+    plantio:                { label:'Plantio',                   icone:'🌱', gasto:true,  units:[],           plantio:true,          one:true  },
+    adubacao:               { label:'Adubação',                  icone:'🧪', gasto:true,  units:['kg','saca','litro','aplicação']                },
+    irrigacao:              { label:'Irrigação',                 icone:'💧', gasto:true,  units:['hora','irrigação','m³']                        },
+    capina:                 { label:'Capina / Controle de Mato', icone:'🌿', gasto:true,  units:['vez','hora','dia']                             },
+    controle_pragas_doencas:{ label:'Controle de Pragas',        icone:'🐛', gasto:true,  units:['aplicação','litro','kg']                       },
+    energia_combustivel:    { label:'Energia / Combustível',     icone:'⛽', gasto:true,  units:['litro','kWh','dia']                            },
+    transporte_embalagem:   { label:'Transporte / Embalagem',    icone:'🚚', gasto:true,  units:['viagem','unidade','caixa']                     },
+    colheita:               { label:'Colheita',                  icone:'🌾', gasto:false, units:['kg','saca','unidade','caixa'],    one:true  },
+  };
 
-    function updateTipoInfo(value) {
-        const tipoInfo = tipoData[value];
-        const quantidadeLabel = document.getElementById('quantidade-label');
-        const unidadeSelect = document.getElementById('quantidade_unidade');
-        const recursoSelect = document.getElementById('recurso_tipo');
-        const recursoContainer = document.getElementById('recurso-container');
-        const medidaSelect = document.getElementById('medida_tipo');
-        const medidaContainer = document.getElementById('medida-container');
-        
-        if (!tipoInfo) {
-            quantidadeNote.textContent = 'Registre a quantidade de eventos ou a escala.';
-            tipoHelp.textContent = 'Cada atividade tem um contexto de quantidade diferente: horas, vezes ou unidade.';
-            tipoDescription.textContent = 'Selecione uma atividade para ver o tipo de quantidade mais adequado.';
-            tituloInput.placeholder = 'Ex: Preparo do Solo';
-            quantidadeLabel.textContent = 'Quantidade de Eventos (ou Escala)';
-            unidadeSelect.innerHTML = '<option value="" disabled selected>Selecione a unidade</option><option value="unidade">Unidade</option>';
-            recursoContainer.style.display = 'none';
-            medidaContainer.style.display = 'none';
-            recursoSelect.value = '';
-            medidaSelect.value = '';
-            return;
-        }
-        
-        quantidadeNote.textContent = tipoInfo.message;
-        tipoHelp.textContent = `Atividade selecionada: ${tipoInfo.label}`;
-        tipoDescription.textContent = tipoInfo.description;
-        tituloInput.placeholder = `Título sugerido: ${tipoInfo.label}`;
-        quantidadeLabel.textContent = tipoInfo.quantidadeLabel;
-        if (tipoInfo.unitOptions && tipoInfo.unitOptions.length > 0) {
-            unidadeSelect.innerHTML = '<option value="" disabled selected>Selecione a unidade</option>' + tipoInfo.unitOptions.map(option => `<option value="${option}">${option}</option>`).join('');
-            unidadeSelect.style.display = 'block';
-            document.querySelector('label[for="quantidade_unidade"]').style.display = 'block';
-            unidadeSelect.required = true;
-        } else {
-            unidadeSelect.style.display = 'none';
-            document.querySelector('label[for="quantidade_unidade"]').style.display = 'none';
-            unidadeSelect.value = '';
-            unidadeSelect.required = false;
-        }
-        
-        // Special handling for plantio
-        const quantidadeInput = document.getElementById('quantidade');
-        if (value === 'plantio') {
-            quantidadeInput.placeholder = '3x2';
-            quantidadeInput.pattern = '\\d+x\\d+';
-            quantidadeInput.title = 'Formato: linhas x colunas (ex: 3x2)';
-        } else {
-            quantidadeInput.placeholder = '1';
-            quantidadeInput.pattern = '\\d+(\\.|,)?\\d*';
-            quantidadeInput.title = '';
-        }
-        
-        // Mostrar/ocultar container de recurso
-        if (tipoInfo.resourceOptions && tipoInfo.resourceOptions.length > 0) {
-            recursoContainer.style.display = 'block';
-            recursoSelect.innerHTML = '<option value="" disabled selected>Selecione o recurso</option>' + tipoInfo.resourceOptions.map(option => `<option value="${option}">${option}</option>`).join('');
-            recursoSelect.value = '';
-        } else {
-            recursoContainer.style.display = 'none';
-            recursoSelect.value = '';
-        }
-        
-        // Mostrar/ocultar container de medida
-        if (tipoInfo.measureOptions && tipoInfo.measureOptions.length > 0) {
-            medidaContainer.style.display = 'block';
-            medidaSelect.innerHTML = '<option value="" disabled selected>Selecione a medida</option>' + tipoInfo.measureOptions.map(option => `<option value="${option}">${option}</option>`).join('');
-            medidaSelect.value = '';
-        } else {
-            medidaContainer.style.display = 'none';
-            medidaSelect.value = '';
-        }
+  const sel       = id => document.getElementById(id);
+  const tipoSel   = sel('tipo_atividade');
+  const dataInput = sel('data');
+  const tituloInp = sel('titulo');
+  const badge     = sel('dc-tipo-badge');
+  const tipoInfo  = sel('dc-tipo-info');
+  const btnSalvar = sel('dc-btn-salvar');
 
-        const producaoFieldset = document.getElementById('producaoCustosFieldset');
-        const colheitaCampos = [
-            'quantidade_produzida', 'preco_unitario', 'custo_sementes', 'custo_adubo',
-            'custo_defensivos', 'custo_agua', 'custo_mao_obra', 'custo_energia',
-            'custo_colheita', 'custo_transporte', 'custo_aluguel', 'custo_manutencao',
-            'ciclos_por_ano'
-        ];
+  const blocoColheita  = sel('bloco-colheita');
+  const blocoQtd       = sel('bloco-quantidade');
+  const unidadeWrapper = sel('unidade-wrapper');
+  const unidadeSel     = sel('quantidade_unidade_gasto');
+  const qtdLabel       = sel('quantidade-label');
+  const qtdInput       = sel('quantidade');
+  const valorInput     = sel('valor_gasto');
+  const labelValor     = sel('label-valor');
+  const qtdProdInput   = sel('quantidade_produzida');
+  const precoInput     = sel('preco_unitario');
+  const receitaPreview = sel('dc-receita-preview');
+  const receitaValor   = sel('dc-receita-valor');
 
-        if (value === 'colheita') {
-            producaoFieldset.style.display = 'block';
-            colheitaCampos.forEach(function(nome) {
-                const campo = document.getElementById(nome);
-                if (campo) {
-                    campo.required = true;
-                }
-            });
-        } else {
-            producaoFieldset.style.display = 'none';
-            colheitaCampos.forEach(function(nome) {
-                const campo = document.getElementById(nome);
-                if (campo) {
-                    campo.required = false;
-                }
-            });
-        }
+  /* Preencher data de hoje por padrão */
+  if (dataInput && !dataInput.value) {
+    const h  = new Date();
+    const yy = h.getFullYear();
+    const mm = String(h.getMonth()+1).padStart(2,'0');
+    const dd = String(h.getDate()).padStart(2,'0');
+    dataInput.value = `${yy}-${mm}-${dd}`;
+  }
+
+  function onTipoChange() {
+    const v = tipoSel ? tipoSel.value : '';
+    const t = TIPOS[v];
+    if (!t) {
+      if (badge)    badge.style.display = 'none';
+      if (tipoInfo) tipoInfo.style.display = 'none';
+      if (blocoColheita) blocoColheita.style.display = 'none';
+      if (blocoQtd)      blocoQtd.style.display = 'grid';
+      return;
     }
-
-    // Event listener para auto-selecionar unidade quando recurso é selecionado
-    const recursoSelect = document.getElementById('recurso_tipo');
-    if (recursoSelect) {
-        recursoSelect.addEventListener('change', function() {
-            const selectedTipo = tipoSelect.value;
-            const selectedRecurso = this.value;
-            
-            if (selectedTipo && tipoData[selectedTipo] && tipoData[selectedTipo].resourceUnitMap) {
-                const unidadeMap = tipoData[selectedTipo].resourceUnitMap;
-                if (unidadeMap[selectedRecurso]) {
-                    document.getElementById('quantidade_unidade').value = unidadeMap[selectedRecurso];
-                }
-            }
-        });
+    if (badge) {
+      badge.textContent  = t.icone + ' ' + t.label;
+      badge.className    = 'dc-badge ' + (t.gasto ? 'dc-badge-gasto' : 'dc-badge-receita');
+      badge.style.display = 'inline-flex';
     }
-
-    if (tipoSelect) {
-        tipoSelect.addEventListener('change', function() {
-            updateTipoInfo(this.value);
-        });
-        updateTipoInfo(tipoSelect.value);
+    if (tipoInfo) {
+      tipoInfo.textContent = t.gasto
+        ? '💸 Este registro será contabilizado como gasto (saída de dinheiro).'
+        : '💰 Este registro será contabilizado como receita (entrada de dinheiro).';
+      tipoInfo.className   = 'dc-tipo-info ' + (t.gasto ? 'dc-info-gasto' : 'dc-info-receita');
+      tipoInfo.style.display = 'block';
     }
-
-    const quantidadeInput = document.getElementById('quantidade');
-    const valorInput = document.getElementById('valor_gasto');
-
-    function sanitizeNumericInput(input) {
-        input.value = input.value
-            .replace(/[^0-9.,]/g, '')
-            .replace(/,/g, '.')
-            .replace(/(\..*?)\..*/g, '$1');
+    if (t.gasto) {
+      if (labelValor) labelValor.textContent = '💸 Valor Gasto (R$)';
+      if (btnSalvar)  btnSalvar.textContent  = '💾 Registrar Gasto';
+      if (valorInput) valorInput.closest('.dc-field').style.display = '';
+      if (blocoColheita) blocoColheita.style.display = 'none';
+      if (blocoQtd)      blocoQtd.style.display = 'grid';
+    } else {
+      if (labelValor) labelValor.textContent = '💰 Valor da Venda (R$)';
+      if (btnSalvar)  btnSalvar.textContent  = '🌾 Registrar Colheita';
+      if (valorInput) valorInput.closest('.dc-field').style.display = 'none';
+      if (blocoColheita) blocoColheita.style.display = 'block';
+      if (blocoQtd)      blocoQtd.style.display = 'none';
     }
-
-    if (quantidadeInput) {
-        quantidadeInput.addEventListener('input', function() {
-            sanitizeNumericInput(this);
-        });
+    if (tituloInp && !tituloInp.value) tituloInp.placeholder = t.label;
+    if (t.plantio) {
+      if (qtdLabel) qtdLabel.textContent = 'Linhas × Colunas';
+      if (qtdInput) { qtdInput.placeholder = '3x2'; qtdInput.pattern = '\\d+x\\d+'; }
+      if (unidadeWrapper) unidadeWrapper.style.display = 'none';
+    } else {
+      if (qtdLabel) qtdLabel.textContent = 'Quantidade';
+      if (qtdInput) { qtdInput.placeholder = '1'; qtdInput.pattern = '\\d+([.,]\\d*)?'; }
+      if (t.units && t.units.length > 0) {
+        if (unidadeSel) {
+          unidadeSel.innerHTML = '<option value="" disabled selected>Selecione</option>' +
+            t.units.map(u => `<option value="${u}">${u}</option>`).join('');
+        }
+        if (unidadeWrapper) unidadeWrapper.style.display = 'block';
+      } else {
+        if (unidadeWrapper) unidadeWrapper.style.display = 'none';
+      }
     }
+  }
 
-    if (valorInput) {
-        valorInput.addEventListener('input', function() {
-            sanitizeNumericInput(this);
-        });
+  if (tipoSel) { tipoSel.addEventListener('change', onTipoChange); onTipoChange(); }
+
+  function atualizarReceita() {
+    if (!qtdProdInput || !precoInput || !receitaPreview) return;
+    const qtd   = parseFloat(qtdProdInput.value.replace(',','.')) || 0;
+    const preco = parseFloat(precoInput.value.replace(',','.'))   || 0;
+    const total = qtd * preco;
+    if (qtd > 0 && preco > 0) {
+      receitaPreview.style.display = 'flex';
+      if (receitaValor) receitaValor.textContent = 'R$ ' + total.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    } else {
+      receitaPreview.style.display = 'none';
     }
+  }
 
-    const registroHeaders = document.querySelectorAll('.registro-header');
-    const modal = document.getElementById('registro-modal');
-    const modalTitulo = document.getElementById('modal-titulo');
-    const modalTipo = document.getElementById('modal-tipo');
-    const modalData = document.getElementById('modal-data');
-    const modalQuantidade = document.getElementById('modal-quantidade');
-    const modalValor = document.getElementById('modal-valor');
-    const modalDetalhe = document.getElementById('modal-detalhe');
-    const modalClose = document.querySelector('.modal-close');
+  if (qtdProdInput) qtdProdInput.addEventListener('input', atualizarReceita);
+  if (precoInput)   precoInput.addEventListener('input', atualizarReceita);
 
-    registroHeaders.forEach(header => {
-        header.addEventListener('click', function() {
-            const tituloText = this.dataset.titulo;
-            const tipoText = 'Tipo: ' + this.dataset.tipo;
-            const dataText = 'Data: ' + this.dataset.data;
-
-            // Prefer mostrar quantidade produzida para colheita quando disponível
-            let quantidadeText = '';
-            const qtdProduzida = parseFloat(this.dataset.quantidadeProduzida || 0);
-            if (qtdProduzida && !isNaN(qtdProduzida) && qtdProduzida > 0) {
-                const unidade = this.dataset.quantidadeUnidade || 'unidades';
-                quantidadeText = `Quantidade Produzida: ${qtdProduzida} ${unidade}`;
-            } else {
-                quantidadeText = 'Quantidade: ' + this.dataset.quantidade + (this.dataset.quantidadeUnidade ? ` ${this.dataset.quantidadeUnidade}` : '');
-            }
-
-            const valorText = 'Valor: R$ ' + (this.dataset.valor ? parseFloat(this.dataset.valor).toFixed(2) : '0.00');
-            const detalheText = this.dataset.detalhe || 'Sem detalhes.';
-
-            modalTitulo.textContent = tituloText;
-            modalTipo.textContent = tipoText;
-            modalData.textContent = dataText;
-            modalQuantidade.textContent = quantidadeText;
-            modalValor.textContent = valorText;
-            modalDetalhe.textContent = detalheText;
-
-            // Mostrar preço unitário quando disponível
-            const precoUnit = parseFloat(this.dataset.precoUnitario || 0);
-            if (precoUnit && !isNaN(precoUnit) && precoUnit > 0) {
-                let precoNode = document.getElementById('modal-preco');
-                if (!precoNode) {
-                    precoNode = document.createElement('p');
-                    precoNode.id = 'modal-preco';
-                    modalDetalhe.parentNode.insertBefore(precoNode, modalDetalhe);
-                }
-                precoNode.textContent = `Preço unitário: R$ ${precoUnit.toFixed(2)}`;
-            } else {
-                const existing = document.getElementById('modal-preco');
-                if (existing) existing.remove();
-            }
-
-            modal.style.display = 'block';
-        });
+  [valorInput, qtdProdInput, precoInput].forEach(inp => {
+    if (!inp) return;
+    inp.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9.,]/g,'').replace(',','.').replace(/(\.\d*)\./g,'$1');
     });
+  });
 
-    modalClose.addEventListener('click', function() {
-        // remove preco node when closing modal to avoid duplicates
-        const existing = document.getElementById('modal-preco');
-        if (existing) existing.remove();
-        modal.style.display = 'none';
-    });
+  /* Modal */
+  const modal       = sel('dc-modal');
+  const modalFechar = sel('dc-modal-fechar');
 
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
+  document.querySelectorAll('.dc-item').forEach(item => {
+    item.querySelector('.dc-item-body').addEventListener('click', function() {
+      const d = item.dataset;
+      sel('dc-modal-icone').textContent  = TIPOS[d.tipoRaw] ? TIPOS[d.tipoRaw].icone : '📌';
+      sel('dc-modal-titulo').textContent = d.titulo;
+      sel('dc-modal-tipo').textContent   = d.tipo;
+      sel('dc-modal-data').textContent   = d.data;
+
+      const isColheita = d.tipoRaw === 'colheita';
+      const lrec = sel('dc-modal-linha-receita');
+      const mval = sel('dc-modal-valor');
+
+      if (isColheita) {
+        sel('dc-modal-qtd').textContent = `${d.qtdProd} ${d.unidade}`;
+        const receita = (parseFloat(d.qtdProd)||0) * (parseFloat(d.preco)||0);
+        sel('dc-modal-receita').textContent = 'R$ ' + receita.toLocaleString('pt-BR',{minimumFractionDigits:2});
+        if (lrec) lrec.style.display = 'flex';
+        mval.textContent = 'R$ ' + parseFloat(d.preco||0).toFixed(2) + '/' + d.unidade;
+        sel('dc-modal-linha-qtd').querySelector('span').textContent = 'Produção';
+      } else {
+        sel('dc-modal-qtd').textContent = `${d.quantidade||'—'} ${d.unidade||''}`.trim();
+        if (lrec) lrec.style.display = 'none';
+        mval.textContent = '− R$ ' + parseFloat(d.valor||0).toFixed(2);
+        sel('dc-modal-linha-qtd').querySelector('span').textContent = 'Quantidade';
+      }
+
+      const obs  = d.detalhe ? d.detalhe.trim() : '';
+      const lobs = sel('dc-modal-linha-obs');
+      if (obs) { sel('dc-modal-obs').textContent = obs; if (lobs) lobs.style.display = 'flex'; }
+      else     { if (lobs) lobs.style.display = 'none'; }
+
+      if (modal) modal.classList.add('dc-modal-ativo');
     });
-});
+  });
+
+  function fecharModal() { if (modal) modal.classList.remove('dc-modal-ativo'); }
+  if (modalFechar) modalFechar.addEventListener('click', fecharModal);
+  if (modal)       modal.addEventListener('click', e => { if (e.target === modal) fecharModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+})();
 </script>
+
 {% endblock content %}

@@ -1,15 +1,19 @@
+/* ── Planejador — style específico (igual ao original) ── */
+
 #formulario {
     text-align: left;
 }
 
-#formulario input {
+#formulario input,
+#formulario select {
     width: 100%;
     max-width: 300px;
     padding: 10px;
-    margin-top: 0;
     border-radius: 8px;
     border: none;
     font-size: 1rem;
+    color: #2d2d2d;
+    background: #ffffff;
 }
 
 .form-grupo {
@@ -19,12 +23,13 @@
 .form-grupo label {
     display: block;
     margin-bottom: 6px;
+    color: #ffffff;
 }
 
 #formulario h2 {
     margin-top: 20px;
     color: #ffffff;
-    border-bottom: 2px solid #ffffff50;
+    border-bottom: 2px solid rgba(255,255,255,0.35);
     padding-bottom: 5px;
 }
 
@@ -72,11 +77,10 @@
     padding: 20px;
     border-radius: 8px;
     border-left: 5px solid #28a745;
+    color: #333;
 }
 
-.resultado-card > div:empty {
-    display: none;
-}
+.resultado-card > div:empty { display: none; }
 
 .resultado-card > div + div {
     margin-top: 14px;
@@ -86,6 +90,7 @@
 
 .resultado-card h3 {
     margin: 0 0 6px;
+    color: #1a5e2a;
 }
 
 .guia-calculos {
@@ -97,6 +102,7 @@
     border-left: 5px solid #0066cc;
     text-align: left;
     z-index: 0;
+    color: #1f3b53;
 }
 
 .guia-calculos h3 {
@@ -128,15 +134,14 @@
     line-height: 1.4;
 }
 
-.guia-lista strong {
-    color: #44515c;
-}
+.guia-lista strong { color: #44515c; }
 
 .guia-dica {
     margin-top: 14px;
     padding-top: 12px;
-    border-top: 1px solid rgba(68, 81, 92, 0.14);
+    border-top: 1px solid rgba(68,81,92,0.14);
     color: #33424f;
+    font-size: 0.9rem;
 }
 
 @media (max-width: 900px) {
@@ -144,24 +149,11 @@
         grid-template-columns: 1fr;
         gap: 24px;
     }
-
-    .guia-calculos {
-        position: static;
-    }
+    .guia-calculos { position: static; }
 }
 
 @media (max-width: 600px) {
-    #formulario {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    #formulario input {
-        max-width: 100%;
-    }
-
-    #formulario button {
-        width: 100%;
-    }
+    #formulario { display: flex; flex-direction: column; align-items: stretch; }
+    #formulario input { max-width: 100%; }
+    #formulario button { width: 100%; }
 }
