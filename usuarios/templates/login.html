@@ -2,31 +2,47 @@
 {% load static %}
 
 {% block content %}
-<div class="container" style="justify-content:center;">
-  <div style="width:100%; max-width:380px;">
-    <h1 style="text-align:center; margin-bottom:24px;">Login</h1>
+<div class="container" style="justify-content:center; max-width:420px; margin-top:110px;">
+  <div style="width:100%;">
+    <h1 style="text-align:center; margin-bottom:6px; font-size:1.4rem;">Entrar</h1>
+    <p style="text-align:center; color:rgba(255,255,255,0.65); font-size:0.88rem; margin-bottom:24px;">
+      Acesse sua conta AgroTech
+    </p>
 
-    {% if form.errors %}
-      <div class="form-error">Usuário ou senha incorretos. Tente novamente.</div>
+    {% if erro %}
+      <div style="background:rgba(220,53,69,0.20); border:1px solid rgba(220,53,69,0.40); border-radius:8px; padding:10px 14px; color:#ff8a8a; font-size:0.88rem; margin-bottom:16px;">
+        {{ erro }}
+      </div>
     {% endif %}
 
     <form method="post" action="{% url 'login' %}" style="display:flex; flex-direction:column; gap:14px;">
       {% csrf_token %}
-      <div class="form-grupo" style="margin-bottom:0;">
-        <label for="username">Usuário</label>
-        <input type="text" id="username" name="username" placeholder="Seu usuário" required
-               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      <div>
+        <label style="display:block; font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.60); margin-bottom:5px;">USUÁRIO</label>
+        <input type="text" name="username" value="{{ username|default:'' }}"
+               placeholder="Seu nome de usuário" required autofocus autocomplete="username"
+               style="width:100%; padding:10px 13px; border-radius:9px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.09); font-size:0.93rem; color:#fff; outline:none; box-sizing:border-box;">
       </div>
-      <div class="form-grupo" style="margin-bottom:0;">
-        <label for="password">Senha</label>
-        <input type="password" id="password" name="password" placeholder="Sua senha" required
-               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
+      <div>
+        <label style="display:block; font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.60); margin-bottom:5px;">SENHA</label>
+        <input type="password" name="password"
+               placeholder="Sua senha" required autocomplete="current-password"
+               style="width:100%; padding:10px 13px; border-radius:9px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.09); font-size:0.93rem; color:#fff; outline:none; box-sizing:border-box;">
       </div>
-      <button type="submit" style="margin-top:8px;">ENTRAR</button>
+      <button type="submit"
+              style="background:#28a745; color:#fff; border:none; border-radius:50px; padding:12px; font-size:0.97rem; font-weight:700; cursor:pointer; margin-top:4px; transition:background .2s;"
+              onmouseover="this.style.background='#20913b'" onmouseout="this.style.background='#28a745'">
+        Entrar
+      </button>
     </form>
 
-    <p style="text-align:center; margin-top:16px; font-size:0.9rem;">
-      Não tem conta? <a href="{% url 'cadastro' %}" style="color:#b2dfcc; font-weight:bold;">Cadastre-se</a>
+    <p style="text-align:center; margin-top:18px; font-size:0.88rem; color:rgba(255,255,255,0.60);">
+      Não tem conta?
+      <a href="{% url 'cadastro' %}" style="color:#b2dfcc; font-weight:700;">Cadastre-se</a>
     </p>
   </div>
 </div>

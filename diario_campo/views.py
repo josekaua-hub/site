@@ -1,5 +1,6 @@
 from decimal import Decimal, InvalidOperation
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
 from django.views.decorators.http import require_http_methods
@@ -103,6 +104,7 @@ def _render_pdf(response, campo, registros):
 
 # ─── views ──────────────────────────────────────────────────────────────────
 
+@login_required(login_url="login")
 def selecionar_campo(request):
     error_message = None
     if request.method == 'POST':
@@ -110,6 +112,7 @@ def selecionar_campo(request):
         descricao = request.POST.get('descricao', '').strip()
         if nome:
             campo, created = Campo.objects.get_or_create(
+                usuario=request.user,
                 nome=nome,
                 defaults={'descricao': descricao}
             )
@@ -117,7 +120,7 @@ def selecionar_campo(request):
         else:
             error_message = 'Digite um nome para o campo.'
 
-    campos = Campo.objects.all().order_by('nome')
+    campos = Campo.objects.filter(usuario=request.user).order_by('nome')
     # Anotar contagem de registros ativos
     campos_data = []
     for c in campos:
@@ -137,15 +140,17 @@ def selecionar_campo(request):
     })
 
 
+@login_required(login_url="login")
 def excluir_campo(request, campo_id):
-    campo = get_object_or_404(Campo, id=campo_id)
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
     if request.method == 'POST':
         campo.delete()
     return redirect('diario_campo')
 
 
+@login_required(login_url="login")
 def excluir_registro(request, registro_id):
-    registro = get_object_or_404(Registro, id=registro_id)
+    registro = get_object_or_404(Registro, id=registro_id, campo__usuario=request.user)
     campo_id = registro.campo.id
     if request.method == 'POST':
         # Se era o único registro de colheita, reativa o ciclo
@@ -158,15 +163,17 @@ def excluir_registro(request, registro_id):
     return redirect('diario_campo_form', campo_id=campo_id)
 
 
+@login_required(login_url="login")
 def reiniciar_ciclo(request, campo_id):
-    campo = get_object_or_404(Campo, id=campo_id)
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
     if request.method == 'POST':
         campo.reiniciar_ciclo()
     return redirect('diario_campo_form', campo_id=campo_id)
 
 
+@login_required(login_url="login")
 def diario_campo(request, campo_id):
-    campo = get_object_or_404(Campo, id=campo_id)
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
     colheita_done = campo.registros.filter(tipo_atividade='colheita', arquivado=False).exists()
 
     error_message = None
@@ -289,8 +296,9 @@ def diario_campo(request, campo_id):
 
 
 @require_http_methods(['GET', 'POST'])
+@login_required(login_url="login")
 def editar_campo(request, campo_id):
-    campo = get_object_or_404(Campo, id=campo_id)
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
     error_message = None
     success_message = None
 
@@ -308,7 +316,7 @@ def editar_campo(request, campo_id):
                 return float(default)
 
         if novo_nome and novo_nome != campo.nome:
-            if Campo.objects.filter(nome=novo_nome).exclude(id=campo.id).exists():
+            if Campo.objects.filter(usuario=request.user, nome=novo_nome).exclude(id=campo.id).exists():
                 error_message = f'Já existe um campo com o nome "{novo_nome}".'
             else:
                 campo.nome = novo_nome
@@ -329,7 +337,7 @@ def editar_campo(request, campo_id):
 
 
 def download_campo_registros(request, campo_id):
-    campo = get_object_or_404(Campo, id=campo_id)
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
     registros = list(campo.registros_ciclo_atual.order_by('-data', '-criado_em'))
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="diario_{campo.nome}_ciclo{campo.numero_ciclo}.pdf"'

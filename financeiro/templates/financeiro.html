@@ -192,28 +192,44 @@
 
   <!-- ── SELETOR DE CAMPOS ── -->
   {% if not selected_campo %}
-  <div style="padding:20px 28px 10px;background:rgba(0,0,0,.10);border-bottom:1px solid rgba(255,255,255,.10);">
-    <p style="font-size:.85rem;color:rgba(255,255,255,.55);margin:0 0 14px;font-weight:600;">
-      📋 Selecione um campo do Diário para carregar os dados automaticamente:
-    </p>
-  </div>
-  <div class="fin-campos-grid">
-    {% for campo in campos %}
-    <a href="?campo_id={{ campo.id }}"
-       class="fin-campo-card {% if campo.colheita_anotada %}{% else %}sem-colheita{% endif %}">
-      <span class="fin-campo-card-nome">{{ campo.nome }}</span>
-      {% if campo.colheita_anotada %}
-        <span class="fin-campo-card-badge ok">✔ Com colheita</span>
-      {% else %}
-        <span class="fin-campo-card-badge aviso">⚠ Sem colheita</span>
-      {% endif %}
-    </a>
-    {% empty %}
-    <p style="color:rgba(255,255,255,.45);font-size:.88rem;grid-column:1/-1;padding:10px 0;">
-      Nenhum campo cadastrado. Crie um no <a href="{% url 'diario_campo' %}" style="color:#6dda7c;">Diário de Campo</a>.
-    </p>
-    {% endfor %}
-  </div>
+    {% if user.is_authenticated %}
+    <div style="padding:20px 28px 10px;background:rgba(0,0,0,.10);border-bottom:1px solid rgba(255,255,255,.10);">
+      <p style="font-size:.85rem;color:rgba(255,255,255,.55);margin:0 0 14px;font-weight:600;">
+        📋 Selecione um campo do Diário para carregar os dados automaticamente:
+      </p>
+    </div>
+    <div class="fin-campos-grid">
+      {% for campo in campos %}
+      <a href="?campo_id={{ campo.id }}"
+         class="fin-campo-card {% if campo.colheita_anotada %}{% else %}sem-colheita{% endif %}">
+        <span class="fin-campo-card-nome">{{ campo.nome }}</span>
+        {% if campo.colheita_anotada %}
+          <span class="fin-campo-card-badge ok">✔ Com colheita</span>
+        {% else %}
+          <span class="fin-campo-card-badge aviso">⚠ Sem colheita</span>
+        {% endif %}
+      </a>
+      {% empty %}
+      <p style="color:rgba(255,255,255,.45);font-size:.88rem;grid-column:1/-1;padding:10px 0;">
+        Nenhum campo cadastrado. Crie um no <a href="{% url 'diario_campo' %}" style="color:#6dda7c;">Diário de Campo</a>.
+      </p>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding:14px 24px 16px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,.08);
+                display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+      <p style="font-size:.85rem;color:rgba(255,255,255,.50);margin:0;">
+        💡 <a href="{% url 'login' %}?next={% url 'financeiro:financeiro' %}" style="color:#6dda7c;font-weight:700;">Entre na sua conta</a>
+        para carregar os dados automaticamente do Diário de Campo.
+        Ou preencha os valores manualmente abaixo.
+      </p>
+      <a href="{% url 'cadastro' %}"
+         style="font-size:.82rem;font-weight:700;padding:7px 18px;border-radius:50px;
+                background:#28a745;color:#fff;text-decoration:none;white-space:nowrap;">
+        Criar conta grátis
+      </a>
+    </div>
+    {% endif %}
   {% endif %}
 
   <!-- ── BARRA DE SALDO (quando campo selecionado) ── -->

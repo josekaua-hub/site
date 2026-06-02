@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgroTech - Análise de Mandioca</title>
+  <title>AgroTech</title>
   <link rel="stylesheet" href="{% static 'global/css/style.css' %}">
   {% block extra_css %}{% endblock extra_css %}
 </head>
@@ -17,29 +17,45 @@
       <img src="{% static 'images/SENAR.png' %}" alt="logo senar" class="img-logo">
     </a>
   </div>
+
   <nav>
     <ul class="nav-links">
-      <li>{% block texto %}<a href="{% url 'planejador' %}">Planejador de Plantio</a>{% endblock %}</li>
-      <li>{% block texto2 %}<a href="{% url 'diario_campo' %}">Diário de Campo</a>{% endblock %}</li>
-      <li>{% block texto3 %}<a href="{% url 'fitopatologia' %}">Doenças</a>{% endblock %}</li>
-      <li>{% block texto4 %}<a href="{% url 'financeiro:financeiro' %}">Calculadora Financeira</a>{% endblock %}</li>
+      <li><a href="{% url 'planejador' %}">🌱 Planejador</a></li>
+      <li><a href="{% url 'diario_campo' %}">📓 Diário</a></li>
+      <li><a href="{% url 'fitopatologia' %}">🦠 Doenças</a></li>
+      <li><a href="{% url 'financeiro:financeiro' %}">💰 Financeiro</a></li>
     </ul>
   </nav>
+
+  <div class="nav-user">
+    {% if user.is_authenticated %}
+      <span class="nav-username">👤 {{ user.username }}</span>
+      <form method="post" action="{% url 'logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="nav-btn-logout">Sair</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}" class="nav-btn-login">Entrar</a>
+      <a href="{% url 'cadastro' %}" class="nav-btn-cadastro">Cadastrar</a>
+    {% endif %}
+  </div>
 </header>
 
-{% block content %}
-<div class="container" style="text-align:center;">
-  <nav>
-    <ul>
-      <li><h1>Otimize a sua cultura de mandioca</h1></li>
-      <li><h3>Ferramentas inteligentes para análise de solo e planejamento de safra</h3></li>
-      <a href="{% url 'planejador' %}">
-        <li class="centralizado"><h4>Começar o Planejamento</h4></li>
-      </a>
-    </ul>
-  </nav>
-</div>
-{% endblock content %}
+{% if messages %}
+  <div class="mensagens-topo" id="mensagens-topo">
+    {% for msg in messages %}
+      <div class="mensagem mensagem-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  <script>
+    setTimeout(function() {
+      var el = document.getElementById('mensagens-topo');
+      if (el) { el.style.opacity = '0'; el.style.transition = 'opacity 0.5s'; setTimeout(function(){ el.remove(); }, 500); }
+    }, 3500);
+  </script>
+{% endif %}
+
+{% block content %}{% endblock content %}
 
 </body>
 </html>

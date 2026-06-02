@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.db.models import Exists, OuterRef
@@ -6,15 +7,19 @@ from diario_campo.models import Campo, Registro
 
 
 def financeiro(request):
-    campos = Campo.objects.annotate(
-        colheita_anotada=Exists(
-            Registro.objects.filter(
-                campo=OuterRef('pk'),
-                tipo_atividade='colheita',
-                quantidade_produzida__gt=0,
+    # Campos só aparecem para usuários autenticados
+    if request.user.is_authenticated:
+        campos = Campo.objects.filter(usuario=request.user).annotate(
+            colheita_anotada=Exists(
+                Registro.objects.filter(
+                    campo=OuterRef('pk'),
+                    tipo_atividade='colheita',
+                    quantidade_produzida__gt=0,
+                )
             )
-        )
-    ).order_by('nome')
+        ).order_by('nome')
+    else:
+        campos = None
 
     selected_campo = None
     prefill = {}
@@ -23,8 +28,8 @@ def financeiro(request):
     show_colheita_warning = False
 
     campo_id = request.GET.get('campo_id')
-    if campo_id:
-        selected_campo = get_object_or_404(Campo, id=campo_id)
+    if campo_id and request.user.is_authenticated:
+        selected_campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
         registros = Registro.objects.filter(campo=selected_campo).order_by('data')
 
         # Mapa: tipo de atividade → categoria de custo na calculadora
@@ -161,6 +166,7 @@ def financeiro(request):
     })
 
 
+@login_required(login_url="login")
 def salvar_fixos(request):
     if request.method != 'POST':
         return redirect(reverse('financeiro:financeiro'))
@@ -170,7 +176,7 @@ def salvar_fixos(request):
         return redirect(reverse('financeiro:financeiro'))
 
     try:
-        campo = Campo.objects.get(id=campo_id)
+        campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
     except Campo.DoesNotExist:
         return redirect(reverse('financeiro:financeiro'))
 

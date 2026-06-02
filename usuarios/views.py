@@ -1,47 +1,72 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.views.decorators.http import require_POST
+
 
 def cadastro(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == 'GET':
         return render(request, 'cadastro.html')
-    username = request.POST.get('username')
-    email = request.POST.get('email')
-    password = request.POST.get('password')
 
-    if User.objects.filter(username=username).exists():
-        return HttpResponse('Usuário já existe')
+    username = request.POST.get('username', '').strip()
+    email    = request.POST.get('email', '').strip()
+    password = request.POST.get('password', '').strip()
 
-    if User.objects.filter(email=email).exists():
-        return HttpResponse('Email já está em uso')
+    erro = None
+    if not username or not email or not password:
+        erro = 'Preencha todos os campos.'
+    elif len(password) < 6:
+        erro = 'A senha deve ter pelo menos 6 caracteres.'
+    elif User.objects.filter(username=username).exists():
+        erro = 'Este nome de usuário já está em uso.'
+    elif User.objects.filter(email=email).exists():
+        erro = 'Este e-mail já está cadastrado.'
 
-    User.objects.create_user(username=username, email=email, password=password)
-    return HttpResponse('Usuário cadastrado com sucesso')
+    if erro:
+        return render(request, 'cadastro.html', {
+            'erro': erro,
+            'username': username,
+            'email': email,
+        })
 
-    
-    
+    user = User.objects.create_user(username=username, email=email, password=password)
+    login(request, user)
+    messages.success(request, f'Bem-vindo, {username}! Conta criada com sucesso.')
+    return redirect('home')
+
 
 def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    if request.user.is_authenticated:
+        return redirect('home')
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return HttpResponse('Login bem-sucedido')
-        else:
-            return HttpResponse('Credenciais inválidas')
-    else:
+    if request.method == 'GET':
+        return render(request, 'login.html', {
+            'next': request.GET.get('next', ''),
+        })
 
-        return render(request, 'login.html')
-    
+    username = request.POST.get('username', '').strip()
+    password = request.POST.get('password', '').strip()
+    next_url = request.POST.get('next', '').strip() or 'home'
 
-# faz com que necessite de login para acessar o planejador, caso contrário, exibe uma mensagem de boas-vindas
-#melhorar essa parte
-# def planejador(request):
-#     if request.user.is_authenticated:
-#         return HttpResponse('aqui é o planejador')
-     
-#     return HttpResponse('Bem-vindo ao planejador, ' + request.user.username + '!')
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
+        # Garante que o next é uma rota relativa (evita redirect aberto)
+        if not next_url.startswith('/'):
+            next_url = 'home'
+        return redirect(next_url)
+
+    return render(request, 'login.html', {
+        'erro': 'Usuário ou senha incorretos.',
+        'username': username,
+        'next': next_url,
+    })
+
+
+@require_POST
+def logout_view(request):
+    logout(request)
+    return redirect('login')
