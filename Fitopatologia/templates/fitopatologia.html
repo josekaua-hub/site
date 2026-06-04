@@ -8,66 +8,52 @@
 {% block content %}
 <div class="page-wrapper">
   <div class="page-header">
-    <h1>🦠 Fitopatologia</h1>
-    <p>Consulte informações sobre doenças da mandioca por fungos ou bactérias.</p>
+    <h1>🌿 Fitopatologia</h1>
+    <p>Principais doenças da mandioca no Nordeste brasileiro. Clique em uma doença para ver detalhes, sintomas e formas de controle.</p>
   </div>
 
-  <!-- Doenças por fungos -->
-  <div class="fito-section">
-    <h2>🍄 Doenças por Fungos</h2>
-    <p>Aparecem em condições de alta umidade ou estresse na planta.</p>
-    <div class="fito-grid">
-      <div class="disease-card" data-disease="antracnose">
-        <div class="disease-image">
-          <img src="{% static 'images/default-disease.jpg' %}" alt="Antracnose">
-        </div>
-        <h3>Antracnose</h3>
-      </div>
-      <div class="disease-card" data-disease="oidio">
-        <div class="disease-image">
-          <img src="{% static 'images/default-disease.jpg' %}" alt="Oídio">
-        </div>
-        <h3>Oídio</h3>
-      </div>
-      <div class="disease-card" data-disease="podridao-radicular">
-        <div class="disease-image">
-          <img src="{% static 'images/default-disease.jpg' %}" alt="Podridão Radicular">
-        </div>
-        <h3>Podridão Radicular</h3>
-      </div>
-      <div class="disease-card" data-disease="ferrugem">
-        <div class="disease-image">
-          <img src="{% static 'images/default-disease.jpg' %}" alt="Ferrugem">
-        </div>
-        <h3>Ferrugem</h3>
-      </div>
-    </div>
-  </div>
+  <div class="fitopatologia-grid">
 
-  <!-- Doenças por bactérias -->
-  <div class="fito-section">
-    <h2>🦠 Doenças por Bactérias</h2>
-    <p>Ocorrem quando a planta está com ferimentos ou em condições de estresse.</p>
-    <div class="fito-grid">
-      <div class="disease-card" data-disease="bacteriose">
-        <div class="disease-image">
-          <img src="{% static 'images/default-disease.jpg' %}" alt="Bacteriose">
-        </div>
+    <div class="disease-card" data-disease="bacteriose">
+      <div class="disease-image disease-image--bacteriose"></div>
+      <div class="disease-card-body">
         <h3>Bacteriose</h3>
-      </div>
-      <div class="disease-card" data-disease="mancha-bacteriana">
-        <div class="disease-image">
-          <img src="{% static 'images/default-disease.jpg' %}" alt="Mancha Bacteriana">
-        </div>
-        <h3>Mancha Bacteriana</h3>
-      </div>
-      <div class="disease-card" data-disease="apodrecimento-bacteriano">
-        <div class="disease-image">
-          <img src="{% static 'images/default-disease.jpg' %}" alt="Apodrecimento Bacteriano">
-        </div>
-        <h3>Apodrecimento Bacteriano</h3>
+        <span class="disease-tag">Xanthomonas axonopodis</span>
       </div>
     </div>
+
+    <div class="disease-card" data-disease="antracnose">
+      <div class="disease-image disease-image--antracnose"></div>
+      <div class="disease-card-body">
+        <h3>Antracnose</h3>
+        <span class="disease-tag">Colletotrichum gloeosporioides</span>
+      </div>
+    </div>
+
+    <div class="disease-card" data-disease="podridao-radicular">
+      <div class="disease-image disease-image--podridao"></div>
+      <div class="disease-card-body">
+        <h3>Podridão Radicular</h3>
+        <span class="disease-tag">Phytophthora / Fusarium spp.</span>
+      </div>
+    </div>
+
+    <div class="disease-card" data-disease="superalongamento">
+      <div class="disease-image disease-image--superalongamento"></div>
+      <div class="disease-card-body">
+        <h3>Superalongamento</h3>
+        <span class="disease-tag">Sphaceloma manihoticola</span>
+      </div>
+    </div>
+
+    <div class="disease-card" data-disease="cercosporiose">
+      <div class="disease-image disease-image--cercosporiose"></div>
+      <div class="disease-card-body">
+        <h3>Cercosporiose</h3>
+        <span class="disease-tag">Cercospora caribaea</span>
+      </div>
+    </div>
+
   </div>
 </div>
 
