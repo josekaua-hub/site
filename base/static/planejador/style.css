@@ -190,7 +190,7 @@
 
 /* ── Guia lateral ── */
 .plj-guia {
-  position: sticky; top: 90px;
+  position: sticky; top: 72px;
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 14px;

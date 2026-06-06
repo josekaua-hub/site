@@ -162,6 +162,22 @@
   text-decoration: underline;
   white-space: nowrap;
 }
+
+/* Banner para usuários não logados */
+.fin-guest-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(109,218,124,0.10);
+  border: 1px solid rgba(109,218,124,0.30);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.80);
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+.fin-guest-banner strong { color: #fff; }
 </style>
 {% endblock extra_css %}
 
@@ -267,11 +283,22 @@
   {% endif %}
 
   <!-- ── CORPO ── -->
-  {% if selected_campo %}
-  <div class="fin-body">
+  <div class="fin-body {% if not user.is_authenticated and not selected_campo %}fin-body--guest{% endif %}">
 
     <!-- COLUNA ESQUERDA: Inputs -->
     <div class="fin-col-entrada">
+
+      {% if not user.is_authenticated and not selected_campo %}
+      <div class="fin-guest-banner">
+        <span style="font-size:1.5rem;">🔒</span>
+        <div>
+          <strong>Calculadora disponível para todos!</strong><br>
+          Preencha os valores manualmente abaixo. Para carregar os dados automaticamente do Diário de Campo,
+          <a href="{% url 'login' %}?next={% url 'financeiro:financeiro' %}" style="color:#6dda7c;font-weight:700;">entre na sua conta</a>
+          ou <a href="{% url 'cadastro' %}" style="color:#6dda7c;font-weight:700;">crie uma conta grátis</a>.
+        </div>
+      </div>
+      {% endif %}
 
       {% if show_colheita_warning %}
       <div class="fin-aviso-colheita">
@@ -283,8 +310,6 @@
         </div>
       </div>
       {% endif %}
-
-      <!-- Origem dos dados -->
       {% if registros_lista %}
       <div class="fin-origem-panel">
         <button class="fin-origem-header" onclick="toggleOrigem(this)">
@@ -459,6 +484,7 @@
             <button class="fin-btn-limpar"   onclick="limparFormulario()">🗑 Limpar</button>
           </div>
 
+          {% if selected_campo %}
           <form id="saveFixosForm" method="post" action="{% url 'financeiro:salvar_fixos' %}">
             {% csrf_token %}
             <input type="hidden" name="campo_id" value="{{ selected_campo.id }}">
@@ -468,6 +494,7 @@
               💾 Salvar custos fixos no Diário
             </button>
           </form>
+          {% endif %}
         </div>
       </div>
 
@@ -546,7 +573,6 @@
 
     </div><!-- /.fin-col-resultado -->
   </div><!-- /.fin-body -->
-  {% endif %}
 
 </div><!-- /.fin-page -->
 

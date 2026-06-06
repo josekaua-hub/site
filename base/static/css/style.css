@@ -1,69 +1,67 @@
-/* ================================================================
-   AgroTech — style.css GLOBAL UNIFICADO
-   Visual: igual ao planejador original (navbar verde, inputs brancos,
-   fundo #376A4F, container #428257)
-   ================================================================ */
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body, html {
+body,html{ 
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     margin: 0;
     padding: 0;
-    min-height: 100%;
+    height: 100%;
     background-color: #376A4F;
     font-family: Arial, sans-serif;
-    color: #ffffff;
 }
 
-a {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #b2dfcc;
-}
-
-/* ── Navbar ── */
-.main-header {
-    width: 100%;
-    height: 70px;
-    background-color: #0c6404;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    color: white;
-    position: fixed;
-    top: 0;
-    z-index: 9999;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+/* Compensa a altura do header fixo (.main-header) para que NENHUMA pagina
+   fique escondida atras do menu, independente do wrapper usado. */
+body {
+    padding-top: 90px;
 }
 
 .logo {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    display: flex;     
+    align-items: center;  
     text-decoration: underline;
     cursor: pointer;
 }
 
 .logo img {
-    height: 100px;
+    height: 100px;       
     width: auto;
 }
 
 .logo h1 {
-    margin: 0;
-    margin-left: -20px;
-    font-size: 1.5rem;
+    margin: 0;          
+    margin-left: -20px;  
+    font-size: 1.5rem;    
+}
+
+a{
+    color: #ffffff;
+    text-decoration: none;
+   
+}
+
+a:hover{
+      color: blue; 
+}
+
+
+.main-header {
+    width: 100%;
+    height: 70px;
+    background-color: #0c6404; 
+    display: flex;
+    justify-content: space-around; 
+    align-items: center;
+    color: white;
+    position: fixed;
+    top: 0;
+    z-index: 9999;
 }
 
 .nav-links {
@@ -77,121 +75,32 @@ a:hover {
     cursor: pointer;
 }
 
-/* ── Container padrão (igual ao planejador/diário) ── */
 .container {
-    margin-top: 100px;
+    margin-top: 0; 
     width: 90%;
     max-width: 1000px;
-    padding: 40px;
+    padding: 40px; 
     background-color: #428257;
-    border-radius: 15px;
+    border-radius: 15px; 
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    text-align: left;
-    color: #ffffff;
+    align-items: center;
+    text-align: center; 
 }
 
 .container ul {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
+    flex-direction: column; 
+    align-items: center;     
+    gap: 5px;               
     list-style: none;
     padding: 0;
     margin: 0;
     color: white;
 }
 
-/* ── Formulários padrão ── */
-.form-grupo {
-    margin-bottom: 14px;
-}
-
-.form-grupo label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
-    color: #ffffff;
-}
-
-.form-grupo input,
-.form-grupo select,
-.form-grupo textarea {
-    width: 100%;
-    max-width: 300px;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-    color: #2d2d2d;
-    background: #ffffff;
-    outline: none;
-    transition: box-shadow 0.2s;
-}
-
-.form-grupo input:focus,
-.form-grupo select:focus,
-.form-grupo textarea:focus {
-    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.45);
-}
-
-/* ── Inputs genéricos usados no diário/financeiro ── */
-input[type="text"],
-input[type="number"],
-input[type="date"],
-input[type="email"],
-input[type="password"],
-textarea,
-select {
-    border-radius: 8px;
-    border: none;
-    font-size: 0.95rem;
-    outline: none;
-    transition: box-shadow 0.2s;
-}
-
-/* ── Botão padrão ── */
-.btn-padrao,
-button[type="submit"] {
-    background-color: #ffffff;
-    color: #376A4F;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    font-size: 1rem;
-}
-
-.btn-padrao:hover,
-button[type="submit"]:hover {
-    background-color: #e0e0e0;
-    transform: scale(1.03);
-}
-
-/* Botão verde (alternativo) */
-.btn-verde {
-    background-color: #28a745;
-    color: #ffffff;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    font-size: 1rem;
-}
-
-.btn-verde:hover {
-    background-color: #1e7e34;
-    transform: scale(1.03);
-}
-
-/* Centralizado (botão call-to-action da home) */
 .centralizado {
-    background-color: white;
+    background-color: white; 
     color: #428257;
     padding: 10px 25px;
     border-radius: 50px;
@@ -203,149 +112,17 @@ button[type="submit"]:hover {
 
 .centralizado:hover {
     background-color: #f0f0f0;
-    transform: scale(1.05);
+    transform: scale(1.05); 
 }
 
-/* ── Seção de título dentro do formulário ── */
-.secao-titulo {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #ffffff;
-    border-bottom: 2px solid rgba(255,255,255,0.35);
-    padding-bottom: 5px;
-    margin: 18px 0 10px;
-}
 
-/* ── Caixas de resultado / resultado-card ── */
-.resultado-box {
-    margin-top: 20px;
-    display: none;
-    text-align: left;
-}
-
-.resultado-card {
-    background-color: #f8f9fa;
-    color: #333;
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 5px solid #28a745;
-}
-
-.resultado-card > div:empty { display: none; }
-
-.resultado-card > div + div {
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid #d9dde2;
-}
-
-.resultado-card h3 {
-    margin: 0 0 6px;
-    color: #1a5e2a;
-}
-
-/* ── Guia lateral ── */
-.guia-calculos {
-    position: sticky;
-    top: 90px;
-    background-color: #e8f4f8;
-    color: #1f3b53;
-    padding: 18px;
-    border-radius: 8px;
-    border-left: 5px solid #0066cc;
-    text-align: left;
-    z-index: 0;
-}
-
-.guia-calculos h3 {
-    margin: 0 0 12px;
-    color: #1f3b53;
-    font-size: 1.05rem;
-}
-
-.guia-calculos p {
-    margin: 0 0 10px;
-    color: #4d5c68;
-    line-height: 1.45;
-}
-
-.guia-lista {
-    display: block;
-    list-style: disc;
-    margin: 6px 0 12px;
-    padding-left: 20px;
-    color: #5f6b76;
-}
-
-.guia-lista li {
-    display: list-item;
-    color: #5f6b76;
-    margin-bottom: 6px;
-    line-height: 1.4;
-}
-
-.guia-lista strong { color: #44515c; }
-
-.guia-dica {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(68,81,92,0.14);
-    color: #33424f;
-    font-size: 0.9rem;
-}
-
-/* ── Fieldset padrão (diário de campo) ── */
-fieldset {
-    border: 2px solid rgba(255,255,255,0.30);
-    border-radius: 10px;
-    padding: 14px 18px;
-    background-color: rgba(0,0,0,0.10);
-}
-
-fieldset legend {
-    font-weight: bold;
-    padding: 0 8px;
-    font-size: 0.9rem;
-    color: #d4f5e2;
-}
-
-/* ── Badges ── */
-.badge {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: bold;
-    padding: 3px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-}
-
-.badge-ok    { background: rgba(40,167,69,0.25);  color: #a3ffbc; border: 1px solid rgba(40,167,69,0.40); }
-.badge-aviso { background: rgba(245,197,66,0.20); color: #f5c542; border: 1px solid rgba(245,197,66,0.40); }
-.badge-erro  { background: rgba(220,53,69,0.20);  color: #ff8a8a; border: 1px solid rgba(220,53,69,0.35); }
-
-/* ── Mensagens de erro/info ── */
-.form-error {
-    background: rgba(220,53,69,0.15);
-    border: 1px solid rgba(220,53,69,0.40);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    color: #ff8a8a;
-    margin-bottom: 12px;
-}
-
-.form-note {
-    background: rgba(0,102,204,0.15);
-    border: 1px solid rgba(0,102,204,0.35);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    color: #a8d8f0;
-    margin-bottom: 12px;
-}
-
-/* ── Responsividade global ── */
+/* Responsividade global */
 @media (max-width: 900px) {
+    /* Header empilha e fica mais alto no mobile: aumenta o offset */
+    body {
+        padding-top: 180px;
+    }
+
     .main-header {
         flex-direction: column;
         height: auto;
@@ -360,16 +137,118 @@ fieldset legend {
     }
 
     .container {
-        margin-top: 120px;
+        margin-top: 0;
         width: 95%;
         padding: 20px;
     }
 
-    .logo img { height: 70px; }
-    .logo h1 { font-size: 1.2rem; margin-left: -10px; }
+    .logo img {
+        height: 70px;
+    }
+
+    .logo h1 {
+        font-size: 1.2rem;
+        margin-left: -10px;
+    }
 }
 
 @media (max-width: 600px) {
-    body, html { align-items: stretch; }
-    .container { padding: 15px; }
+    body,
+    html {
+        align-items: stretch;
+    }
+
+    .container {
+        padding: 15px;
+    }
+}
+
+
+/* ── Usuário na navbar ── */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 16px;
+}
+.nav-username {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.75);
+  font-weight: 600;
+}
+.nav-btn-login,
+.nav-btn-cadastro,
+.nav-btn-logout {
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all .18s;
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-block;
+}
+.nav-btn-login {
+  color: rgba(255,255,255,0.80);
+  border: 1px solid rgba(255,255,255,0.30);
+  background: none;
+}
+.nav-btn-login:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+.nav-btn-cadastro {
+  background: #28a745;
+  color: #fff;
+  border: none;
+}
+.nav-btn-cadastro:hover { background: #20913b; color: #fff; }
+.nav-btn-logout {
+  color: rgba(255,180,180,0.80);
+  border: 1px solid rgba(255,100,100,0.25);
+  background: none;
+}
+.nav-btn-logout:hover {
+  background: rgba(220,53,69,0.18);
+  color: #ff8a8a;
+}
+
+/* ── Mensagens Django (messages framework) ── */
+.mensagens-topo {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 480px;
+  width: 90%;
+}
+.mensagem {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  animation: fadeSlide .3s ease;
+}
+@keyframes fadeSlide {
+  from { opacity:0; transform:translateY(-8px); }
+  to   { opacity:1; transform:none; }
+}
+.mensagem-success { background: rgba(40,167,69,0.25); color: #6dda7c; border: 1px solid rgba(40,167,69,0.40); }
+.mensagem-error   { background: rgba(220,53,69,0.20); color: #ff8a8a; border: 1px solid rgba(220,53,69,0.35); }
+.mensagem-warning { background: rgba(255,193,7,0.18); color: #ffd55a; border: 1px solid rgba(255,193,7,0.32); }
+.mensagem-info    { background: rgba(23,162,184,0.18); color: #7fd8e8; border: 1px solid rgba(23,162,184,0.32); }
+
+/* ── Responsivo da navbar estendida ── */
+@media (max-width: 900px) {
+  .nav-user { margin: 4px 0 0; }
+  .nav-username { display: none; }
+}
+@media (max-width: 600px) {
+  .nav-btn-cadastro { display: none; }
 }

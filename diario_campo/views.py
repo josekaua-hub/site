@@ -21,6 +21,9 @@ TIPOS_GASTO   = {'preparo_solo', 'plantio', 'adubacao', 'irrigacao',
                  'transporte_embalagem'}
 TIPOS_RECEITA = {'colheita'}
 TIPOS_ONE_TIME = {'preparo_solo', 'plantio', 'colheita'}
+# Gastos cujo valor informado é POR UNIDADE (total = quantidade × valor)
+TIPOS_COM_QUANTIDADE = {'adubacao', 'irrigacao', 'capina', 'controle_pragas_doencas',
+                        'energia_combustivel', 'transporte_embalagem'}
 
 ATIVIDADE_INFO = [
     {'value': 'preparo_solo',            'label': 'Preparo do Solo',             'tipo': 'gasto',   'one_time': True},
@@ -217,9 +220,21 @@ def diario_campo(request, campo_id):
                     valor_gasto          = '0'
                     quantidade           = quantidade_produzida
                 else:
-                    valor_gasto          = _clean_dec(request.POST.get('valor_gasto', '0'))
+                    valor_informado      = _clean_dec(request.POST.get('valor_gasto', '0'))
+                    modo_gasto           = request.POST.get('_modo_gasto', 'por_unidade')
                     quantidade_produzida = '0'
-                    preco_unitario       = '0'
+                    if tipo_atividade in TIPOS_COM_QUANTIDADE and modo_gasto != 'total':
+                        # valor informado é POR UNIDADE → total = quantidade × valor
+                        try:
+                            total = Decimal(quantidade) * Decimal(valor_informado)
+                        except (InvalidOperation, TypeError):
+                            total = Decimal(valor_informado or '0')
+                        valor_gasto    = str(total)
+                        preco_unitario = valor_informado   # guarda o valor unitário
+                    else:
+                        # valor informado já é o TOTAL (modo "total", preparo, plantio…)
+                        valor_gasto    = valor_informado
+                        preco_unitario = '0'
 
                 Registro.objects.create(
                     campo=campo,

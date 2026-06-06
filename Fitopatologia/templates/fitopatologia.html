@@ -7,23 +7,28 @@
 
 {% block content %}
 <div class="page-wrapper">
+
   <div class="page-header">
-    <h1>🌿 Fitopatologia</h1>
-    <p>Principais doenças da mandioca no Nordeste brasileiro. Clique em uma doença para ver detalhes, sintomas e formas de controle.</p>
+    <h1>🦠 Doenças da Mandioca</h1>
+    <p>Clique em uma doença para ver sintomas, condições favoráveis e formas de controle.</p>
   </div>
 
   <div class="fitopatologia-grid">
 
     <div class="disease-card" data-disease="bacteriose">
-      <div class="disease-image disease-image--bacteriose"></div>
+      <div class="disease-image">
+        <img src="{% static 'images/bacteriose.jpg' %}" alt="Bacteriose">
+      </div>
       <div class="disease-card-body">
         <h3>Bacteriose</h3>
-        <span class="disease-tag">Xanthomonas axonopodis</span>
+        <span class="disease-tag">Xanthomonas axonopodis pv. manihotis</span>
       </div>
     </div>
 
     <div class="disease-card" data-disease="antracnose">
-      <div class="disease-image disease-image--antracnose"></div>
+      <div class="disease-image">
+        <img src="{% static 'images/antracnose.jpg' %}" alt="Antracnose">
+      </div>
       <div class="disease-card-body">
         <h3>Antracnose</h3>
         <span class="disease-tag">Colletotrichum gloeosporioides</span>
@@ -31,40 +36,47 @@
     </div>
 
     <div class="disease-card" data-disease="podridao-radicular">
-      <div class="disease-image disease-image--podridao"></div>
+      <div class="disease-image">
+        <img src="{% static 'images/podridao-radicular.jpg' %}" alt="Podridão Radicular">
+      </div>
       <div class="disease-card-body">
         <h3>Podridão Radicular</h3>
-        <span class="disease-tag">Phytophthora / Fusarium spp.</span>
+        <span class="disease-tag">Phytophthora drechsleri / Fusarium spp.</span>
       </div>
     </div>
 
-    <div class="disease-card" data-disease="superalongamento">
-      <div class="disease-image disease-image--superalongamento"></div>
+    <div class="disease-card" data-disease="Ferrugem da mandioca">
+      <div class="disease-image">
+        <img src="{% static 'images/ferrugem.jpg' %}" alt="Ferrugem">
+      </div>
       <div class="disease-card-body">
-        <h3> Ferrugem </h3>
+        <h3>Ferrugem da Mandioca</h3>
         <span class="disease-tag">Uromyces manihotis</span>
       </div>
     </div>
 
     <div class="disease-card" data-disease="cercosporiose">
-      <div class="disease-image disease-image--cercosporiose"></div>
+      <div class="disease-image">
+        <img src="{% static 'images/oidio.jpg' %}" alt="Oídio">
+      </div>
       <div class="disease-card-body">
-        <h3>Oídio</h3>
+        <h3>Oídio da Mandioca</h3>
         <span class="disease-tag">Oidium manihotis</span>
       </div>
     </div>
 
   </div>
-</div>
 
-<!-- Modal -->
-<div id="diseaseModal" class="disease-modal">
-  <div class="disease-modal-content">
-    <span class="disease-modal-close">&times;</span>
-    <h2 id="diseaseModalTitle"></h2>
-    <div id="diseaseModalBody"></div>
+  <!-- Modal -->
+  <div class="disease-modal" id="diseaseModal">
+    <div class="disease-modal-content">
+      <span class="disease-modal-close">&times;</span>
+      <h2 id="diseaseModalTitle"></h2>
+      <div id="diseaseModalBody"></div>
+    </div>
   </div>
+
 </div>
 
 <script src="{% static 'Fitopatologia/fitopatologia.js' %}"></script>
-{% endblock %}
+{% endblock content %}

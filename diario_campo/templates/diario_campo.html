@@ -120,8 +120,7 @@
               <div class="dc-field">
                 <label for="data">📅 Data</label>
                 <input type="date" id="data" name="data"
-                       min="{{ campo_criado_em|date:'Y-m-d' }}"
-                       max="{% now 'Y-m-d' %}" required>
+                       min="{{ campo_criado_em|date:'Y-m-d' }}" required>
               </div>
               <div class="dc-field">
                 <label for="tipo_atividade">🏷 Tipo de Atividade</label>
@@ -166,6 +165,19 @@
 
             <!-- ═══ Bloco Quantidade (gastos) ═══ -->
             <div id="bloco-quantidade" style="display:none;">
+              <!-- modo: valor por unidade  OU  valor total -->
+              <div class="dc-field" style="margin-bottom:10px;">
+                <label style="font-size:0.78rem; color:rgba(255,255,255,0.60); font-weight:700;">Como informar o valor</label>
+                <div style="display:flex; gap:6px; padding-top:2px; flex-wrap:wrap;">
+                  <label class="dc-radio-btn">
+                    <input type="radio" name="_modo_gasto" value="por_unidade" checked> Valor por unidade
+                  </label>
+                  <label class="dc-radio-btn">
+                    <input type="radio" name="_modo_gasto" value="total"> Valor total
+                  </label>
+                </div>
+              </div>
+
               <!-- linha: unidade padrão (pill) + quantidade + valor total preview -->
               <div id="dc-unidade-pills" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;"></div>
 
@@ -192,7 +204,7 @@
                    background:rgba(220,53,69,0.10); border:1px solid rgba(220,53,69,0.25);
                    border-radius:8px; padding:8px 14px; margin-top:2px;
                    display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                <span style="font-size:0.80rem; color:rgba(255,255,255,0.55);">Gasto estimado:</span>
+                <span id="dc-gasto-preview-label" style="font-size:0.80rem; color:rgba(255,255,255,0.55);">Gasto estimado:</span>
                 <strong id="dc-gasto-preview-val" style="font-size:1.0rem; color:#ff7b7b;">R$ 0,00</strong>
               </div>
             </div>
@@ -498,6 +510,7 @@
         { valor:'hora',     label:'hora',     kg:null },
         { valor:'m³',       label:'m³',       kg:null },
         { valor:'irrigação',label:'irrigação', kg:null },
+        { valor:'mês',      label:'mês',      kg:null },
         { valor:'outra',    label:'outra unidade…', kg:null },
       ]
     },
@@ -508,6 +521,7 @@
         { valor:'vez',  label:'vez',  kg:null },
         { valor:'hora', label:'hora', kg:null },
         { valor:'dia',  label:'dia',  kg:null },
+        { valor:'mês',      label:'mês',      kg:null },
         { valor:'outra',label:'outra unidade…', kg:null },
       ]
     },
@@ -518,6 +532,7 @@
         { valor:'aplicação', label:'aplicação', kg:null },
         { valor:'litro',     label:'litro',     kg:null },
         { valor:'kg',        label:'kg',        kg:1    },
+        { valor:'mês',      label:'mês',      kg:null },
         { valor:'outra',     label:'outra unidade…', kg:null },
       ]
     },
@@ -528,6 +543,7 @@
         { valor:'litro', label:'litro', kg:null },
         { valor:'kWh',   label:'kWh',   kg:null },
         { valor:'dia',   label:'dia',   kg:null },
+        { valor:'mês',      label:'mês',      kg:null },
         { valor:'outra', label:'outra unidade…', kg:null },
       ]
     },
@@ -538,6 +554,7 @@
         { valor:'viagem',   label:'viagem',           kg:null },
         { valor:'caixa',    label:'caixa',             kg:null },
         { valor:'tonelada', label:'tonelada (1.000 kg)',kg:1000 },
+        { valor:'mês',      label:'mês',      kg:null },
         { valor:'outra',    label:'outra unidade…',    kg:null },
       ]
     },
@@ -624,6 +641,9 @@
     const isOutra = (valorUnidade === 'outra');
     if (outraNomeField) outraNomeField.style.display = isOutra ? 'block' : 'none';
 
+    // Rótulo do valor reflete o modo + a medida escolhida
+    atualizarRotuloValor();
+
     // Atualiza hidden e display
     if (!isOutra) {
       if (unidadeHidden)  unidadeHidden.value = valorUnidade;
@@ -635,14 +655,42 @@
     atualizarGastoPreview();
   }
 
+  function getModoGasto() {
+    const r = document.querySelector('input[name="_modo_gasto"]:checked');
+    return r ? r.value : 'por_unidade';
+  }
+
+  function nomeMedidaAtual() {
+    if (gastoUnidadeAtual === 'outra') {
+      return (outraNomeInp && outraNomeInp.value.trim()) || 'unidade';
+    }
+    return gastoUnidadeAtual || 'unidade';
+  }
+
+  function atualizarRotuloValor() {
+    if (!labelValor) return;
+    labelValor.textContent = (getModoGasto() === 'total')
+      ? '💸 Valor total gasto (R$)'
+      : `💸 Valor por ${nomeMedidaAtual()} (R$)`;
+  }
+
   function atualizarGastoPreview() {
     if (!gastoPreview) return;
-    const qtd   = parseDec(qtdInput ? qtdInput.value : 0);
-    const valor  = parseDec(valorInput ? valorInput.value : 0);
-    if (qtd > 1 && valor > 0) {
-      // Mostramos o total apenas quando qty > 1 (1 unidade não precisa de preview)
+    const qtd   = parseDec(qtdInput ? qtdInput.value : 0) || 1;
+    const valor = parseDec(valorInput ? valorInput.value : 0);
+    const modo  = getModoGasto();
+    // "total": o valor digitado já é o total. "por_unidade": total = qtd × valor.
+    const total = (modo === 'total') ? valor : qtd * valor;
+    if (valor > 0) {
       gastoPreview.style.display = 'flex';
-      if (gastoPreviewVal) gastoPreviewVal.textContent = fmtBRL(valor);
+      if (gastoPreviewVal) gastoPreviewVal.textContent = fmtBRL(total);
+      const lbl = document.getElementById('dc-gasto-preview-label');
+      if (lbl) {
+        const un = (unidadeDisplay && unidadeDisplay.textContent) ? unidadeDisplay.textContent : '';
+        lbl.textContent = (modo !== 'total' && qtd > 1)
+          ? `${qtd.toLocaleString('pt-BR')} ${un} × ${fmtBRL(valor)}`
+          : 'Gasto total:';
+      }
     } else {
       gastoPreview.style.display = 'none';
     }
@@ -787,10 +835,31 @@
   /* ─── Listeners gasto preview ─────────────────────────────────────────── */
   if (qtdInput)    qtdInput.addEventListener('input',    atualizarGastoPreview);
   if (valorInput)  valorInput.addEventListener('input',  atualizarGastoPreview);
+  document.querySelectorAll('input[name="_modo_gasto"]').forEach(r =>
+    r.addEventListener('change', () => { atualizarRotuloValor(); atualizarGastoPreview(); })
+  );
   if (outraNomeInp) outraNomeInp.addEventListener('input', () => {
     if (unidadeHidden) unidadeHidden.value = outraNomeInp.value.trim();
     if (unidadeDisplay) unidadeDisplay.textContent = outraNomeInp.value.trim();
+    atualizarRotuloValor();
+    atualizarGastoPreview();
   });
+
+  /* --- Sincroniza campos com nomes duplicados ---------------------------
+     Os blocos de gasto, plantio e colheita possuem inputs com os MESMOS names
+     ("quantidade" e "quantidade_unidade"). Como os blocos so sao ocultados com
+     display:none, todos seriam enviados no POST e o Django leria o ULTIMO valor
+     (o do bloco de colheita), gravando a unidade errada no historico.
+     Aqui desabilitamos os campos dos blocos inativos para que apenas o bloco
+     visivel seja enviado. */
+  function sincronizarCamposAtivos() {
+    [blocoQtd, blocoPlantio, blocoColheita].forEach(bloco => {
+      if (!bloco) return;
+      const ativo = bloco.style.display !== 'none';
+      bloco.querySelectorAll('[name="quantidade"], [name="quantidade_unidade"], [name="quantidade_produzida"]')
+           .forEach(inp => { inp.disabled = !ativo; });
+    });
+  }
 
   /* ─── Troca de tipo de atividade ──────────────────────────────────────── */
   function onTipoChange() {
@@ -843,11 +912,14 @@
       if (btnSalvar)  btnSalvar.textContent   = '💾 Registrar Gasto';
     } else {
       // Demais gastos com unidade
-      if (labelValor) labelValor.textContent = '💸 Valor Gasto (R$)';
+      if (labelValor) labelValor.textContent = '💸 Valor por Unidade (R$)';
       if (btnSalvar)  btnSalvar.textContent   = '💾 Registrar Gasto';
       if (blocoQtd)   blocoQtd.style.display = 'block';
       buildPillsGasto(t);
     }
+
+    // Garante que so o bloco visivel envie quantidade/unidade
+    sincronizarCamposAtivos();
   }
 
   if (tipoSel) tipoSel.addEventListener('change', onTipoChange);
@@ -920,4 +992,4 @@
 })();
 </script>
 
-{% endblock content %}
+{% endblock content %} 

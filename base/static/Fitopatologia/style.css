@@ -46,30 +46,24 @@
     box-shadow: 0 10px 24px rgba(0,0,0,0.22);
 }
 
-/* Imagens ilustrativas */
+/* Imagens reais */
 .disease-image {
     width: 100%;
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3.2rem;
+    height: 140px;
+    overflow: hidden;
 }
 
-.disease-image--bacteriose      { background: linear-gradient(135deg, #1a3a5c 0%, #2e7dbd 100%); }
-.disease-image--bacteriose::after { content: "🦠"; }
+.disease-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
 
-.disease-image--antracnose      { background: linear-gradient(135deg, #3b1a08 0%, #a0522d 100%); }
-.disease-image--antracnose::after { content: "🍂"; }
-
-.disease-image--podridao        { background: linear-gradient(135deg, #1c2b10 0%, #4a7c2f 100%); }
-.disease-image--podridao::after { content: "🍄"; }
-
-.disease-image--superalongamento { background: linear-gradient(135deg, #1a4a1a 0%, #5aab3a 100%); }
-.disease-image--superalongamento::after { content: "🌿"; }
-
-.disease-image--cercosporiose   { background: linear-gradient(135deg, #4a3800 0%, #c49a00 100%); }
-.disease-image--cercosporiose::after { content: "🌾"; }
+.disease-card:hover .disease-image img {
+    transform: scale(1.06);
+}
 
 .disease-card-body {
     padding: 14px;
