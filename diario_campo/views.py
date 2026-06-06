@@ -18,12 +18,12 @@ from .models import Campo, Registro
 
 TIPOS_GASTO   = {'preparo_solo', 'plantio', 'adubacao', 'irrigacao',
                  'capina', 'controle_pragas_doencas', 'energia_combustivel',
-                 'transporte_embalagem'}
+                 'transporte_embalagem', 'pos_colheita'}
 TIPOS_RECEITA = {'colheita'}
 TIPOS_ONE_TIME = {'preparo_solo', 'plantio', 'colheita'}
 # Gastos cujo valor informado é POR UNIDADE (total = quantidade × valor)
 TIPOS_COM_QUANTIDADE = {'adubacao', 'irrigacao', 'capina', 'controle_pragas_doencas',
-                        'energia_combustivel', 'transporte_embalagem'}
+                        'energia_combustivel', 'transporte_embalagem', 'pos_colheita'}
 
 ATIVIDADE_INFO = [
     {'value': 'preparo_solo',            'label': 'Preparo do Solo',             'tipo': 'gasto',   'one_time': True},
@@ -35,6 +35,7 @@ ATIVIDADE_INFO = [
     {'value': 'energia_combustivel',     'label': 'Energia / Combustível',       'tipo': 'gasto',   'one_time': False},
     {'value': 'transporte_embalagem',    'label': 'Transporte / Embalagem',      'tipo': 'gasto',   'one_time': False},
     {'value': 'colheita',                'label': 'Colheita',                    'tipo': 'receita', 'one_time': True},
+    {'value': 'pos_colheita',            'label': 'Pós-colheita / Beneficiamento','tipo': 'gasto',   'one_time': False},
 ]
 
 
@@ -63,8 +64,10 @@ def _build_pdf_table(registros):
     return rows
 
 
-def _render_pdf(response, campo, registros):
+def _render_pdf(response, campo, registros, numero_ciclo=None):
     """Gera PDF de registros e escreve em response."""
+    if numero_ciclo is None:
+        numero_ciclo = campo.numero_ciclo
     doc = SimpleDocTemplate(response, pagesize=A4,
                             leftMargin=1.5*cm, rightMargin=1.5*cm,
                             topMargin=2*cm, bottomMargin=2*cm)
@@ -79,7 +82,7 @@ def _render_pdf(response, campo, registros):
 
     elements = [
         Paragraph(f"Diário de Campo — {campo.nome}", title_style),
-        Paragraph(f"Ciclo {campo.numero_ciclo}  |  Registros: {len(registros)}  |  "
+        Paragraph(f"Ciclo {numero_ciclo}  |  Registros: {len(registros)}  |  "
                   f"Gastos: R$ {total_gastos:.2f}  |  Receita: R$ {total_receita:.2f}  |  "
                   f"Saldo: R$ {saldo:.2f}", sub_style),
     ]
@@ -130,12 +133,16 @@ def selecionar_campo(request):
         regs = c.registros_ciclo_atual
         total_gastos  = sum(r.valor_gasto   for r in regs if r.tipo_atividade not in TIPOS_RECEITA)
         total_receita = sum(r.receita_total for r in regs if r.tipo_atividade in TIPOS_RECEITA)
+        ciclos = sorted(set(
+            c.registros.values_list('numero_ciclo', flat=True)
+        ))
         campos_data.append({
             'campo': c,
             'num_registros': regs.count(),
             'total_gastos': total_gastos,
             'total_receita': total_receita,
             'saldo': total_receita - total_gastos,
+            'ciclos': ciclos,
         })
     return render(request, 'selecionar_campo.html', {
         'campos_data': campos_data,
@@ -188,13 +195,16 @@ def diario_campo(request, campo_id):
             campo.reiniciar_ciclo()
             return redirect('diario_campo_form', campo_id=campo.id)
 
-        if colheita_done:
-            error_message = 'A colheita já foi registrada. Reinicie o ciclo para adicionar novos registros.'
+        tipo_atividade = request.POST.get('tipo_atividade', '').strip()
+
+        # Após a colheita o ciclo é encerrado, mas custos de PÓS-COLHEITA
+        # (beneficiamento) ainda podem ser lançados.
+        if colheita_done and tipo_atividade != 'pos_colheita':
+            error_message = 'A colheita já foi registrada. Só é possível lançar custos de pós-colheita, ou reinicie o ciclo.'
         else:
             data           = request.POST.get('data', '').strip()
             titulo         = request.POST.get('titulo', '').strip()
             detalhe        = request.POST.get('detalhe', '').strip()
-            tipo_atividade = request.POST.get('tipo_atividade', '').strip()
             quantidade_unidade = request.POST.get('quantidade_unidade', '').strip()
 
             if not tipo_atividade:
@@ -357,6 +367,90 @@ def download_campo_registros(request, campo_id):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="diario_{campo.nome}_ciclo{campo.numero_ciclo}.pdf"'
     _render_pdf(response, campo, registros)
+    return response
+
+
+@login_required(login_url="login")
+def download_ciclo(request, campo_id, numero_ciclo):
+    """Baixa o PDF completo de um ciclo específico do campo (inclui ciclos arquivados)."""
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
+    registros = list(
+        campo.registros.filter(numero_ciclo=numero_ciclo).order_by('-data', '-criado_em')
+    )
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = (
+        f'attachment; filename="diario_{campo.nome}_ciclo{numero_ciclo}.pdf"'
+    )
+    _render_pdf(response, campo, registros, numero_ciclo=numero_ciclo)
+    return response
+
+
+def _render_pdf_todos(response, campo):
+    """Gera um PDF com o histórico COMPLETO do campo (todos os ciclos)."""
+    doc = SimpleDocTemplate(response, pagesize=A4,
+                            leftMargin=1.5*cm, rightMargin=1.5*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('title', parent=styles['Title'], fontSize=14, spaceAfter=6)
+    sub_style   = ParagraphStyle('sub',   parent=styles['Normal'], fontSize=9,
+                                 textColor=colors.grey, spaceAfter=12)
+    ciclo_style = ParagraphStyle('ciclo', parent=styles['Heading2'], fontSize=12,
+                                 spaceBefore=16, spaceAfter=6,
+                                 textColor=colors.HexColor('#2d6a4f'))
+
+    todos = list(campo.registros.order_by('numero_ciclo', '-data', '-criado_em'))
+    ciclos = sorted(set(r.numero_ciclo for r in todos))
+
+    g_gastos  = sum(r.valor_gasto   for r in todos if r.tipo_atividade not in TIPOS_RECEITA)
+    g_receita = sum(r.receita_total for r in todos if r.tipo_atividade in TIPOS_RECEITA)
+
+    elements = [
+        Paragraph(f"Diário de Campo — {campo.nome}", title_style),
+        Paragraph(f"Histórico completo  ·  {len(ciclos)} ciclo(s)  ·  {len(todos)} registro(s)  ·  "
+                  f"Gastos: R$ {g_gastos:.2f}  ·  Receita: R$ {g_receita:.2f}  ·  "
+                  f"Saldo: R$ {g_receita - g_gastos:.2f}", sub_style),
+    ]
+
+    table_style = TableStyle([
+        ('BACKGROUND',    (0, 0), (-1, 0),  colors.HexColor('#2d6a4f')),
+        ('TEXTCOLOR',     (0, 0), (-1, 0),  colors.white),
+        ('FONTNAME',      (0, 0), (-1, 0),  'Helvetica-Bold'),
+        ('FONTSIZE',      (0, 0), (-1, -1), 8),
+        ('ALIGN',         (0, 0), (-1, -1), 'LEFT'),
+        ('ROWBACKGROUNDS',(0, 1), (-1, -1), [colors.white, colors.HexColor('#f0f7f3')]),
+        ('GRID',          (0, 0), (-1, -1), 0.4, colors.HexColor('#cccccc')),
+        ('TOPPADDING',    (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ])
+
+    if not todos:
+        elements.append(Paragraph("Nenhum registro neste campo.", styles['Normal']))
+    else:
+        for nc in ciclos:
+            regs = [r for r in todos if r.numero_ciclo == nc]
+            cg = sum(r.valor_gasto   for r in regs if r.tipo_atividade not in TIPOS_RECEITA)
+            cr = sum(r.receita_total for r in regs if r.tipo_atividade in TIPOS_RECEITA)
+            atual = ' (atual)' if nc == campo.numero_ciclo else ''
+            elements.append(Paragraph(
+                f"Ciclo {nc}{atual}  —  {len(regs)} registro(s)  ·  "
+                f"Gastos R$ {cg:.2f}  ·  Receita R$ {cr:.2f}  ·  Saldo R$ {cr - cg:.2f}",
+                ciclo_style))
+            table = Table(_build_pdf_table(regs), repeatRows=1)
+            table.setStyle(table_style)
+            elements.append(table)
+
+    doc.build(elements)
+
+
+@login_required(login_url="login")
+def download_todos_ciclos(request, campo_id):
+    """Baixa o PDF com TODOS os ciclos do campo (arquivados + atual)."""
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = (
+        f'attachment; filename="diario_{campo.nome}_TODOS_os_ciclos.pdf"'
+    )
+    _render_pdf_todos(response, campo)
     return response
 
 

@@ -176,6 +176,20 @@
     background: rgba(220,53,69,0.20); border: 1px solid rgba(220,53,69,0.45);
     border-radius: 8px; padding: 10px 16px; color: #ff8a8a; margin-bottom: 16px;
   }
+
+  .sc-download-ciclo {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.10);
+  }
+  .sc-download-label {
+    font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.65);
+  }
+  .sc-ciclo-select {
+    flex: 1; min-width: 150px; padding: 7px 12px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.92);
+    color: #1e3a1a; font-size: 0.84rem; cursor: pointer; font-family: inherit;
+  }
 </style>
 
 <div class="sc-page">
@@ -276,6 +290,20 @@
             {% endif %}
           </div>
         </div>
+
+        {% if cd.ciclos %}
+        <div class="sc-download-ciclo">
+          <span class="sc-download-label">📥 Baixar ciclo completo:</span>
+          <select class="sc-ciclo-select"
+                  onchange="if(this.value){window.location=this.value; this.selectedIndex=0;}">
+            <option value="">Escolher o que baixar…</option>
+            <option value="{% url 'download_todos_ciclos' cd.campo.id %}">📚 Todos os ciclos (completo)</option>
+            {% for nc in cd.ciclos %}
+            <option value="{% url 'download_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
