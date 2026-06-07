@@ -6,25 +6,27 @@
   <div style="width:100%; max-width:380px;">
     <h1 style="text-align:center; margin-bottom:24px;">Cadastro</h1>
 
-    {% if form.errors %}
-      <div class="form-error">Verifique os campos e tente novamente.</div>
+    {% if erro %}
+      <div style="background:rgba(220,53,69,0.20); border:1px solid rgba(220,53,69,0.40); border-radius:8px; padding:10px 14px; color:#ff8a8a; font-size:0.88rem; margin-bottom:16px;">
+        {{ erro }}
+      </div>
     {% endif %}
 
     <form method="post" action="{% url 'cadastro' %}" style="display:flex; flex-direction:column; gap:14px;">
       {% csrf_token %}
       <div class="form-grupo" style="margin-bottom:0;">
         <label for="username">Usuário</label>
-        <input type="text" id="username" name="username" placeholder="Escolha um usuário" required
+        <input type="text" id="username" name="username" value="{{ username|default:'' }}" placeholder="Escolha um usuário" required
                style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
       </div>
       <div class="form-grupo" style="margin-bottom:0;">
         <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" placeholder="seu@email.com" required
+        <input type="email" id="email" name="email" value="{{ email|default:'' }}" placeholder="seu@email.com" required
                style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
       </div>
       <div class="form-grupo" style="margin-bottom:0;">
         <label for="password">Senha</label>
-        <input type="password" id="password" name="password" placeholder="Crie uma senha" required
+        <input type="password" id="password" name="password" placeholder="Crie uma senha (mín. 6 caracteres)" required
                style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
       </div>
       <button type="submit" style="margin-top:8px;">CADASTRAR</button>
