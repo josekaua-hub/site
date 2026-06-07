@@ -48,13 +48,13 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql="""
                 UPDATE diario_campo_campo
-                SET ciclo_ativo = 0
+                SET ciclo_ativo = false
                 WHERE id IN (
                     SELECT DISTINCT campo_id
                     FROM diario_campo_registro
                     WHERE tipo_atividade = 'colheita'
                 );
             """,
-            reverse_sql="UPDATE diario_campo_campo SET ciclo_ativo = 1;",
+            reverse_sql="UPDATE diario_campo_campo SET ciclo_ativo = true;",
         ),
     ]
