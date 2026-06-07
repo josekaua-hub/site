@@ -10,3 +10,6 @@ python manage.py collectstatic --noinput
 
 # Aplica as migrações do banco de dados
 python manage.py migrate
+
+#Cria o superusuário e || true  evita que o build quebre nos próximos deploys, quando o usuário já existir.
+python manage.py createsuperuser --noinput || true
