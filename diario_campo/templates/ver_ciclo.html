@@ -1,0 +1,122 @@
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'diario_campo/diario_campo/style.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="dc-page">
+
+  <header class="dc-header">
+    <div class="dc-header-left">
+      <span class="dc-icon">📜</span>
+      <div>
+        <h1 class="dc-titulo">Histórico — Ciclo {{ numero_ciclo }}{% if is_atual %} (atual){% endif %}</h1>
+        <p class="dc-subtitulo">{{ campo.nome }}
+          <span style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-left:6px;">somente leitura</span>
+        </p>
+      </div>
+    </div>
+    <nav class="dc-nav">
+      <a href="{% url 'diario_campo' %}" class="dc-btn-nav">← Campos</a>
+      {% if is_atual %}<a href="{% url 'diario_campo_form' campo.id %}" class="dc-btn-nav">✏️ Editar ciclo atual</a>{% endif %}
+      <a href="{% url 'download_ciclo' campo.id numero_ciclo %}" class="dc-btn-nav">📥 PDF</a>
+    </nav>
+  </header>
+
+  <div style="padding:10px 20px; background:rgba(255,193,7,0.12); border-bottom:1px solid rgba(255,255,255,0.08); color:#ffd55a; font-size:0.85rem;">
+    🔒 Ciclo em modo somente leitura — os registros não podem ser editados nem excluídos.
+  </div>
+
+  <div style="padding:10px 20px; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+    <span style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-right:4px;">Ver ciclo:</span>
+    {% for nc in ciclos %}
+      <a href="{% url 'ver_ciclo' campo.id nc %}"
+         style="font-size:0.80rem; padding:3px 12px; border-radius:20px; text-decoration:none;
+         {% if nc == numero_ciclo %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.45);
+         {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.65); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+        Ciclo {{ nc }}{% if nc == campo.numero_ciclo %} (atual){% endif %}
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="dc-saldo-bar">
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Total de Gastos</span>
+      <span class="dc-saldo-val dc-vermelho">− R$ {{ total_gastos|floatformat:2 }}</span>
+    </div>
+    <div class="dc-saldo-sep"></div>
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Receita da Colheita</span>
+      <span class="dc-saldo-val dc-verde">+ R$ {{ total_receita|floatformat:2 }}</span>
+    </div>
+    <div class="dc-saldo-sep"></div>
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Saldo do Ciclo</span>
+      <span class="dc-saldo-val {% if saldo >= 0 %}dc-verde{% else %}dc-vermelho{% endif %} dc-bold">
+        {% if saldo >= 0 %}+{% endif %} R$ {{ saldo|floatformat:2 }}
+      </span>
+    </div>
+    <div class="dc-saldo-sep"></div>
+    <div class="dc-saldo-item">
+      <span class="dc-saldo-label">Registros</span>
+      <span class="dc-saldo-val">{{ num_registros }}</span>
+    </div>
+  </div>
+
+  <section class="dc-historico-col" style="background:rgba(0,0,0,0.10); border-radius:0 0 14px 14px;">
+    <div class="dc-historico-header">
+      <h2>📋 Registros do ciclo</h2>
+      {% if num_registros %}<span class="dc-contador">{{ num_registros }}</span>{% endif %}
+    </div>
+
+    {% if registros %}
+      <ul class="dc-lista">
+        {% for r in registros %}
+        <li class="dc-item {% if r.tipo_atividade == 'colheita' %}dc-item-receita{% else %}dc-item-gasto{% endif %}">
+          <div class="dc-item-icon">
+            {% if r.tipo_atividade == 'colheita' %}🌾
+            {% elif r.tipo_atividade == 'plantio' %}🌱
+            {% elif r.tipo_atividade == 'preparo_solo' %}🚜
+            {% elif r.tipo_atividade == 'adubacao' %}🧪
+            {% elif r.tipo_atividade == 'irrigacao' %}💧
+            {% elif r.tipo_atividade == 'capina' %}🌿
+            {% elif r.tipo_atividade == 'controle_pragas_doencas' %}🐛
+            {% elif r.tipo_atividade == 'energia_combustivel' %}⛽
+            {% elif r.tipo_atividade == 'transporte_embalagem' %}🚚
+            {% elif r.tipo_atividade == 'pos_colheita' %}🏭
+            {% else %}📌{% endif %}
+          </div>
+          <div class="dc-item-body" style="cursor:default;">
+            <div class="dc-item-top">
+              <span class="dc-item-titulo">{{ r.titulo }}</span>
+              <span class="dc-item-valor {% if r.tipo_atividade == 'colheita' %}dc-verde{% else %}dc-vermelho{% endif %}">
+                {% if r.tipo_atividade == 'colheita' %}+ R$ {{ r.receita_total|floatformat:2 }}{% else %}− R$ {{ r.valor_gasto|floatformat:2 }}{% endif %}
+              </span>
+            </div>
+            <div class="dc-item-meta">
+              <span class="dc-tag">{{ r.get_tipo_atividade_display }}</span>
+              <span class="dc-tag dc-tag-data">{{ r.data|date:"d/m/Y" }}</span>
+              {% if r.tipo_atividade == 'colheita' %}
+                <span class="dc-tag dc-tag-colheita">{{ r.quantidade_produzida }} {{ r.quantidade_unidade }}</span>
+                <span class="dc-tag">R$ {{ r.preco_unitario|floatformat:2 }}/{{ r.quantidade_unidade }}</span>
+              {% elif r.quantidade %}
+                <span class="dc-tag">{{ r.quantidade }} {{ r.quantidade_unidade }}</span>
+              {% endif %}
+            </div>
+            {% if r.detalhe %}<div style="margin-top:6px; font-size:0.80rem; color:rgba(255,255,255,0.55);">📝 {{ r.detalhe }}</div>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="dc-vazio">
+        <span class="dc-vazio-icon">📭</span>
+        <p>Nenhum registro neste ciclo.</p>
+      </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock content %}

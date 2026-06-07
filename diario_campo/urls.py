@@ -13,4 +13,5 @@ urlpatterns = [
     path('download_campo/<int:campo_id>/', views.download_campo_registros, name='download_campo_registros'),
     path('download_ciclo/<int:campo_id>/<int:numero_ciclo>/', views.download_ciclo, name='download_ciclo'),
     path('download_todos/<int:campo_id>/', views.download_todos_ciclos, name='download_todos_ciclos'),
+    path('ciclo/<int:campo_id>/<int:numero_ciclo>/', views.ver_ciclo, name='ver_ciclo'),
 ]

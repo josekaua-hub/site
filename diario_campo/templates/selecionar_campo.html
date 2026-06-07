@@ -177,19 +177,32 @@
     border-radius: 8px; padding: 10px 16px; color: #ff8a8a; margin-bottom: 16px;
   }
 
-  .sc-download-ciclo {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    margin-top: 12px; padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,0.10);
+  /* -- Painel de ciclos -- */
+  .sc-ciclos { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.10); }
+  .sc-ciclos-title {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); margin-bottom: 8px;
   }
-  .sc-download-label {
-    font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.65);
+  .sc-ciclos-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 520px) { .sc-ciclos-row { grid-template-columns: 1fr; } }
+  .sc-ciclo-control {
+    position: relative; display: flex; align-items: center; gap: 8px;
+    padding: 0 10px 0 12px; border-radius: 10px; cursor: pointer;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16);
+    transition: background 0.16s, border-color 0.16s, transform 0.12s;
   }
+  .sc-ciclo-control:hover { background: rgba(255,255,255,0.11); border-color: rgba(90,160,74,0.55); transform: translateY(-1px); }
+  .sc-ciclo-ic { font-size: 1.05rem; line-height: 1; flex-shrink: 0; }
+  .sc-ciclo-download { border-left: 3px solid rgba(40,167,69,0.55); }
+  .sc-ciclo-ver      { border-left: 3px solid rgba(90,170,210,0.55); }
   .sc-ciclo-select {
-    flex: 1; min-width: 150px; padding: 7px 12px; border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.92);
-    color: #1e3a1a; font-size: 0.84rem; cursor: pointer; font-family: inherit;
+    flex: 1; width: 100%; padding: 10px 22px 10px 0; border: none; background: transparent;
+    outline: none; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    font-family: inherit; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-opacity='0.6' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 2px center;
   }
+  .sc-ciclo-select option { color: #1e3a1a; background: #fff; }
 </style>
 
 <div class="sc-page">
@@ -292,16 +305,32 @@
         </div>
 
         {% if cd.ciclos %}
-        <div class="sc-download-ciclo">
-          <span class="sc-download-label">📥 Baixar ciclo completo:</span>
-          <select class="sc-ciclo-select"
-                  onchange="if(this.value){window.location=this.value; this.selectedIndex=0;}">
-            <option value="">Escolher o que baixar…</option>
-            <option value="{% url 'download_todos_ciclos' cd.campo.id %}">📚 Todos os ciclos (completo)</option>
-            {% for nc in cd.ciclos %}
-            <option value="{% url 'download_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
-            {% endfor %}
-          </select>
+        <div class="sc-ciclos">
+          <div class="sc-ciclos-title">🗂️ Ciclos do campo</div>
+          <div class="sc-ciclos-row">
+            <label class="sc-ciclo-control sc-ciclo-download" title="Baixar PDF de um ciclo">
+              <span class="sc-ciclo-ic">📥</span>
+              <select class="sc-ciclo-select"
+                      onchange="if(this.value){window.location=this.value; this.selectedIndex=0;}">
+                <option value="">Baixar PDF…</option>
+                <option value="{% url 'download_todos_ciclos' cd.campo.id %}">📚 Todos os ciclos</option>
+                {% for nc in cd.ciclos %}
+                <option value="{% url 'download_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label class="sc-ciclo-control sc-ciclo-ver" title="Visualizar um ciclo (somente leitura)">
+              <span class="sc-ciclo-ic">👁</span>
+              <select class="sc-ciclo-select"
+                      onchange="if(this.value){window.location=this.value;}">
+                <option value="">Visualizar…</option>
+                {% for nc in cd.ciclos %}
+                <option value="{% url 'ver_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
+                {% endfor %}
+              </select>
+            </label>
+          </div>
         </div>
         {% endif %}
       </div>

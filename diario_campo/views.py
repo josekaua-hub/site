@@ -454,6 +454,29 @@ def download_todos_ciclos(request, campo_id):
     return response
 
 
+@login_required(login_url="login")
+def ver_ciclo(request, campo_id, numero_ciclo):
+    """Visualiza (somente leitura) os registros de um ciclo — inclusive arquivados."""
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
+    registros = campo.registros.filter(numero_ciclo=numero_ciclo).order_by('-data', '-criado_em')
+    ciclos = sorted(set(campo.registros.values_list('numero_ciclo', flat=True)))
+
+    total_gastos  = sum(r.valor_gasto   for r in registros if r.tipo_atividade not in TIPOS_RECEITA)
+    total_receita = sum(r.receita_total for r in registros if r.tipo_atividade in TIPOS_RECEITA)
+
+    return render(request, 'ver_ciclo.html', {
+        'campo':          campo,
+        'registros':      registros,
+        'ciclos':         ciclos,
+        'numero_ciclo':   numero_ciclo,
+        'is_atual':       numero_ciclo == campo.numero_ciclo,
+        'total_gastos':   total_gastos,
+        'total_receita':  total_receita,
+        'saldo':          total_receita - total_gastos,
+        'num_registros':  registros.count(),
+    })
+
+
 def download_registro(request, registro_id):
     registro = get_object_or_404(Registro, id=registro_id)
     campo = registro.campo
