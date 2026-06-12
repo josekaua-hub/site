@@ -13,5 +13,9 @@ urlpatterns = [
     path('download_campo/<int:campo_id>/', views.download_campo_registros, name='download_campo_registros'),
     path('download_ciclo/<int:campo_id>/<int:numero_ciclo>/', views.download_ciclo, name='download_ciclo'),
     path('download_todos/<int:campo_id>/', views.download_todos_ciclos, name='download_todos_ciclos'),
+    path('download_anteriores/<int:campo_id>/', views.download_ciclos_anteriores, name='download_ciclos_anteriores'),
+    path('download_csv/<int:campo_id>/', views.download_csv_ciclo, name='download_csv_ciclo_atual'),
+    path('download_csv/<int:campo_id>/<int:numero_ciclo>/', views.download_csv_ciclo, name='download_csv_ciclo'),
+    path('download_csv_todos/<int:campo_id>/', views.download_csv_todos, name='download_csv_todos'),
     path('ciclo/<int:campo_id>/<int:numero_ciclo>/', views.ver_ciclo, name='ver_ciclo'),
 ]

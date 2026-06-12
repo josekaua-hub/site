@@ -1,3 +1,4 @@
+import csv
 from decimal import Decimal, InvalidOperation
 
 from django.contrib.auth.decorators import login_required
@@ -136,6 +137,7 @@ def selecionar_campo(request):
         ciclos = sorted(set(
             c.registros.values_list('numero_ciclo', flat=True)
         ))
+        ciclos_anteriores = [nc for nc in ciclos if nc != c.numero_ciclo]
         campos_data.append({
             'campo': c,
             'num_registros': regs.count(),
@@ -143,6 +145,8 @@ def selecionar_campo(request):
             'total_receita': total_receita,
             'saldo': total_receita - total_gastos,
             'ciclos': ciclos,
+            'ciclos_anteriores': ciclos_anteriores,
+            'tem_ciclos_anteriores': len(ciclos_anteriores) > 0,
         })
     return render(request, 'selecionar_campo.html', {
         'campos_data': campos_data,
@@ -521,6 +525,150 @@ def download_registro(request, registro_id):
         Paragraph(f"Registro — {registro.titulo}", title_style),
         table,
     ])
+    return response
+
+
+def _render_pdf_ciclos_anteriores(response, campo):
+    """Gera PDF com apenas os ciclos arquivados (não inclui o ciclo atual)."""
+    doc = SimpleDocTemplate(response, pagesize=A4,
+                            leftMargin=1.5*cm, rightMargin=1.5*cm,
+                            topMargin=2*cm, bottomMargin=2*cm)
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('title', parent=styles['Title'], fontSize=14, spaceAfter=6)
+    sub_style   = ParagraphStyle('sub',   parent=styles['Normal'], fontSize=9,
+                                 textColor=colors.grey, spaceAfter=12)
+    ciclo_style = ParagraphStyle('ciclo', parent=styles['Heading2'], fontSize=12,
+                                 spaceBefore=16, spaceAfter=6,
+                                 textColor=colors.HexColor('#2d6a4f'))
+
+    todos = list(campo.registros.filter(arquivado=True).order_by('numero_ciclo', '-data', '-criado_em'))
+    ciclos = sorted(set(r.numero_ciclo for r in todos))
+
+    g_gastos  = sum(r.valor_gasto   for r in todos if r.tipo_atividade not in TIPOS_RECEITA)
+    g_receita = sum(r.receita_total for r in todos if r.tipo_atividade in TIPOS_RECEITA)
+
+    elements = [
+        Paragraph(f"Diário de Campo — {campo.nome}", title_style),
+        Paragraph(f"Ciclos anteriores  ·  {len(ciclos)} ciclo(s)  ·  {len(todos)} registro(s)  ·  "
+                  f"Gastos: R$ {g_gastos:.2f}  ·  Receita: R$ {g_receita:.2f}  ·  "
+                  f"Saldo: R$ {g_receita - g_gastos:.2f}", sub_style),
+    ]
+
+    table_style = TableStyle([
+        ('BACKGROUND',    (0, 0), (-1, 0),  colors.HexColor('#2d6a4f')),
+        ('TEXTCOLOR',     (0, 0), (-1, 0),  colors.white),
+        ('FONTNAME',      (0, 0), (-1, 0),  'Helvetica-Bold'),
+        ('FONTSIZE',      (0, 0), (-1, -1), 8),
+        ('ALIGN',         (0, 0), (-1, -1), 'LEFT'),
+        ('ROWBACKGROUNDS',(0, 1), (-1, -1), [colors.white, colors.HexColor('#f0f7f3')]),
+        ('GRID',          (0, 0), (-1, -1), 0.4, colors.HexColor('#cccccc')),
+        ('TOPPADDING',    (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ])
+
+    if not todos:
+        elements.append(Paragraph("Nenhum ciclo anterior encontrado.", styles['Normal']))
+    else:
+        for nc in ciclos:
+            regs = [r for r in todos if r.numero_ciclo == nc]
+            cg = sum(r.valor_gasto   for r in regs if r.tipo_atividade not in TIPOS_RECEITA)
+            cr = sum(r.receita_total for r in regs if r.tipo_atividade in TIPOS_RECEITA)
+            elements.append(Paragraph(
+                f"Ciclo {nc}  —  {len(regs)} registro(s)  ·  "
+                f"Gastos R$ {cg:.2f}  ·  Receita R$ {cr:.2f}  ·  Saldo R$ {cr - cg:.2f}",
+                ciclo_style))
+            table = Table(_build_pdf_table(regs), repeatRows=1)
+            table.setStyle(table_style)
+            elements.append(table)
+
+    doc.build(elements)
+
+
+@login_required(login_url="login")
+def download_ciclos_anteriores(request, campo_id):
+    """Baixa PDF com apenas os ciclos arquivados (excluindo o ciclo atual)."""
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = (
+        f'attachment; filename="diario_{campo.nome}_ciclos_anteriores.pdf"'
+    )
+    _render_pdf_ciclos_anteriores(response, campo)
+    return response
+
+
+@login_required(login_url="login")
+def download_csv_ciclo(request, campo_id, numero_ciclo=None):
+    """Baixa CSV (planilha) de um ciclo específico, ou do ciclo atual se omitido."""
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
+    if numero_ciclo is None:
+        numero_ciclo = campo.numero_ciclo
+
+    registros = list(
+        campo.registros.filter(numero_ciclo=numero_ciclo).order_by('data', 'criado_em')
+    )
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = (
+        f'attachment; filename="diario_{campo.nome}_ciclo{numero_ciclo}.csv"'
+    )
+
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow([
+        'Data', 'Tipo de Atividade', 'Título', 'Observações',
+        'Quantidade', 'Unidade', 'Valor Gasto (R$)',
+        'Qtd Produzida', 'Preço Unitário (R$)', 'Receita Total (R$)',
+    ])
+    for r in registros:
+        eh_colheita = r.tipo_atividade == 'colheita'
+        writer.writerow([
+            r.data.strftime('%d/%m/%Y'),
+            r.get_tipo_atividade_display() if r.tipo_atividade else '',
+            r.titulo,
+            r.detalhe or '',
+            str(r.quantidade).replace('.', ','),
+            r.quantidade_unidade or '',
+            f"{r.valor_gasto:.2f}".replace('.', ','),
+            str(r.quantidade_produzida).replace('.', ',') if eh_colheita else '',
+            f"{r.preco_unitario:.2f}".replace('.', ',') if eh_colheita else '',
+            f"{r.receita_total:.2f}".replace('.', ',') if eh_colheita else '',
+        ])
+
+    return response
+
+
+@login_required(login_url="login")
+def download_csv_todos(request, campo_id):
+    """Baixa CSV com TODOS os ciclos do campo."""
+    campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
+    registros = list(campo.registros.order_by('numero_ciclo', 'data', 'criado_em'))
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = (
+        f'attachment; filename="diario_{campo.nome}_todos_os_ciclos.csv"'
+    )
+
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow([
+        'Ciclo', 'Data', 'Tipo de Atividade', 'Título', 'Observações',
+        'Quantidade', 'Unidade', 'Valor Gasto (R$)',
+        'Qtd Produzida', 'Preço Unitário (R$)', 'Receita Total (R$)',
+    ])
+    for r in registros:
+        eh_colheita = r.tipo_atividade == 'colheita'
+        writer.writerow([
+            r.numero_ciclo,
+            r.data.strftime('%d/%m/%Y'),
+            r.get_tipo_atividade_display() if r.tipo_atividade else '',
+            r.titulo,
+            r.detalhe or '',
+            str(r.quantidade).replace('.', ','),
+            r.quantidade_unidade or '',
+            f"{r.valor_gasto:.2f}".replace('.', ','),
+            str(r.quantidade_produzida).replace('.', ',') if eh_colheita else '',
+            f"{r.preco_unitario:.2f}".replace('.', ',') if eh_colheita else '',
+            f"{r.receita_total:.2f}".replace('.', ',') if eh_colheita else '',
+        ])
+
     return response
 
 

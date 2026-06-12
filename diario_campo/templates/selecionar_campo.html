@@ -194,6 +194,7 @@
   .sc-ciclo-control:hover { background: rgba(255,255,255,0.11); border-color: rgba(90,160,74,0.55); transform: translateY(-1px); }
   .sc-ciclo-ic { font-size: 1.05rem; line-height: 1; flex-shrink: 0; }
   .sc-ciclo-download { border-left: 3px solid rgba(40,167,69,0.55); }
+  .sc-ciclo-csv      { border-left: 3px solid rgba(255,193,7,0.55); }
   .sc-ciclo-ver      { border-left: 3px solid rgba(90,170,210,0.55); }
   .sc-ciclo-select {
     flex: 1; width: 100%; padding: 10px 22px 10px 0; border: none; background: transparent;
@@ -306,30 +307,64 @@
 
         {% if cd.ciclos %}
         <div class="sc-ciclos">
-          <div class="sc-ciclos-title">🗂️ Ciclos do campo</div>
-          <div class="sc-ciclos-row">
-            <label class="sc-ciclo-control sc-ciclo-download" title="Baixar PDF de um ciclo">
-              <span class="sc-ciclo-ic">📥</span>
+          <div class="sc-ciclos-title">⬇️ Downloads do campo</div>
+          <div class="sc-ciclos-row" style="grid-template-columns: 1fr 1fr; gap: 8px;">
+
+            <!-- PDF dropdown -->
+            <label class="sc-ciclo-control sc-ciclo-download" title="Baixar PDF">
+              <span class="sc-ciclo-ic">📄</span>
               <select class="sc-ciclo-select"
                       onchange="if(this.value){window.location=this.value; this.selectedIndex=0;}">
-                <option value="">Baixar PDF…</option>
-                <option value="{% url 'download_todos_ciclos' cd.campo.id %}">📚 Todos os ciclos</option>
-                {% for nc in cd.ciclos %}
-                <option value="{% url 'download_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
-                {% endfor %}
+                <option value="">PDF…</option>
+                <optgroup label="📄 PDF">
+                  <option value="{% url 'download_todos_ciclos' cd.campo.id %}">📚 Histórico completo</option>
+                  <option value="{% url 'download_campo_registros' cd.campo.id %}">📋 Ciclo atual</option>
+                  {% if cd.tem_ciclos_anteriores %}
+                  <option value="{% url 'download_ciclos_anteriores' cd.campo.id %}">📁 Ciclos anteriores</option>
+                  {% endif %}
+                </optgroup>
+                {% if cd.ciclos|length > 1 %}
+                <optgroup label="🔢 Ciclo específico">
+                  {% for nc in cd.ciclos %}
+                  <option value="{% url 'download_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
+                  {% endfor %}
+                </optgroup>
+                {% endif %}
               </select>
             </label>
 
-            <label class="sc-ciclo-control sc-ciclo-ver" title="Visualizar um ciclo (somente leitura)">
+            <!-- CSV dropdown -->
+            <label class="sc-ciclo-control sc-ciclo-csv" title="Baixar tabela (CSV para Excel)">
+              <span class="sc-ciclo-ic">📊</span>
+              <select class="sc-ciclo-select"
+                      onchange="if(this.value){window.location=this.value; this.selectedIndex=0;}">
+                <option value="">Tabela CSV…</option>
+                <optgroup label="📊 Planilha">
+                  <option value="{% url 'download_csv_todos' cd.campo.id %}">📚 Todos os ciclos</option>
+                  <option value="{% url 'download_csv_ciclo_atual' cd.campo.id %}">📋 Ciclo atual</option>
+                </optgroup>
+                {% if cd.ciclos|length > 1 %}
+                <optgroup label="🔢 Ciclo específico">
+                  {% for nc in cd.ciclos %}
+                  <option value="{% url 'download_csv_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
+                  {% endfor %}
+                </optgroup>
+                {% endif %}
+              </select>
+            </label>
+
+            <!-- Visualizar ciclo -->
+            <label class="sc-ciclo-control sc-ciclo-ver" title="Visualizar um ciclo (somente leitura)" style="grid-column: span 2;">
               <span class="sc-ciclo-ic">👁</span>
               <select class="sc-ciclo-select"
                       onchange="if(this.value){window.location=this.value;}">
-                <option value="">Visualizar…</option>
+                <option value="">Visualizar ciclo…</option>
                 {% for nc in cd.ciclos %}
                 <option value="{% url 'ver_ciclo' cd.campo.id nc %}">Ciclo {{ nc }}{% if nc == cd.campo.numero_ciclo %} (atual){% endif %}</option>
                 {% endfor %}
               </select>
             </label>
+
           </div>
         </div>
         {% endif %}

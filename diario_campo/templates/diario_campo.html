@@ -22,7 +22,17 @@
     <nav class="dc-nav">
       <a href="{% url 'diario_campo' %}" class="dc-btn-nav">← Trocar campo</a>
       <a href="{% url 'editar_campo' campo.id %}" class="dc-btn-nav">⚙ Configurar</a>
-      <a href="{% url 'download_campo_registros' campo.id %}" class="dc-btn-nav">📥 PDF</a>
+      <div class="dc-nav-dropdown" title="Baixar dados">
+        <button class="dc-btn-nav dc-btn-nav-drop" onclick="toggleNavDrop(this)">⬇️ Baixar ▾</button>
+        <div class="dc-dropdown-menu">
+          <div class="dc-drop-section-label">📄 PDF</div>
+          <a href="{% url 'download_campo_registros' campo.id %}" class="dc-drop-item">📋 Ciclo atual (PDF)</a>
+          <a href="{% url 'download_todos_ciclos' campo.id %}" class="dc-drop-item">📚 Histórico completo (PDF)</a>
+          <div class="dc-drop-section-label" style="margin-top:8px;">📊 Tabela (CSV / Excel)</div>
+          <a href="{% url 'download_csv_ciclo_atual' campo.id %}" class="dc-drop-item">📋 Ciclo atual (CSV)</a>
+          <a href="{% url 'download_csv_todos' campo.id %}" class="dc-drop-item">📚 Todos os ciclos (CSV)</a>
+        </div>
+      </div>
     </nav>
   </header>
 
@@ -319,6 +329,26 @@
         {% if num_registros_total %}
           <span class="dc-contador">{{ num_registros_total }}</span>
         {% endif %}
+        <div style="margin-left:auto; display:flex; gap:6px; align-items:center;">
+          <a href="{% url 'download_csv_ciclo_atual' campo.id %}"
+             title="Baixar tabela deste ciclo em CSV (abre no Excel)"
+             style="display:inline-flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700;
+                    padding:4px 11px; border-radius:20px; text-decoration:none;
+                    background:rgba(255,193,7,0.14); color:#ffd55a;
+                    border:1px solid rgba(255,193,7,0.30); white-space:nowrap;
+                    transition: background 0.15s;">
+            📊 CSV
+          </a>
+          <a href="{% url 'download_campo_registros' campo.id %}"
+             title="Baixar PDF deste ciclo"
+             style="display:inline-flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700;
+                    padding:4px 11px; border-radius:20px; text-decoration:none;
+                    background:rgba(40,167,69,0.14); color:#6dda7c;
+                    border:1px solid rgba(40,167,69,0.30); white-space:nowrap;
+                    transition: background 0.15s;">
+            📄 PDF
+          </a>
+        </div>
       </div>
 
       <form method="get" style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
@@ -444,6 +474,61 @@
 </div>
 
 <style>
+/* ── Nav download dropdown ── */
+.dc-nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dc-btn-nav-drop {
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.20);
+  border-radius: 8px;
+  padding: 6px 13px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.dc-btn-nav-drop:hover { background: rgba(255,255,255,0.18); }
+.dc-dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 230px;
+  background: #1e3a22;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 10px;
+  padding: 8px 0;
+  z-index: 200;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+}
+.dc-dropdown-menu.open { display: block; }
+.dc-drop-section-label {
+  font-size: 0.70rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.40);
+  padding: 6px 14px 3px;
+}
+.dc-drop-item {
+  display: block;
+  padding: 8px 14px;
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.dc-drop-item:hover {
+  background: rgba(255,255,255,0.09);
+  color: #fff;
+}
+
 /* ── Pills de unidade ── */
 .dc-pill {
   padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.20);
@@ -988,6 +1073,22 @@
   if (modalFechar) modalFechar.addEventListener('click', fecharModal);
   if (modal)       modal.addEventListener('click', e => { if (e.target === modal) fecharModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+  /* ─── Nav download dropdown ─── */
+  function toggleNavDrop(btn) {
+    const menu = btn.nextElementSibling;
+    menu.classList.toggle('open');
+    // fecha ao clicar fora
+    function onOutside(e) {
+      if (!btn.parentElement.contains(e.target)) {
+        menu.classList.remove('open');
+        document.removeEventListener('click', onOutside);
+      }
+    }
+    if (menu.classList.contains('open')) {
+      setTimeout(() => document.addEventListener('click', onOutside), 0);
+    }
+  }
 
 })();
 </script>

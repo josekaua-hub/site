@@ -21,7 +21,10 @@
     <nav class="dc-nav">
       <a href="{% url 'diario_campo' %}" class="dc-btn-nav">← Campos</a>
       {% if is_atual %}<a href="{% url 'diario_campo_form' campo.id %}" class="dc-btn-nav">✏️ Editar ciclo atual</a>{% endif %}
-      <a href="{% url 'download_ciclo' campo.id numero_ciclo %}" class="dc-btn-nav">📥 PDF</a>
+      <a href="{% url 'download_ciclo' campo.id numero_ciclo %}" class="dc-btn-nav" title="Baixar PDF deste ciclo">📄 PDF</a>
+      <a href="{% url 'download_csv_ciclo' campo.id numero_ciclo %}" class="dc-btn-nav"
+         style="background:rgba(255,193,7,0.16); border:1px solid rgba(255,193,7,0.30); color:#ffd55a;"
+         title="Baixar tabela deste ciclo em CSV (abre no Excel)">📊 CSV</a>
     </nav>
   </header>
 
