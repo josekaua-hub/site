@@ -130,7 +130,7 @@
               <div class="dc-field">
                 <label for="data">📅 Data</label>
                 <input type="date" id="data" name="data"
-                       min="{% if data_min_ciclo %}{{ data_min_ciclo }}{% else %}{{ campo_criado_em|date:'Y-m-d' }}{% endif %}" required>
+                       {% if data_min_ciclo %}min="{{ data_min_ciclo }}"{% endif %} required>
               </div>
               <div class="dc-field">
                 <label for="tipo_atividade">🏷 Tipo de Atividade</label>
