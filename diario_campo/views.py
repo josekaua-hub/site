@@ -306,6 +306,10 @@ def diario_campo(request, campo_id):
                        .values_list('tipo_atividade', flat=True)
     )
 
+    # Data mínima para novos registros = data do registro mais antigo do ciclo atual
+    primeiro_reg = campo.registros_ciclo_atual.order_by('data', 'criado_em').first()
+    data_min_ciclo = primeiro_reg.data.strftime('%Y-%m-%d') if primeiro_reg else None
+
     return render(request, 'diario_campo.html', {
         'campo':                    campo,
         'registros':                registros,
@@ -314,6 +318,7 @@ def diario_campo(request, campo_id):
         'atividade_info':           ATIVIDADE_INFO,
         'used_one_time_atividades': used_one_time_atividades,
         'campo_criado_em':          campo.criado_em,
+        'data_min_ciclo':           data_min_ciclo,
         'total_gastos':             total_gastos,
         'total_receita':            total_receita,
         'saldo_ciclo':              saldo_ciclo,
