@@ -150,3 +150,11 @@
     .fitopatologia-grid { grid-template-columns: repeat(2, 1fr); }
     .disease-modal-content { padding: 20px; margin: 10% auto; }
 }
+/* ═══════════ TEMA CLARO — alto contraste p/ projetor ═══════════ */
+.page-wrapper { color:#16261b; }
+.page-header h1 { color:#14532d; }
+.page-header p  { color:#3f5a47; }
+.disease-card { background:#ffffff; border-color:#c9ddca; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.disease-card:hover { background:#f0f6f0; border-color:#9cc4a0; }
+.disease-card-body h3 { color:#16261b; font-size:1.02rem; }
+.disease-tag { color:#5a7563; }

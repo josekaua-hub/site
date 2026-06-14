@@ -20,23 +20,23 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6dda7c;
-  background: rgba(109,218,124,0.12);
-  border: 1px solid rgba(109,218,124,0.28);
+  color: #176b2c;
+  background: #dff0e1;
+  border: 1px solid #9ed4a8;
   border-radius: 20px;
   padding: 4px 14px;
 }
 .home-hero h1 {
-  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-size: clamp(1.9rem, 5vw, 2.9rem);
   font-weight: 900;
   line-height: 1.15;
   margin: 0;
-  color: #fff;
+  color: #14532d;
 }
-.home-hero h1 span { color: #6dda7c; }
+.home-hero h1 span { color: #1c7d33; }
 .home-hero p {
-  font-size: 1.05rem;
-  color: rgba(255,255,255,0.62);
+  font-size: 1.08rem;
+  color: #3f5a47;
   max-width: 520px;
   line-height: 1.65;
   margin: 0;
@@ -62,27 +62,27 @@
 }
 .home-btn-primary:hover { background: #22923c; transform: translateY(-2px); }
 .home-btn-secondary {
-  background: rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.80);
-  border: 1px solid rgba(255,255,255,0.22);
+  background: #e6ece6;
+  color: #2c4a36;
+  border: 1px solid #bcd2bd;
   border-radius: 50px;
   padding: 12px 26px;
   font-size: 0.92rem;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   transition: background 0.2s, transform 0.15s;
   white-space: nowrap;
 }
-.home-btn-secondary:hover { background: rgba(255,255,255,0.16); transform: translateY(-2px); }
+.home-btn-secondary:hover { background: #d7e2d7; transform: translateY(-2px); }
 
 /* ── Divisor ── */
 .home-section-label {
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.35);
+  color: #5a7563;
   margin: 8px 0 20px;
 }
 
@@ -102,10 +102,11 @@
   gap: 14px;
   padding: 24px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.05);
+  border: 1px solid #c9ddca;
+  background: #ffffff;
   text-decoration: none;
   color: inherit;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   transition: transform 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
   position: relative;
   overflow: hidden;
@@ -121,9 +122,9 @@
 }
 .home-app-card:hover {
   transform: translateY(-5px);
-  background: rgba(255,255,255,0.09);
-  border-color: rgba(255,255,255,0.22);
-  box-shadow: 0 14px 36px rgba(0,0,0,0.25);
+  background: #f5faf5;
+  border-color: #9cc4a0;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.16);
 }
 .home-app-card:hover::before { opacity: 1; }
 
@@ -132,14 +133,14 @@
   line-height: 1;
 }
 .home-app-titulo {
-  font-size: 1.05rem;
+  font-size: 1.12rem;
   font-weight: 800;
-  color: #fff;
+  color: #16261b;
   margin: 0;
 }
 .home-app-desc {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.58);
+  font-size: 0.88rem;
+  color: #3f5a47;
   line-height: 1.60;
   margin: 0;
   flex: 1;
@@ -153,8 +154,8 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.50);
+  font-size: 0.82rem;
+  color: #4a6553;
 }
 .home-app-feature::before {
   content: '✓';
@@ -179,8 +180,8 @@
   margin: 0 24px 40px;
   padding: 20px 28px;
   border-radius: 14px;
-  background: rgba(109,218,124,0.08);
-  border: 1px solid rgba(109,218,124,0.22);
+  background: #dff3e2;
+  border: 1px solid #9ed4a8;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -192,11 +193,11 @@
 }
 .home-auth-banner p {
   margin: 0;
-  font-size: 0.90rem;
-  color: rgba(255,255,255,0.72);
+  font-size: 0.92rem;
+  color: #2c4a36;
   line-height: 1.5;
 }
-.home-auth-banner strong { color: #fff; }
+.home-auth-banner strong { color: #14532d; }
 .home-auth-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 @media (max-width: 600px) {
@@ -241,7 +242,7 @@
 <div class="home-apps-grid">
 
   <!-- Planejador -->
-  <a href="{% url 'planejador' %}" class="home-app-card" style="--card-accent:#6dda7c;">
+  <a href="{% url 'planejador' %}" class="home-app-card" style="--card-accent:#1c7d33;">
     <div class="home-app-icon">🌱</div>
     <div>
       <p class="home-app-titulo">Planejador de Safra</p>
@@ -256,7 +257,7 @@
   </a>
 
   <!-- Diário de Campo -->
-  <a href="{% url 'diario_campo' %}" class="home-app-card" style="--card-accent:#64b5f6;">
+  <a href="{% url 'diario_campo' %}" class="home-app-card" style="--card-accent:#1565c0;">
     <div class="home-app-icon">📓</div>
     <div>
       <p class="home-app-titulo">Diário de Campo</p>
@@ -267,11 +268,11 @@
       <span class="home-app-feature">Histórico de ciclos anteriores</span>
       <span class="home-app-feature">Exportação em PDF por registro</span>
     </div>
-    <span class="home-app-link" style="color:#64b5f6;">Acessar o Diário</span>
+    <span class="home-app-link" style="color:#1565c0;">Acessar o Diário</span>
   </a>
 
   <!-- Financeiro -->
-  <a href="{% url 'financeiro:financeiro' %}" class="home-app-card" style="--card-accent:#ffb74d;">
+  <a href="{% url 'financeiro:financeiro' %}" class="home-app-card" style="--card-accent:#b06a00;">
     <div class="home-app-icon">🧮</div>
     <div>
       <p class="home-app-titulo">Calculadora Financeira</p>
@@ -282,11 +283,11 @@
       <span class="home-app-feature">Indicadores: ROI, margem, equilíbrio</span>
       <span class="home-app-feature">Simulador de cenários</span>
     </div>
-    <span class="home-app-link" style="color:#ffb74d;">Acessar a Calculadora</span>
+    <span class="home-app-link" style="color:#b06a00;">Acessar a Calculadora</span>
   </a>
 
   <!-- Fitopatologia -->
-  <a href="{% url 'fitopatologia' %}" class="home-app-card" style="--card-accent:#ef9a9a;">
+  <a href="{% url 'fitopatologia' %}" class="home-app-card" style="--card-accent:#c0392b;">
     <div class="home-app-icon">🦠</div>
     <div>
       <p class="home-app-titulo">Doenças da Mandioca</p>
@@ -297,7 +298,7 @@
       <span class="home-app-feature">Ferrugem e Oídio</span>
       <span class="home-app-feature">Descrição de sintomas e controle</span>
     </div>
-    <span class="home-app-link" style="color:#ef9a9a;">Ver as Doenças</span>
+    <span class="home-app-link" style="color:#c0392b;">Ver as Doenças</span>
   </a>
 
 </div>

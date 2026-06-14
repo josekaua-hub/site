@@ -26,11 +26,36 @@ def financeiro(request):
     resumo = {}
     registros_lista = []
     show_colheita_warning = False
+    ciclos_disponiveis = []
+    ciclo_selecionado = None
+    ciclo_atual = None
 
     campo_id = request.GET.get('campo_id')
     if campo_id and request.user.is_authenticated:
         selected_campo = get_object_or_404(Campo, id=campo_id, usuario=request.user)
-        registros = Registro.objects.filter(campo=selected_campo).order_by('data')
+        ciclo_atual = selected_campo.numero_ciclo
+
+        # Ciclos que possuem registros (separa o cálculo por ciclo)
+        ciclos_disponiveis = sorted(set(
+            Registro.objects.filter(campo=selected_campo)
+                            .values_list('numero_ciclo', flat=True)
+        ))
+        if ciclo_atual not in ciclos_disponiveis:
+            ciclos_disponiveis.append(ciclo_atual)
+            ciclos_disponiveis.sort()
+
+        # Ciclo pedido na URL (?ciclo=N); padrão = ciclo atual do campo
+        try:
+            ciclo_selecionado = int(request.GET.get('ciclo', ciclo_atual))
+        except (TypeError, ValueError):
+            ciclo_selecionado = ciclo_atual
+        if ciclo_selecionado not in ciclos_disponiveis:
+            ciclo_selecionado = ciclo_atual
+
+        # Apenas os registros do ciclo selecionado deste campo
+        registros = Registro.objects.filter(
+            campo=selected_campo, numero_ciclo=ciclo_selecionado
+        ).order_by('data')
 
         # Mapa: tipo de atividade → categoria de custo na calculadora
         TIPO_PARA_CUSTO = {
@@ -47,8 +72,6 @@ def financeiro(request):
         # Acumuladores — só gastos (sem colheita)
         custo_sementes = custo_adubo = custo_defensivos = custo_agua = 0.0
         custo_mao_obra = custo_energia = custo_transporte = 0.0
-        # aluguel e manutenção vêm dos padrões do Campo, não dos registros individuais
-        # (cada registro copia o padrão, o que causava multiplicação errada)
         total_gastos = 0.0
 
         gastos_qs = registros.exclude(tipo_atividade='colheita')
@@ -57,32 +80,26 @@ def financeiro(request):
             vg = float(r.valor_gasto or 0)
             total_gastos += vg
 
-            # Verifica se o registro tem custos detalhados preenchidos
-            # (ignora custo_aluguel e custo_manutencao aqui — virão do campo)
             cs  = float(r.custo_sementes or 0)
             ca  = float(r.custo_adubo or 0)
             cd  = float(r.custo_defensivos or 0)
             cag = float(r.custo_agua or 0)
             cmo = float(r.custo_mao_obra or 0)
             ce  = float(r.custo_energia or 0)
-            cc  = float(r.custo_colheita or 0)   # custo de processamento pós-colheita
+            cc  = float(r.custo_colheita or 0)
             ct  = float(r.custo_transporte or 0)
 
             soma_detalhada = cs + ca + cd + cag + cmo + ce + cc + ct
 
             if soma_detalhada > 0:
-                # Usa os campos detalhados do registro
                 custo_sementes   += cs
                 custo_adubo      += ca
                 custo_defensivos += cd
                 custo_agua       += cag
                 custo_mao_obra   += cmo
                 custo_energia    += ce
-                # cc (custo_colheita = processamento) não é somado aqui porque
-                # geralmente é zero nos registros de gasto do diário
                 custo_transporte += ct
             else:
-                # Fallback: distribui valor_gasto pela categoria do tipo de atividade
                 dest = TIPO_PARA_CUSTO.get(r.tipo_atividade, 'mao_obra')
                 if dest == 'sementes':    custo_sementes   += vg
                 elif dest == 'adubo':     custo_adubo      += vg
@@ -92,11 +109,9 @@ def financeiro(request):
                 elif dest == 'energia':   custo_energia    += vg
                 elif dest == 'transporte':custo_transporte += vg
 
-        # Aluguel e manutenção: usa os padrões do campo (evita multiplicação)
         custo_aluguel    = float(selected_campo.custo_aluguel_padrao or 0)
         custo_manutencao = float(selected_campo.custo_manutencao_padrao or 0)
 
-        # Receita: vem do registro de colheita
         colheita_reg = registros.filter(tipo_atividade='colheita').order_by('-data').first()
         qtd_produzida  = 0.0
         preco_unitario = 0.0
@@ -120,6 +135,7 @@ def financeiro(request):
             'qtd_produzida': qtd_produzida,
             'unidade':       unidade_colheita,
             'num_registros': registros.count(),
+            'ciclo':         ciclo_selecionado,
         }
 
         prefill = {
@@ -131,7 +147,7 @@ def financeiro(request):
             'custoAgua':       f'{custo_agua:.2f}',
             'custoMaoObra':    f'{custo_mao_obra:.2f}',
             'custoEnergia':    f'{custo_energia:.2f}',
-            'custoColheita':   '0.00',   # processamento pós-colheita: preenchimento manual
+            'custoColheita':   '0.00',
             'custoTransporte': f'{custo_transporte:.2f}',
             'custoAluguel':    f'{custo_aluguel:.2f}',
             'custoManutencao': f'{custo_manutencao:.2f}',
@@ -163,6 +179,9 @@ def financeiro(request):
         'resumo':                resumo,
         'registros_lista':       registros_lista,
         'show_colheita_warning': show_colheita_warning,
+        'ciclos_disponiveis':    ciclos_disponiveis,
+        'ciclo_selecionado':     ciclo_selecionado,
+        'ciclo_atual':           ciclo_atual,
     })
 
 
@@ -186,13 +205,9 @@ def salvar_fixos(request):
         except Exception:
             return 0.0
 
-    from django.utils import timezone
-    today = timezone.now().date()
-
     aluguel    = to_float('custoAluguel')
     manutencao = to_float('custoManutencao')
 
-    # Atualiza os padrões do campo em vez de criar registros duplicados
     campo.custo_aluguel_padrao    = aluguel
     campo.custo_manutencao_padrao = manutencao
     campo.save()

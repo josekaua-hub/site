@@ -14,24 +14,25 @@
     gap: 14px;
     margin-bottom: 28px;
     padding: 28px 0 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.10);
+    border-bottom: 1px solid #c9ddca;
   }
   .sc-hero-icon { font-size: 2.6rem; line-height:1; }
-  .sc-hero h1  { font-size: 1.65rem; font-weight: 800; color:#fff; margin:0 0 4px; }
-  .sc-hero p   { font-size: 0.88rem; color:rgba(255,255,255,0.55); margin:0; }
+  .sc-hero h1  { font-size: 1.7rem; font-weight: 800; color:#14532d; margin:0 0 4px; }
+  .sc-hero p   { font-size: 0.9rem; color:#3f5a47; margin:0; }
 
   /* ── card novo campo ── */
   .sc-novo {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.14);
+    background: #ffffff;
+    border: 1px solid #c9ddca;
     border-radius: 14px;
     padding: 22px 24px;
     margin-bottom: 36px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   }
   .sc-novo h2 {
-    font-size: 0.97rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.85);
+    font-size: 1rem;
+    font-weight: 800;
+    color: #14532d;
     margin: 0 0 16px;
     display: flex;
     align-items: center;
@@ -39,20 +40,20 @@
   }
   .sc-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
   .sc-form-row > div { flex: 1; min-width: 180px; }
-  .sc-label { display: block; font-size: 0.80rem; font-weight: 700; color: rgba(255,255,255,0.60); margin-bottom: 5px; letter-spacing: 0.3px; }
+  .sc-label { display: block; font-size: 0.80rem; font-weight: 700; color: #264433; margin-bottom: 5px; letter-spacing: 0.3px; }
   .sc-input {
-    width: 100%; padding: 9px 13px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(255,255,255,0.08); font-size: 0.92rem; color: #fff; outline: none;
+    width: 100%; padding: 9px 13px; border-radius: 9px; border: 1px solid #bcd2bd;
+    background: #fff; font-size: 0.92rem; color: #16261b; outline: none;
     box-sizing: border-box; transition: border 0.15s;
   }
-  .sc-input::placeholder { color: rgba(255,255,255,0.30); }
-  .sc-input:focus { border-color: rgba(100,210,130,0.55); background: rgba(255,255,255,0.11); }
+  .sc-input::placeholder { color: #9bb0a1; }
+  .sc-input:focus { border-color: #2e8b4f; background: #fff; }
   .sc-btn-criar {
-    background: #28a745; color: #fff; border: none; border-radius: 50px;
-    padding: 10px 28px; font-weight: 700; font-size: 0.93rem; cursor: pointer;
+    background: #1d6b38; color: #fff; border: none; border-radius: 50px;
+    padding: 10px 28px; font-weight: 800; font-size: 0.93rem; cursor: pointer;
     transition: background 0.2s; white-space: nowrap; align-self: flex-end;
   }
-  .sc-btn-criar:hover { background: #20913b; }
+  .sc-btn-criar:hover { background: #155029; }
 
   /* ── lista de campos ── */
   .sc-lista-header {
@@ -62,24 +63,25 @@
     margin-bottom: 14px;
   }
   .sc-lista-header h2 {
-    font-size: 1.0rem; font-weight: 700; color: rgba(255,255,255,0.88); margin: 0;
+    font-size: 1.05rem; font-weight: 800; color: #14532d; margin: 0;
   }
   .sc-count {
-    font-size: 0.75rem; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.65);
-    border-radius: 20px; padding: 2px 10px; font-weight: 600;
+    font-size: 0.78rem; background: #e3efe4; color: #3f5a47;
+    border-radius: 20px; padding: 2px 10px; font-weight: 700;
   }
 
   /* ── card campo ── */
   .sc-campo-card {
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.13);
+    background: #ffffff;
+    border: 1px solid #c9ddca;
     border-radius: 13px;
     padding: 0;
     margin-bottom: 10px;
     overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: border-color 0.18s, background 0.18s;
   }
-  .sc-campo-card:hover { border-color: rgba(100,210,130,0.35); background: rgba(255,255,255,0.09); }
+  .sc-campo-card:hover { border-color: #9cc4a0; background: #f5faf5; }
 
   .sc-card-top {
     display: flex;
@@ -97,32 +99,32 @@
   }
   .sc-card-nome {
     font-weight: 800;
-    font-size: 1.0rem;
-    color: #fff;
+    font-size: 1.05rem;
+    color: #16261b;
   }
   .sc-badge {
     font-size: 0.70rem; font-weight: 700; border-radius: 20px; padding: 2px 9px;
     white-space: nowrap;
   }
   .sc-badge-andamento {
-    background: rgba(255,193,7,0.18); color: #ffd55a; border: 1px solid rgba(255,193,7,0.32);
+    background: #fff2cc; color: #8a6400; border: 1px solid #e6c14a;
   }
   .sc-badge-colheita {
-    background: rgba(40,167,69,0.22); color: #6fcf97; border: 1px solid rgba(40,167,69,0.38);
+    background: #dff0e1; color: #176b2c; border: 1px solid #9ed4a8;
   }
   .sc-badge-ciclo {
-    font-size: 0.70rem; color: rgba(255,255,255,0.40); font-weight: 500;
+    font-size: 0.72rem; color: #5a7563; font-weight: 600;
   }
   .sc-descricao {
-    font-size: 0.79rem; color: rgba(255,255,255,0.48); margin: 2px 0 0;
+    font-size: 0.81rem; color: #5a7563; margin: 2px 0 0;
   }
 
   /* ── métricas do card ── */
   .sc-metricas {
     display: flex;
     gap: 0;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    background: rgba(0,0,0,0.10);
+    border-top: 1px solid #e2ece2;
+    background: #eef4ee;
   }
   .sc-metrica {
     flex: 1;
@@ -132,19 +134,19 @@
     justify-content: center;
     padding: 10px 6px;
     gap: 2px;
-    border-right: 1px solid rgba(255,255,255,0.07);
+    border-right: 1px solid #dbe7db;
     text-align: center;
   }
   .sc-metrica:last-child { border-right: none; }
   .sc-metrica-label {
-    font-size: 0.66rem; color: rgba(255,255,255,0.40); text-transform: uppercase;
+    font-size: 0.66rem; color: #5a7563; text-transform: uppercase;
     letter-spacing: 0.4px; font-weight: 600;
   }
   .sc-metrica-val {
-    font-size: 0.88rem; font-weight: 700; color: #fff;
+    font-size: 0.9rem; font-weight: 800; color: #16261b;
   }
-  .sc-metrica-val.verde   { color: #6dda7c; }
-  .sc-metrica-val.vermelho{ color: #ff7b7b; }
+  .sc-metrica-val.verde   { color: #1c7d33; }
+  .sc-metrica-val.vermelho{ color: #c0392b; }
 
   /* ── ações ── */
   .sc-card-acoes {
@@ -154,56 +156,56 @@
     flex-shrink: 0;
   }
   .sc-btn-abrir {
-    background: #28a745; color: #fff; border-radius: 20px; padding: 7px 18px;
-    font-size: 0.82rem; font-weight: 700; text-decoration: none; white-space: nowrap;
+    background: #1d6b38; color: #fff; border-radius: 20px; padding: 7px 18px;
+    font-size: 0.84rem; font-weight: 800; text-decoration: none; white-space: nowrap;
     transition: background 0.18s;
   }
-  .sc-btn-abrir:hover { background: #20913b; color: #fff; }
+  .sc-btn-abrir:hover { background: #155029; color: #fff; }
   .sc-btn-del {
-    background: rgba(220,53,69,0.14); color: #ff8a8a;
-    border: 1px solid rgba(220,53,69,0.28); border-radius: 20px;
+    background: #ffe1e1; color: #b3261e;
+    border: 1px solid #e7a9a4; border-radius: 20px;
     padding: 7px 12px; font-size: 0.82rem; cursor: pointer; transition: background 0.18s;
   }
-  .sc-btn-del:hover { background: rgba(220,53,69,0.35); }
+  .sc-btn-del:hover { background: #ffcaca; }
 
   .sc-vazio {
     text-align: center; padding: 40px 20px;
-    color: rgba(255,255,255,0.40); font-size: 0.92rem;
+    color: #5a7563; font-size: 0.94rem;
   }
   .sc-vazio-icon { font-size: 2.4rem; display: block; margin-bottom: 10px; }
 
   .sc-erro {
-    background: rgba(220,53,69,0.20); border: 1px solid rgba(220,53,69,0.45);
-    border-radius: 8px; padding: 10px 16px; color: #ff8a8a; margin-bottom: 16px;
+    background: #ffdddd; border: 1px solid #d9534f;
+    border-radius: 8px; padding: 10px 16px; color: #a11722; margin-bottom: 16px;
   }
 
   /* -- Painel de ciclos -- */
-  .sc-ciclos { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.10); }
+  .sc-ciclos { margin-top: 14px; padding-top: 14px; border-top: 1px solid #c9ddca; }
   .sc-ciclos-title {
     font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-    color: rgba(255,255,255,0.45); margin-bottom: 8px;
+    color: #5a7563; margin-bottom: 8px;
   }
   .sc-ciclos-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   @media (max-width: 520px) { .sc-ciclos-row { grid-template-columns: 1fr; } }
   .sc-ciclo-control {
     position: relative; display: flex; align-items: center; gap: 8px;
     padding: 0 10px 0 12px; border-radius: 10px; cursor: pointer;
-    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.16);
+    background: #fff; border: 1px solid #c9ddca;
     transition: background 0.16s, border-color 0.16s, transform 0.12s;
   }
-  .sc-ciclo-control:hover { background: rgba(255,255,255,0.11); border-color: rgba(90,160,74,0.55); transform: translateY(-1px); }
+  .sc-ciclo-control:hover { background: #f0f6f0; border-color: #2e8b4f; transform: translateY(-1px); }
   .sc-ciclo-ic { font-size: 1.05rem; line-height: 1; flex-shrink: 0; }
-  .sc-ciclo-download { border-left: 3px solid rgba(40,167,69,0.55); }
-  .sc-ciclo-csv      { border-left: 3px solid rgba(255,193,7,0.55); }
-  .sc-ciclo-ver      { border-left: 3px solid rgba(90,170,210,0.55); }
+  .sc-ciclo-download { border-left: 3px solid #1c7d33; }
+  .sc-ciclo-csv      { border-left: 3px solid #b58900; }
+  .sc-ciclo-ver      { border-left: 3px solid #2b7da8; }
   .sc-ciclo-select {
     flex: 1; width: 100%; padding: 10px 22px 10px 0; border: none; background: transparent;
-    outline: none; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    outline: none; color: #16261b; font-size: 0.85rem; font-weight: 700; cursor: pointer;
     font-family: inherit; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffffff' stroke-opacity='0.6' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23335544' stroke-width='1.8' fill='none'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 2px center;
   }
-  .sc-ciclo-select option { color: #1e3a1a; background: #fff; }
+  .sc-ciclo-select option { color: #16261b; background: #fff; }
 </style>
 
 <div class="sc-page">

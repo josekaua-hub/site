@@ -1,29 +1,53 @@
 """
 Django settings for Site project.
+
+Configuracao pronta para producao:
+- Variaveis sensiveis vem de variaveis de ambiente.
+- DEBUG desligado por padrao (defina DJANGO_DEBUG=True para desenvolvimento local).
+- WhiteNoise serve os estaticos; dj-database-url configura o Postgres em producao.
 """
 
 import os
 import dj_database_url
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'chave-temporaria-para-desenvolvimento-local')
+def _env_bool(name, default=False):
+    return os.environ.get(name, str(default)).strip().lower() in ('1', 'true', 'yes', 'on')
+
+
+def _env_list(name, default=''):
+    raw = os.environ.get(name, default)
+    return [item.strip() for item in raw.split(',') if item.strip()]
+
+
+# ─── Seguranca basica ────────────────────────────────────────────────────────
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = _env_bool('DJANGO_DEBUG', default=False)
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '192.168.1.25,localhost,127.0.0.1').split(',')
+# SECURITY WARNING: keep the secret key used in production secret!
+_INSECURE_DEFAULT_KEY = 'chave-temporaria-para-desenvolvimento-local'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', _INSECURE_DEFAULT_KEY)
+if not DEBUG and SECRET_KEY == _INSECURE_DEFAULT_KEY:
+    raise ImproperlyConfigured(
+        'Defina a variavel de ambiente DJANGO_SECRET_KEY com uma chave secreta '
+        'forte para rodar em producao (DEBUG=False).'
+    )
+
+ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
 
 # Render fornece automaticamente o hostname externo nesta variavel
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# Application definition
+
+# ─── Aplicacoes ──────────────────────────────────────────────────────────────
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -73,10 +97,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
-# Database
+# ─── Banco de dados ──────────────────────────────────────────────────────────
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
-        'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+        'default': dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=_env_bool('DJANGO_DB_SSL_REQUIRE', default=True),
+        )
     }
 else:
     DATABASES = {
@@ -86,34 +113,24 @@ else:
         }
     }
 
-# Password validation
+
+# ─── Validacao de senha ──────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
-# Internationalization
+# ─── Internacionalizacao ─────────────────────────────────────────────────────
 LANGUAGE_CODE = 'pt-br'
-
 TIME_ZONE = 'America/Fortaleza'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# ─── Arquivos estaticos e media ──────────────────────────────────────────────
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'base' / 'static',
@@ -133,14 +150,41 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# ─── Endurecimento de seguranca (apenas em producao) ─────────────────────────
+CSRF_TRUSTED_ORIGINS = _env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
+
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = _env_bool('DJANGO_SECURE_SSL_REDIRECT', default=True)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    # O proxy do Render encerra o SSL e encaminha via HTTP internamente.
-    # Sem isto, SECURE_SSL_REDIRECT causa loop infinito de redirecionamento.
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    # Necessario para que os formularios POST (login, cadastro...) nao retornem erro 403 CSRF.
-    CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+    SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '31536000'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = 'same-origin'
+    SESSION_COOKIE_HTTPONLY = True
+    X_FRAME_OPTIONS = 'DENY'
+    if not CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
     if RENDER_EXTERNAL_HOSTNAME:
         CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+
+
+# ─── Logging (console; capturado pela plataforma) ────────────────────────────
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {'format': '[{levelname}] {asctime} {name}: {message}', 'style': '{'},
+    },
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'},
+    },
+    'root': {'handlers': ['console'], 'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO')},
+    'loggers': {
+        'django': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
+        'django.request': {'handlers': ['console'], 'level': 'ERROR', 'propagate': False},
+    },
+}

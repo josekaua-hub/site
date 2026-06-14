@@ -7,7 +7,7 @@
     <h1 style="text-align:center; margin-bottom:24px;">Cadastro</h1>
 
     {% if erro %}
-      <div style="background:rgba(220,53,69,0.20); border:1px solid rgba(220,53,69,0.40); border-radius:8px; padding:10px 14px; color:#ff8a8a; font-size:0.88rem; margin-bottom:16px;">
+      <div style="background:#ffdddd; border:1px solid #d9534f; border-radius:8px; padding:10px 14px; color:#a11722; font-size:0.9rem; margin-bottom:16px;">
         {{ erro }}
       </div>
     {% endif %}
@@ -17,23 +17,23 @@
       <div class="form-grupo" style="margin-bottom:0;">
         <label for="username">Usuário</label>
         <input type="text" id="username" name="username" value="{{ username|default:'' }}" placeholder="Escolha um usuário" required
-               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
+               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:1px solid #bcd2bd; background:#fff; font-size:1rem; color:#16261b;">
       </div>
       <div class="form-grupo" style="margin-bottom:0;">
         <label for="email">E-mail</label>
         <input type="email" id="email" name="email" value="{{ email|default:'' }}" placeholder="seu@email.com" required
-               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
+               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:1px solid #bcd2bd; background:#fff; font-size:1rem; color:#16261b;">
       </div>
       <div class="form-grupo" style="margin-bottom:0;">
         <label for="password">Senha</label>
         <input type="password" id="password" name="password" placeholder="Crie uma senha (mín. 6 caracteres)" required
-               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:none; font-size:1rem; color:#2d2d2d;">
+               style="max-width:100%; width:100%; padding:10px; border-radius:8px; border:1px solid #bcd2bd; background:#fff; font-size:1rem; color:#16261b;">
       </div>
-      <button type="submit" style="margin-top:8px;">CADASTRAR</button>
+      <button type="submit" style="margin-top:8px; background:#1d6b38; color:#fff; border:none; border-radius:50px; padding:12px; font-size:0.97rem; font-weight:800; cursor:pointer;">CADASTRAR</button>
     </form>
 
     <p style="text-align:center; margin-top:16px; font-size:0.9rem;">
-      Já tem conta? <a href="{% url 'login' %}" style="color:#b2dfcc; font-weight:bold;">Entrar</a>
+      Já tem conta? <a href="{% url 'login' %}" style="color:#176b2c; font-weight:bold;">Entrar</a>
     </p>
   </div>
 </div>

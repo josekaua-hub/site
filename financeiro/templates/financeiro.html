@@ -194,9 +194,10 @@
       </div>
     </div>
     {% if selected_campo %}
-    <div style="display:flex;align-items:center;gap:10px;font-size:.85rem;color:rgba(255,255,255,.65);">
-      <span>Campo selecionado:</span>
-      <strong style="color:#fff;font-size:.95rem;">{{ selected_campo.nome }}</strong>
+    <div style="display:flex;align-items:center;gap:10px;font-size:.9rem;color:rgba(255,255,255,.85);">
+      <span>Campo:</span>
+      <strong style="color:#fff;font-size:1rem;">{{ selected_campo.nome }}</strong>
+      <span style="color:rgba(255,255,255,.75);">· Ciclo {{ ciclo_selecionado }}</span>
       <a href="{% url 'financeiro:financeiro' %}"
          style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.70);border:1px solid rgba(255,255,255,.20);
                 border-radius:20px;padding:5px 14px;font-size:.80rem;font-weight:700;text-decoration:none;">
@@ -246,6 +247,19 @@
       </a>
     </div>
     {% endif %}
+  {% endif %}
+
+  <!-- ── SELETOR DE CICLO ── -->
+  {% if selected_campo %}
+  <div class="fin-ciclo-bar">
+    <span class="lbl">🔄 Ciclo:</span>
+    {% for c in ciclos_disponiveis %}
+      <a href="?campo_id={{ selected_campo.id }}&ciclo={{ c }}"
+         class="fin-ciclo-chip {% if c == ciclo_selecionado %}ativo{% endif %}">
+        Ciclo {{ c }}{% if c == ciclo_atual %} <span class="tag-atual">(atual)</span>{% endif %}
+      </a>
+    {% endfor %}
+  </div>
   {% endif %}
 
   <!-- ── BARRA DE SALDO (quando campo selecionado) ── -->

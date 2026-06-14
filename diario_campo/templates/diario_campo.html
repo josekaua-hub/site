@@ -62,27 +62,27 @@
   </div>
 
   <!-- ───── PROGRESSO DO CICLO ───── -->
-  <div style="padding:10px 20px; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.08);
+  <div style="padding:10px 20px; background:#eef4ee; border-bottom:1px solid #c9ddca;
               display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-    <span style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-right:4px;">Etapas:</span>
+    <span style="font-size:0.8rem; color:#3f5a47; font-weight:700; margin-right:4px;">Etapas:</span>
     <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
-      {% if 'preparo_solo' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
-      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      {% if 'preparo_solo' in etapas_concluidas %}background:#dff0e1; color:#176b2c; border:1px solid #9ed4a8; font-weight:700;
+      {% else %}background:#fff; color:#7a8c80; border:1px solid #c9ddca;{% endif %}">
       🚜 Preparo
     </span>
     <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
-      {% if 'plantio' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
-      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      {% if 'plantio' in etapas_concluidas %}background:#dff0e1; color:#176b2c; border:1px solid #9ed4a8; font-weight:700;
+      {% else %}background:#fff; color:#7a8c80; border:1px solid #c9ddca;{% endif %}">
       🌱 Plantio
     </span>
     <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
-      {% if 'adubacao' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
-      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      {% if 'adubacao' in etapas_concluidas %}background:#dff0e1; color:#176b2c; border:1px solid #9ed4a8; font-weight:700;
+      {% else %}background:#fff; color:#7a8c80; border:1px solid #c9ddca;{% endif %}">
       🧪 Adubação
     </span>
     <span style="font-size:0.78rem; padding:3px 10px; border-radius:20px;
-      {% if 'colheita' in etapas_concluidas %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.4);
-      {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+      {% if 'colheita' in etapas_concluidas %}background:#dff0e1; color:#176b2c; border:1px solid #9ed4a8; font-weight:700;
+      {% else %}background:#fff; color:#7a8c80; border:1px solid #c9ddca;{% endif %}">
       🌾 Colheita
     </span>
   </div>
@@ -177,7 +177,7 @@
             <div id="bloco-quantidade" style="display:none;">
               <!-- modo: valor por unidade  OU  valor total -->
               <div class="dc-field" style="margin-bottom:10px;">
-                <label style="font-size:0.78rem; color:rgba(255,255,255,0.60); font-weight:700;">Como informar o valor</label>
+                <label style="font-size:0.78rem; color:#264433; font-weight:700;">Como informar o valor</label>
                 <div style="display:flex; gap:6px; padding-top:2px; flex-wrap:wrap;">
                   <label class="dc-radio-btn">
                     <input type="radio" name="_modo_gasto" value="por_unidade" checked> Valor por unidade
@@ -198,7 +198,7 @@
                     <input type="text" inputmode="decimal" id="quantidade" name="quantidade"
                            placeholder="1" style="flex:1;">
                     <span id="dc-unidade-display"
-                          style="font-size:0.82rem; color:rgba(255,255,255,0.55); white-space:nowrap; min-width:30px;"></span>
+                          style="font-size:0.82rem; color:#3f5a47; white-space:nowrap; min-width:30px;"></span>
                   </div>
                   <!-- campo oculto que guarda a unidade real -->
                   <input type="hidden" id="quantidade_unidade_gasto" name="quantidade_unidade" value="">
@@ -211,11 +211,11 @@
 
               <!-- Preview de gasto -->
               <div id="dc-gasto-preview" style="display:none;
-                   background:rgba(220,53,69,0.10); border:1px solid rgba(220,53,69,0.25);
+                   background:#ffe9e9; border:1px solid #e7b4b0;
                    border-radius:8px; padding:8px 14px; margin-top:2px;
                    display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                <span id="dc-gasto-preview-label" style="font-size:0.80rem; color:rgba(255,255,255,0.55);">Gasto estimado:</span>
-                <strong id="dc-gasto-preview-val" style="font-size:1.0rem; color:#ff7b7b;">R$ 0,00</strong>
+                <span id="dc-gasto-preview-label" style="font-size:0.80rem; color:#3f5a47;">Gasto estimado:</span>
+                <strong id="dc-gasto-preview-val" style="font-size:1.0rem; color:#c0392b;">R$ 0,00</strong>
               </div>
             </div>
 
@@ -235,7 +235,7 @@
 
               <!-- Seleção de unidade via pills -->
               <div style="margin-bottom:10px;">
-                <label style="font-size:0.80rem; color:rgba(255,255,255,0.60); font-weight:700;
+                <label style="font-size:0.80rem; color:#264433; font-weight:700;
                               display:block; margin-bottom:6px;">UNIDADE DA PRODUÇÃO</label>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;" id="colheita-unidade-pills">
                   <button type="button" class="dc-pill dc-pill-ativo" data-unidade="kg" data-kg="1">kg</button>
@@ -262,8 +262,8 @@
               </div>
 
               <!-- Info de equivalência kg -->
-              <div id="dc-conversao-kg" style="display:none; font-size:0.78rem; color:rgba(255,255,255,0.48);
-                   background:rgba(255,255,255,0.05); border-radius:8px; padding:6px 12px; margin-bottom:10px;"></div>
+              <div id="dc-conversao-kg" style="display:none; font-size:0.78rem; color:#3f5a47;
+                   background:#eef4ee; border:1px solid #d7e4d8; border-radius:8px; padding:6px 12px; margin-bottom:10px;"></div>
 
               <!-- Quantidade + modo de preço -->
               <div class="dc-grid-2" style="margin-bottom:10px;">
@@ -303,7 +303,7 @@
                 <strong id="dc-receita-valor">R$ 0,00</strong>
               </div>
               <div id="dc-receita-detalhe" style="display:none; font-size:0.76rem;
-                   color:rgba(255,255,255,0.42); margin-top:4px; text-align:right;"></div>
+                   color:#5a7563; margin-top:4px; text-align:right;"></div>
             </div>
 
             <!-- Observações -->
@@ -334,8 +334,8 @@
              title="Baixar tabela deste ciclo em CSV (abre no Excel)"
              style="display:inline-flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700;
                     padding:4px 11px; border-radius:20px; text-decoration:none;
-                    background:rgba(255,193,7,0.14); color:#ffd55a;
-                    border:1px solid rgba(255,193,7,0.30); white-space:nowrap;
+                    background:#fff2cc; color:#8a6400;
+                    border:1px solid #e6c14a; white-space:nowrap;
                     transition: background 0.15s;">
             📊 CSV
           </a>
@@ -343,8 +343,8 @@
              title="Baixar PDF deste ciclo"
              style="display:inline-flex; align-items:center; gap:4px; font-size:0.78rem; font-weight:700;
                     padding:4px 11px; border-radius:20px; text-decoration:none;
-                    background:rgba(40,167,69,0.14); color:#6dda7c;
-                    border:1px solid rgba(40,167,69,0.30); white-space:nowrap;
+                    background:#dff0e1; color:#176b2c;
+                    border:1px solid #9ed4a8; white-space:nowrap;
                     transition: background 0.15s;">
             📄 PDF
           </a>
@@ -353,24 +353,24 @@
 
       <form method="get" style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
         <input type="text" name="q" value="{{ busca }}" placeholder="🔍 Buscar por título ou observação…"
-               style="flex:2; min-width:140px; padding:7px 12px; border-radius:8px; border:none;
-                      font-size:0.85rem; color:#2d2d2d; outline:none;">
+               style="flex:2; min-width:140px; padding:7px 12px; border-radius:8px; border:1px solid #bcd2bd; background:#fff;
+                      font-size:0.85rem; color:#16261b; outline:none;">
         <select name="tipo"
-                style="flex:1; min-width:120px; padding:7px 10px; border-radius:8px; border:none;
-                       font-size:0.83rem; color:#2d2d2d; outline:none;">
+                style="flex:1; min-width:120px; padding:7px 10px; border-radius:8px; border:1px solid #bcd2bd; background:#fff;
+                       font-size:0.83rem; color:#16261b; outline:none;">
           <option value="">Todos os tipos</option>
           {% for a in atividade_info %}
           <option value="{{ a.value }}" {% if filtro_tipo == a.value %}selected{% endif %}>{{ a.label }}</option>
           {% endfor %}
         </select>
         <button type="submit"
-                style="background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.25);
-                       border-radius:8px; padding:7px 14px; font-size:0.83rem; cursor:pointer; white-space:nowrap;">
+                style="background:#1d6b38; color:#fff; border:none;
+                       border-radius:8px; padding:7px 14px; font-size:0.83rem; font-weight:700; cursor:pointer; white-space:nowrap;">
           Filtrar
         </button>
         {% if busca or filtro_tipo %}
         <a href="{% url 'diario_campo_form' campo.id %}"
-           style="background:rgba(220,53,69,0.15); color:#ff8a8a; border:1px solid rgba(220,53,69,0.30);
+           style="background:#ffe1e1; color:#b3261e; border:1px solid #e7a9a4;
                   border-radius:8px; padding:7px 12px; font-size:0.83rem; text-decoration:none; white-space:nowrap;">
           ✕ Limpar
         </a>
@@ -379,7 +379,7 @@
 
       {% if registros %}
         {% if busca or filtro_tipo %}
-          <p style="font-size:0.78rem; color:rgba(255,255,255,0.45); margin-bottom:8px;">
+          <p style="font-size:0.8rem; color:#5a7563; margin-bottom:8px;">
             {{ registros|length }} resultado{{ registros|length|pluralize }} encontrado{{ registros|length|pluralize }}
           </p>
         {% endif %}
@@ -531,25 +531,25 @@
 
 /* ── Pills de unidade ── */
 .dc-pill {
-  padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.20);
-  background: rgba(255,255,255,0.07); font-size: 0.80rem; color: rgba(255,255,255,0.75);
+  padding: 4px 12px; border-radius: 20px; border: 1px solid #c2d6c4;
+  background: #f0f4f0; font-size: 0.80rem; color: #2c4a36;
   cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.5;
 }
-.dc-pill:hover { border-color: rgba(100,210,130,0.40); background: rgba(100,210,130,0.10); }
+.dc-pill:hover { border-color: #2e8b4f; background: #e2f0e5; }
 .dc-pill-ativo {
-  background: rgba(40,167,69,0.22) !important;
-  border-color: rgba(40,167,69,0.55) !important;
-  color: #6fcf97 !important;
+  background: #1d6b38 !important;
+  border-color: #14532d !important;
+  color: #ffffff !important;
 }
 /* ── Radio pill ── */
 .dc-radio-btn {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 5px 13px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.07); font-size: 0.80rem; cursor: pointer;
-  color: rgba(255,255,255,0.70); transition: all 0.15s; user-select: none;
+  padding: 5px 13px; border-radius: 20px; border: 1px solid #c2d6c4;
+  background: #f0f4f0; font-size: 0.80rem; cursor: pointer;
+  color: #2c4a36; transition: all 0.15s; user-select: none;
 }
 .dc-radio-btn:has(input:checked) {
-  background: rgba(40,167,69,0.22); border-color: rgba(40,167,69,0.45); color: #6fcf97;
+  background: #1d6b38; border-color: #14532d; color: #ffffff;
 }
 .dc-radio-btn input[type=radio] { display: none; }
 /* Preview gasto oculto por padrão */

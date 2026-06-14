@@ -5,20 +5,20 @@
 <div class="container" style="flex-direction:column; align-items:flex-start; max-width:540px;">
 
   <h1 style="margin-bottom:4px;">⚙ Configurar Campo</h1>
-  <p style="color:rgba(255,255,255,0.60); font-size:0.88rem; margin-bottom:24px;">
+  <p style="color:#3f5a47; font-size:0.9rem; margin-bottom:24px;">
     Campo: <strong>{{ campo.nome }}</strong> &nbsp;·&nbsp; Ciclo {{ campo.numero_ciclo }}
   </p>
 
   {% if error_message %}
-    <div style="background:rgba(220,53,69,0.20); border:1px solid rgba(220,53,69,0.45);
-                border-radius:8px; padding:10px 16px; color:#ff8a8a; margin-bottom:16px; width:100%;">
+    <div style="background:#ffdddd; border:1px solid #d9534f;
+                border-radius:8px; padding:10px 16px; color:#a11722; margin-bottom:16px; width:100%;">
       {{ error_message }}
     </div>
   {% endif %}
 
   {% if success_message %}
-    <div style="background:rgba(40,167,69,0.20); border:1px solid rgba(40,167,69,0.40);
-                border-radius:8px; padding:10px 16px; color:#6fcf97; margin-bottom:16px; width:100%;">
+    <div style="background:#dff0e1; border:1px solid #9ed4a8;
+                border-radius:8px; padding:10px 16px; color:#176b2c; margin-bottom:16px; width:100%;">
       ✔ {{ success_message }}
     </div>
   {% endif %}
@@ -30,26 +30,26 @@
     <div>
       <label style="display:block; font-weight:bold; margin-bottom:5px;">Nome do Campo</label>
       <input type="text" name="nome" value="{{ campo.nome }}" required
-             style="width:100%; padding:10px 14px; border-radius:8px; border:none;
-                    font-size:0.95rem; color:#2d2d2d; outline:none; box-sizing:border-box;">
+             style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #bcd2bd; background:#fff;
+                    font-size:0.95rem; color:#16261b; outline:none; box-sizing:border-box;">
     </div>
 
     <!-- Descrição -->
     <div>
       <label style="display:block; font-weight:bold; margin-bottom:5px;">Descrição</label>
-      <small style="color:rgba(255,255,255,0.55); display:block; margin-bottom:6px; font-size:0.82rem;">
+      <small style="color:#5a7563; display:block; margin-bottom:6px; font-size:0.84rem;">
         Informações adicionais sobre o campo (opcional).
       </small>
       <textarea name="descricao" rows="2"
                 placeholder="Ex: Área de 2 hectares, solo argiloso…"
-                style="width:100%; padding:10px 14px; border-radius:8px; border:none;
-                       font-size:0.93rem; color:#2d2d2d; outline:none; resize:vertical; box-sizing:border-box;">{{ campo.descricao }}</textarea>
+                style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #bcd2bd; background:#fff;
+                       font-size:0.93rem; color:#16261b; outline:none; resize:vertical; box-sizing:border-box;">{{ campo.descricao }}</textarea>
     </div>
 
     <!-- Peso por saca -->
     <div>
       <label style="display:block; font-weight:bold; margin-bottom:5px;">Peso por Saca (kg)</label>
-      <small style="color:rgba(255,255,255,0.55); display:block; margin-bottom:6px; font-size:0.82rem;">
+      <small style="color:#5a7563; display:block; margin-bottom:6px; font-size:0.84rem;">
         Quantos kg equivalem a 1 saca neste campo. Usado na calculadora financeira.
       </small>
       <div style="display:flex; border-radius:8px; overflow:hidden;">
@@ -65,7 +65,7 @@
     <!-- Aluguel padrão -->
     <div>
       <label style="display:block; font-weight:bold; margin-bottom:5px;">Custo de Aluguel Padrão (R$)</label>
-      <small style="color:rgba(255,255,255,0.55); display:block; margin-bottom:6px; font-size:0.82rem;">
+      <small style="color:#5a7563; display:block; margin-bottom:6px; font-size:0.84rem;">
         Valor padrão de aluguel para novos registros neste campo.
       </small>
       <div style="display:flex; border-radius:8px; overflow:hidden;">
@@ -81,7 +81,7 @@
     <!-- Manutenção padrão -->
     <div>
       <label style="display:block; font-weight:bold; margin-bottom:5px;">Custo de Manutenção Padrão (R$)</label>
-      <small style="color:rgba(255,255,255,0.55); display:block; margin-bottom:6px; font-size:0.82rem;">
+      <small style="color:#5a7563; display:block; margin-bottom:6px; font-size:0.84rem;">
         Valor padrão de manutenção de equipamentos para este campo.
       </small>
       <div style="display:flex; border-radius:8px; overflow:hidden;">
@@ -96,12 +96,12 @@
 
     <div style="display:flex; gap:10px; margin-top:4px; flex-wrap:wrap;">
       <a href="{% url 'diario_campo_form' campo.id %}"
-         style="background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
+         style="background:#e6ece6; color:#2c4a36; border:1px solid #bcd2bd;
                 border-radius:50px; padding:10px 22px; font-weight:bold; text-decoration:none;">
         ← Voltar
       </a>
       <button type="submit"
-              style="flex:1; background:#28a745; color:#fff; border:none; border-radius:50px;
+              style="flex:1; background:#1d6b38; color:#fff; border:none; border-radius:50px;
                      padding:10px 24px; font-weight:bold; font-size:1rem; cursor:pointer;">
         💾 Salvar Configurações
       </button>

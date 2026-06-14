@@ -350,3 +350,82 @@
   .fin-ind-grid{ grid-template-columns: 1fr; }
   .fin-trio    { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════════════
+   TEMA CLARO — alto contraste p/ projetor
+   ═══════════════════════════════════════════════ */
+.fin-page { color: #16261b; }
+.fin-header { background: #14532d; border-bottom: 3px solid #ffd23f; }
+.fin-titulo { color: #fff; }
+.fin-subtitulo { color: rgba(255,255,255,.9); }
+.fin-campo-form { color: #fff; }
+.fin-campo-form select { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.5); color:#fff; }
+.fin-saldo-bar { background:#dcebdd; border-bottom-color:#c4d8c6; }
+.fin-saldo-label { color:#3f5a47; }
+.fin-saldo-val   { color:#16261b; }
+.fin-saldo-sep   { background: rgba(0,0,0,.14); }
+.fin-verde    { color:#1c7d33 !important; }
+.fin-vermelho { color:#c0392b !important; }
+.fin-aviso { background:#fff6df; border-color:#e6c14a; color:#8a6400; }
+.fin-body { background:#f4f7f2; }
+.fin-col-entrada { border-right-color:#d3e2d4; }
+.fin-card { background:#ffffff; border-color:#c9ddca; box-shadow:0 2px 6px rgba(0,0,0,.06); }
+.fin-card-titulo { background:#e3efe4; color:#14532d; border-bottom-color:#c9ddca; }
+.fin-field label { color:#264433; }
+.fin-field small { color:#5a7563; }
+.fin-input-wrap { background:#fff; border-color:#bcd2bd; }
+.fin-input { color:#16261b; }
+.fin-field > .fin-input { background:#fff; border-color:#bcd2bd; color:#16261b; }
+.fin-prefix { color:#1d6b38; background:#e3f0e6; border-right-color:#bcd9c1; }
+.fin-receita-preview { background:#dff3e2; border-color:#9ed4a8; color:#176b2c; }
+.fin-btn-limpar  { background:#e6ece6; color:#2c4a36; border-color:#bcd2bd; }
+.fin-btn-salvar  { background:#e6ece6; color:#2c4a36; border-color:#bcd2bd; }
+.fin-btn-simular { background:#d9eafb; color:#155f88; border-color:#a9cdec; }
+.fin-trio-item  { background:#eef4ee; }
+.fin-trio-label { color:#3f5a47; }
+.fin-saldo-destaque       { background:#eef4ee; border-color:#c9ddca; }
+.fin-saldo-destaque-label { color:#3f5a47; }
+.fin-saldo-destaque-val   { color:#16261b; }
+.fin-ind        { background:#eef4ee; }
+.fin-ind-label  { color:#3f5a47; }
+.fin-ind-val    { color:#16261b; }
+.fin-detalhe-item { background:#eef4ee; }
+.fin-detalhe-item span:first-child { color:#3f5a47; }
+.fin-detalhe-item span:last-child  { color:#16261b; }
+.fin-detalhe-total { background:#e0ebe0; border-color:#c9ddca; }
+.fin-cenario-resultado { border-top-color:#c9ddca; }
+.fin-ciclo-bar {
+  display:flex; align-items:center; flex-wrap:wrap; gap:10px;
+  padding:14px 28px; background:#e3efe4; border-bottom:1px solid #c9ddca;
+}
+.fin-ciclo-bar .lbl { font-weight:800; color:#14532d; font-size:1rem; }
+.fin-ciclo-chip {
+  padding:8px 18px; border-radius:30px; font-weight:800; font-size:1rem;
+  text-decoration:none; border:2px solid #bcd2bd; background:#fff; color:#1d6b38;
+  transition:all .15s;
+}
+.fin-ciclo-chip:hover { background:#f0f6f0; border-color:#2e8b4f; }
+.fin-ciclo-chip.ativo { background:#1d6b38; color:#fff; border-color:#14532d; }
+.fin-ciclo-chip .tag-atual { font-size:.72rem; opacity:.85; font-weight:700; }
+
+/* Override dos blocos definidos inline no template (vence com !important) */
+.fin-campos-grid { background:#e3efe4 !important; border-bottom-color:#c9ddca !important; }
+.fin-campo-card { background:#fff !important; border-color:#c9ddca !important; color:#16261b !important; }
+.fin-campo-card:hover { background:#f0f6f0 !important; border-color:#9cc4a0 !important; }
+.fin-campo-card.ativo { background:#dff0e1 !important; border-color:#2e8b4f !important; }
+.fin-campo-card.sem-colheita { border-color:#e6c14a !important; }
+.fin-campo-card-nome { color:#16261b !important; }
+.fin-campo-card-badge.ok    { background:#dff0e1 !important; color:#176b2c !important; border-color:#9ed4a8 !important; }
+.fin-campo-card-badge.aviso { background:#fff2cc !important; color:#8a6400 !important; border-color:#e6c14a !important; }
+.fin-origem-panel  { background:#fff !important; border-color:#c9ddca !important; }
+.fin-origem-header { background:#e3efe4 !important; color:#14532d !important; }
+.fin-origem-item   { border-bottom-color:#e2ece2 !important; }
+.fin-origem-titulo { color:#16261b !important; }
+.fin-origem-meta   { color:#5a7563 !important; }
+.fin-origem-valor.receita { color:#176b2c !important; }
+.fin-origem-valor.gasto   { color:#c0392b !important; }
+.fin-input-fonte   { color:#176b2c !important; }
+.fin-aviso-colheita { background:#fff6df !important; border-color:#e6c14a !important; color:#8a6400 !important; }
+.fin-aviso-colheita a { color:#8a6400 !important; }
+.fin-guest-banner { background:#dff3e2 !important; border-color:#9ed4a8 !important; color:#234a30 !important; }
+.fin-guest-banner strong { color:#14532d !important; }

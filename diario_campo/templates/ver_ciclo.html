@@ -28,17 +28,17 @@
     </nav>
   </header>
 
-  <div style="padding:10px 20px; background:rgba(255,193,7,0.12); border-bottom:1px solid rgba(255,255,255,0.08); color:#ffd55a; font-size:0.85rem;">
+  <div style="padding:10px 20px; background:#fff6df; border-bottom:1px solid #e6c14a; color:#8a6400; font-size:0.88rem; font-weight:600;">
     🔒 Ciclo em modo somente leitura — os registros não podem ser editados nem excluídos.
   </div>
 
-  <div style="padding:10px 20px; background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-    <span style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-right:4px;">Ver ciclo:</span>
+  <div style="padding:10px 20px; background:#eef4ee; border-bottom:1px solid #c9ddca; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+    <span style="font-size:0.78rem; color:#3f5a47; font-weight:700; margin-right:4px;">Ver ciclo:</span>
     {% for nc in ciclos %}
       <a href="{% url 'ver_ciclo' campo.id nc %}"
-         style="font-size:0.80rem; padding:3px 12px; border-radius:20px; text-decoration:none;
-         {% if nc == numero_ciclo %}background:rgba(40,167,69,0.25); color:#6fcf97; border:1px solid rgba(40,167,69,0.45);
-         {% else %}background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.65); border:1px solid rgba(255,255,255,0.12);{% endif %}">
+         style="font-size:0.84rem; font-weight:700; padding:4px 14px; border-radius:20px; text-decoration:none;
+         {% if nc == numero_ciclo %}background:#dff0e1; color:#176b2c; border:1px solid #9ed4a8;
+         {% else %}background:#fff; color:#3f5a47; border:1px solid #c9ddca;{% endif %}">
         Ciclo {{ nc }}{% if nc == campo.numero_ciclo %} (atual){% endif %}
       </a>
     {% endfor %}
@@ -108,7 +108,7 @@
                 <span class="dc-tag">{{ r.quantidade }} {{ r.quantidade_unidade }}</span>
               {% endif %}
             </div>
-            {% if r.detalhe %}<div style="margin-top:6px; font-size:0.80rem; color:rgba(255,255,255,0.55);">📝 {{ r.detalhe }}</div>{% endif %}
+            {% if r.detalhe %}<div style="margin-top:6px; font-size:0.82rem; color:#5a7563;">📝 {{ r.detalhe }}</div>{% endif %}
           </div>
         </li>
         {% endfor %}
