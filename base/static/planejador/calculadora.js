@@ -1,5 +1,5 @@
 /* ================================================================
-   PLANEJADOR DE PLANTIO — calculadora.js  (v2 2026-05-31)
+   PLANEJADOR DE PLANTIO — calculadora.js  
    Melhorias:
    - Preview em tempo real de covas/varas ao digitar área/espaçamento
    - Indicadores de faixa de solo (baixo/médio/alto) por nutriente
