@@ -21,6 +21,7 @@
   }
 
   function fmt(n) {
+    if (!isFinite(n)) return 'R$ —';
     return 'R$ ' + n.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2

@@ -24,6 +24,7 @@ function lerNum(id, def = null) {
 }
 
 function fmt(n, dec = 1) {
+  if (n === null || n === undefined || !isFinite(n)) return '—';
   return n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: dec });
 }
 
@@ -287,6 +288,16 @@ function calcular() {
 
   // Calcário
   if (V1 !== null && T !== null && V1 >= 0 && T >= 0) {
+    if (PRNT <= 0) {
+      insumoCards.push(`<div class="plj-card plj-card-aviso">
+          <span class="plj-card-icone">⚠️</span>
+          <div class="plj-card-info">
+            <div class="plj-card-nome">Calcário</div>
+            <div class="plj-card-detalhe">Informe o PRNT do calcário (valor deve ser maior que 0%) para calcular a necessidade de calagem.</div>
+          </div>
+          <div class="plj-card-qty"><span class="plj-card-qty-val">—</span></div>
+         </div>`);
+    } else {
     const nc      = V1 < 60 ? ((60 - V1) * T) / PRNT : 0;
     const kgCal   = nc * areaHa * 1000;
     const sacCal  = Math.ceil(ajustarSacosMinimos(kgCal / 50));
@@ -303,7 +314,7 @@ function calcular() {
           <span class="plj-card-icone">⚪</span>
           <div class="plj-card-info">
             <div class="plj-card-nome">Calcário</div>
-            <div class="plj-card-detalhe">V% já ≥ 60% — sem necessidade de calagem</div>
+            <div class="plj-card-detalhe">${V1 >= 60 ? 'V% já ≥ 60% — sem necessidade de calagem' : 'CTC = 0 — sem necessidade de calagem calculável'}</div>
           </div>
           <div class="plj-card-qty"><span class="plj-card-qty-val">—</span></div>
          </div>`
@@ -318,6 +329,7 @@ function calcular() {
             <span class="plj-card-qty-unit">sacos 50 kg</span>
           </div>
          </div>`);
+    } // end else (PRNT > 0)
   }
 
   if (insumoCards.length > 0) {

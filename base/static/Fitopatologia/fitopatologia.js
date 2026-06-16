@@ -42,7 +42,7 @@ const diseaseInfo = {
         </li><li>Usar cultivares resistentes
         </li><li>Aplicar fungicidas cúpricos ou sistêmicos preventivamente
         </li><li>Eliminar e incinerar ramos infectados
-        </li><li>Melhorar drenagem e espaçamento entre plantas</li></ul>'
+        </li><li>Melhorar drenagem e espaçamento entre plantas</li></ul>
     `},
     'podridao-radicular': {
         title: 'Podridão Radicular',
@@ -68,7 +68,7 @@ const diseaseInfo = {
         </li><li>Usar manivas sadias e tratadas com fungicidas
         </li><li>Evitar compactação do solo
         </li><li>Fazer rotação de culturas
-        </li><li>Retirar e eliminar plantas doentes do campo</li></ul>'
+        </li><li>Retirar e eliminar plantas doentes do campo</li></ul>
     `},
     'Ferrugem da mandioca': {
         title: 'Ferrugem da mandioca',
@@ -97,7 +97,7 @@ const diseaseInfo = {
         </li></ul>`
         },
     cercosporiose: {
-        title: 'oídio da Mandioca',
+        title: 'Oídio da Mandioca',
         agente: 'Oidium manihotis',
         description: `<h3>Descrição</h3><p>O oídio é uma doença fúngica que se manifesta como um pó branco ou acinzentado na superfície das folhas,
         dando-lhes uma aparência enfarinhada. Embora seja mais comum em condições de baixa umidade, pode ocorrer em áreas com alta umidade relativa,
