@@ -37,7 +37,8 @@ function faixaFosforo(p) {
   if (p === null) return null;
   if (p <= 10)  return { label:'Muito baixo', cls:'plj-faixa-baixo',  dose:60 };
   if (p <= 20)  return { label:'Baixo',        cls:'plj-faixa-baixo',  dose:40 };
-  return              { label:'Médio/Alto',    cls:'plj-faixa-alto',   dose:20 };
+  if (p <= 30)  return { label:'Médio',        cls:'plj-faixa-medio',  dose:20 };
+  return              { label:'Alto',          cls:'plj-faixa-alto',   dose:0  };
 }
 
 function faixaPotassio(k) {
