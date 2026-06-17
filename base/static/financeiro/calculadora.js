@@ -81,11 +81,18 @@
     const roi         = custoTotal > 0 ? (saldo / custoTotal) * 100 : 0;
     const custoUnit   = qtd > 0 ? custoTotal / qtd : 0;
     const lucroUnit   = preco - custoUnit;
-    /* Ponto de equilíbrio: só faz sentido quando preço > custo variável unitário */
+    /* Ponto de equilíbrio */
     const custoVarUnit = qtd > 0 ? custosVar / qtd : 0;
-    const peUnid = (preco > custoVarUnit && preco > 0)
-      ? custosFixC / (preco - custoVarUnit)
-      : 0;
+    let peUnid;
+    if (custosFixC > 0 && preco > custoVarUnit && preco > 0) {
+      // Fórmula clássica: FC / (P - CVunit)
+      peUnid = custosFixC / (preco - custoVarUnit);
+    } else if (preco > 0 && custoTotal > 0) {
+      // Sem custos fixos: mínimo de unidades para cobrir todos os custos
+      peUnid = custoTotal / preco;
+    } else {
+      peUnid = 0;
+    }
     const peValor = peUnid * preco;
 
     /* Atualizar DOM */

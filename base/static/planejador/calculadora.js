@@ -50,7 +50,7 @@ function faixaPotassio(k) {
 function faixaSaturacao(v) {
   if (v === null) return null;
   if (v < 40)  return { label:'Baixa — precisa de calcário', cls:'plj-faixa-baixo'  };
-  if (v < 60)  return { label:'Média — verificar calcário',  cls:'plj-faixa-medio'  };
+  if (v < 50)  return { label:'Média — verificar calcário',  cls:'plj-faixa-medio'  };
   return             { label:'Adequada — sem calcário',      cls:'plj-faixa-alto'   };
 }
 
@@ -287,7 +287,7 @@ function calcular() {
 
   // Calcário
   if (V1 !== null && T !== null && V1 >= 0 && T >= 0) {
-    const nc      = V1 < 60 ? ((60 - V1) * T) / PRNT : 0;
+    const nc      = V1 < 50 ? ((50 - V1) * T) / PRNT : 0;
     const kgCal   = nc * areaHa * 1000;
     const sacCal  = Math.ceil(ajustarSacosMinimos(kgCal / 50));
     let custoStr = '';
@@ -303,7 +303,7 @@ function calcular() {
           <span class="plj-card-icone">⚪</span>
           <div class="plj-card-info">
             <div class="plj-card-nome">Calcário</div>
-            <div class="plj-card-detalhe">V% já ≥ 60% — sem necessidade de calagem</div>
+            <div class="plj-card-detalhe">V% já ≥ 50% — sem necessidade de calagem</div>
           </div>
           <div class="plj-card-qty"><span class="plj-card-qty-val">—</span></div>
          </div>`
@@ -311,7 +311,7 @@ function calcular() {
           <span class="plj-card-icone">⚪</span>
           <div class="plj-card-info">
             <div class="plj-card-nome">Calcário (PRNT ${fmt(PRNT,0)}%)</div>
-            <div class="plj-card-detalhe">V1=${fmt(V1,1)}% → meta 60% · NC=${fmt(nc,2)} t/ha · ${fmt(kgCal,1)} kg total${custoStr}</div>
+            <div class="plj-card-detalhe">V1=${fmt(V1,1)}% → meta 50% · NC=${fmt(nc,2)} t/ha · ${fmt(kgCal,1)} kg total${custoStr}</div>
           </div>
           <div class="plj-card-qty">
             <span class="plj-card-qty-val">${sacCal}</span>
